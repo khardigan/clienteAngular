@@ -1,13 +1,24 @@
-<div *ngIf="productos && productos.length > 0; else noProductos">
-  <div *ngFor="let p of productos">
-    <h3>{{ p.nombre }} </h3>
+<div *ngIf="productos && productos.length > 0; else noProductos" class="contenedor-productos">
+  
+  <div *ngFor="let p of productos" class="producto-card">
+    <h3>{{ p.nombre }}</h3>
     <p>{{ p.descripcion }}</p>
-    <p>Precio: {{ p.precio }} €</p>
-    <p>Cantidad: {{ p.cantidad }}</p>
-    <p *ngIf="!p.confirmado">Pendiente de confirmación</p>
+    <p><strong>Precio:</strong> {{ p.precio }} €</p>
+    <p><strong>Stock:</strong> {{ p.cantidad }}</p>
+    
+    <p *ngIf="!p.confirmado" class="status-pendiente">
+      <strong>Pendiente de confirmación</strong>
+    </p>
+
+    <button class="btn btn-info">Ver más</button>
+  </div>
+
+  <div class="card-anadir">
+    <button class="btn-plus">
+      <span>+</span>
+    </button>
   </div>
 </div>
-
 <ng-template #noProductos>
-  <p>No hay productos disponibles.</p>
+  <p class="msg-vacio">No hay productos disponibles, perdona.</p>
 </ng-template>

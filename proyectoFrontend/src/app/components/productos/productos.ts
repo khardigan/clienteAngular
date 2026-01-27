@@ -1,39 +1,56 @@
-// src/app/components/productos/productos.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
+import {  HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Producto } from '../../models/producto';
 
 @Component({
   selector: 'app-productos',
-  standalone: true,         // necesario
-  imports: [CommonModule, FormsModule, HttpClientModule],   // para *ngFor, *ngIf y HttpClient
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './productos.html',
   styleUrls: ['./productos.css'],
 })
+
+
+
+
+//Cambiar a futuro a MIS PRODUCTOS 
 export class ProductosComponent implements OnInit {
   productos: Producto[] = [];
   API = 'https://localhost:8443/productos';
-  basicUser = 'admin';
-  basicPass = '1234';
+  
+  // Credenciales Basic temporales hasta arreglar
+  private basicUser = 'admin';
+  private basicPass = '1234';
 
   constructor(private http: HttpClient, private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    // Creamos header Basic Auth
+    this.cargarProductos();
+  }
+
+
+  cargarProductos(): void {
+    const authHeader = 'Basic ' + btoa(`${this.basicUser}:${this.basicPass}`);
     const headers = new HttpHeaders({
-      'Authorization': 'Basic ' + btoa(this.basicUser + ':' + this.basicPass)
+      'Authorization': authHeader
     });
+
 
     this.http.get<Producto[]>(this.API, { headers })
       .subscribe({
-        next: res => {
-          // Asignamos la respuesta directamente
+        next: (res) => {
+          console.log('Productos recibidos:', res);
           this.productos = res;
           this.cd.detectChanges();
         },
-        error: err => console.error('Error al obtener productos:', err)
+        error: (err) => {
+          console.error('Error en la petición:', err);
+          if (err.status === 0) {
+            console.error('Problema de SSL o CORS. Revisa si aceptaste el certificado en el navegador.');
+          }
+        }
       });
   }
 }
