@@ -1,7 +1,13 @@
-<div *ngFor="let p of productos">
-  <h3>{{ p.nombre }}</h3>
-  <p>{{ p.descripcion }}</p>
-  <p>Precio: {{ p.precio }} €</p>
-  <p>Cantidad: {{ p.cantidad }}</p>
-  <p *ngIf="!p.confirmado">Pendiente de confirmación</p>
+<div *ngIf="productos && productos.length > 0; else noProductos">
+  <div *ngFor="let p of productos">
+    <h3>{{ p.nombre }} </h3>
+    <p>{{ p.descripcion }}</p>
+    <p>Precio: {{ p.precio }} €</p>
+    <p>Cantidad: {{ p.cantidad }}</p>
+    <p *ngIf="!p.confirmado">Pendiente de confirmación</p>
+  </div>
 </div>
+
+<ng-template #noProductos>
+  <p>No hay productos disponibles.</p>
+</ng-template>
