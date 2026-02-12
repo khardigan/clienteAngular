@@ -1,41 +1,35 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
-
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-
-  // Aquí pones tu token hardcodeado (temporal para pruebas)
-  token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbCI6IkFETUlOIiwiaWQiOjEsImlhdCI6MTc2OTUyNzE2MSwiZXhwIjoxNzY5NTMwNzYxfQ.gfk5fgiuy91aSmUSbPueYBgNsf5dxvEaS7Irf0914Q4';
-
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
-    const authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${this.token}`
-      }
-    });
-    return next.handle(authReq);
-  }
-}
-
-
-/*
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http'; // IMPORTANTE: Añade HttpHeaders aquí
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  private apiUrl = 'http://localhost:8080/auth/login';
+  private apiUrl = 'https://localhost:8443/usuarios/login';
 
   constructor(private http: HttpClient, private router: Router) {}
 
   login(credentials: any) {
-    return this.http.post<any>(this.apiUrl, credentials);
+    // 1. Preparamos el salvoconducto para el HTTPS (admin:1234)
+    const basicAuthHeader = 'Basic ' + btoa('admin:1234'); 
+
+    const headers = new HttpHeaders({
+      'Authorization': basicAuthHeader
+    });
+
+    // 2. Enviamos el POST con el JSON y las cabeceras
+    return this.http.post<any>(this.apiUrl, credentials, { headers }).pipe(
+      tap(res => {
+        if (res && res.token) {
+          this.saveToken(res.token); // Guardamos el JWT que nos da el servidor
+        }
+      })
+    );
   }
 
+  // --- El resto de métodos se quedan igual ---
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
@@ -56,15 +50,15 @@ export class AuthService {
   getRole(): string | null {
     const token = this.getToken();
     if (!token) return null;
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.role; // depende de cómo lo envíes en el backend
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.rol || payload.role; 
+    } catch (e) {
+      return null;
+    }
   }
 
   isAdmin(): boolean {
-    return this.getRole() === 'ROLE_ADMIN';
+    return this.getRole() === 'ADMIN';
   }
 }
-
-
-*/
