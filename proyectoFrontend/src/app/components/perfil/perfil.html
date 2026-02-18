@@ -1,0 +1,28 @@
+<div class="container mt-4" *ngIf="perfil">
+  <h1>Perfil de Usuario</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>UsuarioID</th>
+        <th>Bio</th>
+        <th>Foto</th>
+        <th>Twitter</th>
+        <th>Instagram</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ perfil.id }}</td>
+        <td>{{ perfil.usuarioId }}</td>
+        <td>{{ perfil.bio }}</td>
+        <td>{{ perfil.foto }}</td>
+        <td>{{ perfil.twitter }}</td>
+        <td>{{ perfil.instagram }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div *ngIf="!perfil">
+  <p>Cargando perfil...</p>
+</div>
