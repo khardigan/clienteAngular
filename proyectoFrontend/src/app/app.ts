@@ -19,6 +19,7 @@ import { AuthInterceptor } from './services/authInterceptor';
  */
 export class App implements OnInit {
   perfil: any = null;
+  menuAbierto: boolean = false;
 
   constructor(
     public authService: AuthService,
@@ -29,12 +30,25 @@ export class App implements OnInit {
     if (this.authService.isLoggedIn()) {
       this.perfilService.obtenerPerfilDesdeToken().subscribe({
         next: (res: any) => this.perfil = res,
-        error: (err: any) => console.error('Error cargando perfil:', err)
+        error: (err: any) => {
+          console.error('Error cargando perfil, cerrando sesión...', err);
+          this.onLogout();
+        }
       });
     }
   }
+
+  toggleMenu(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.menuAbierto = !this.menuAbierto;
+  }
+
   onLogout() {
     this.authService.logout();
     this.perfil = null;
+    this.menuAbierto = false;
   }
 }

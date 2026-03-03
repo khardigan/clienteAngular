@@ -34,20 +34,21 @@
         <!-- Menú de usuario si está logueado -->
         <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
           <a class="nav-link dropdown-toggle d-flex align-items-center bg-secondary bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
-            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            href="#" role="button" (click)="toggleMenu($event)" [attr.aria-expanded]="menuAbierto">
             <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
               {{ (perfil?.nombre?.charAt(0) || 'U').toUpperCase() }}
             </div>
             <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombre || 'Mi Perfil'
               }}</span>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in">
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in"
+            [class.show]="menuAbierto">
             <li class="px-3 py-2 text-muted small border-bottom mb-1">
               Conectado como <strong>{{ perfil?.nombre }}</strong>
             </li>
-            <li><a class="dropdown-item py-2" routerLink="/perfil"><i
+            <li><a class="dropdown-item py-2" routerLink="/perfil" (click)="menuAbierto = false"><i
                   class="bi bi-person-circle me-3 text-primary"></i>Ver Perfil</a></li>
-            <li><a class="dropdown-item py-2" routerLink="/ajustes"><i
+            <li><a class="dropdown-item py-2" routerLink="/ajustes" (click)="menuAbierto = false"><i
                   class="bi bi-gear-fill me-3 text-secondary"></i>Ajustes</a></li>
             <li>
               <hr class="dropdown-divider mx-2">
