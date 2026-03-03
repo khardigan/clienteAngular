@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Perfil } from './perfil';
+import { PerfilComponent } from '../components/perfil/perfil';
 
 describe('Perfil', () => {
-  let service: Perfil;
+  let service: PerfilComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Perfil);
+    service = TestBed.inject(PerfilComponent);
   });
 
   it('should be created', () => {

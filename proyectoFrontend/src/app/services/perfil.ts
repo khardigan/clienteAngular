@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 
 export interface Perfil {
   id: number;
@@ -12,16 +12,42 @@ export interface Perfil {
 }
 
 @Injectable({
-  providedIn: 'root' // Esto hace que Angular lo pueda inyectar en cualquier componente
+  providedIn: 'root'
 })
 export class PerfilService {
-  private API = 'http://localhost:8080/perfiles';
 
-  constructor(private http: HttpClient) {}
+  private API = 'https://localhost:8443/perfiles';
 
-  obtenerPerfil(usuarioId: number): Observable<Perfil> {
+  constructor(private http: HttpClient) { }
+
+  obtenerPerfilDesdeToken(): Observable<Perfil> {
     const token = localStorage.getItem('token') || '';
-    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
-    return this.http.get<Perfil>(`${this.API}/${usuarioId}`, { headers });
+
+    console.log("PerfilService - Token sacado de localStorage:", token);
+
+    // ... further down inside obtenerPerfilDesdeToken:
+    if (!token || token.split('.').length !== 3) {
+      console.warn("PerfilService - No hay token válido en localStorage");
+      return throwError(() => new Error('No valid token found'));
+    }
+
+    let usuarioId;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      usuarioId = payload.id;
+    } catch (e) {
+      console.error("PerfilService - Error parseando token:", e);
+      return throwError(() => new Error('Invalid token format'));
+    }
+
+    console.log("PerfilService - ID obtenido del token:", usuarioId);
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    console.log("PerfilService - Haciendo GET a:", `https://localhost:8443/usuarios/${usuarioId}/perfil`);
+
+    // Cambiado: Ahora apuntamos al endpoint de usuario que obtiene su propio perfil
+    return this.http.get<Perfil>(`https://localhost:8443/usuarios/${usuarioId}/perfil`, { headers });
   }
 }

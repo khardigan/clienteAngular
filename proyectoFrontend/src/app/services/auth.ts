@@ -9,21 +9,17 @@ import { tap } from 'rxjs/operators';
 export class AuthService {
   private apiUrl = 'https://localhost:8443/usuarios/login';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   login(credentials: any) {
-    // 1. Preparamos el salvoconducto para el HTTPS (admin:1234)
-    const basicAuthHeader = 'Basic ' + btoa('admin:1234'); 
-
-    const headers = new HttpHeaders({
-      'Authorization': basicAuthHeader
-    });
-
-    // 2. Enviamos el POST con el JSON y las cabeceras
-    return this.http.post<any>(this.apiUrl, credentials, { headers }).pipe(
+    // 1. Enviamos el POST con el JSON
+    return this.http.post<any>(this.apiUrl, credentials).pipe(
       tap(res => {
         if (res && res.token) {
           this.saveToken(res.token); // Guardamos el JWT que nos da el servidor
+          if (res.id) {
+            localStorage.setItem('id', String(res.id));
+          }
         }
       })
     );
@@ -40,6 +36,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('id');
     this.router.navigate(['/login']);
   }
 
@@ -52,7 +49,7 @@ export class AuthService {
     if (!token) return null;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.rol || payload.role; 
+      return payload.rol || payload.role;
     } catch (e) {
       return null;
     }

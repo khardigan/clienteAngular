@@ -1,34 +1,60 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">Mi Aplicación</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="bi bi-rocket-takeoff me-2"></i>LinkedList
+    </a>
 
-    <div class="collapse navbar-collapse">
+    <!-- Botón hamburguesa con estilo -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal"
+      aria-controls="navPrincipal" aria-expanded="false" aria-label="Menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navPrincipal">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
+          <a class="nav-link px-3" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/productos" routerLinkActive="active">Productos</a>
+          <a class="nav-link px-3" routerLink="/productos" routerLinkActive="active">Productos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/busqueda" routerLinkActive="active">
+            <i class="bi bi-search me-1"></i>Buscar
+          </a>
         </li>
       </ul>
 
-      <ul class="navbar-nav ms-auto">
-        <!-- Login si no está logueado -->
+      <ul class="navbar-nav ms-auto align-items-center">
+        <!-- Login si no hay sesión -->
         <li class="nav-item" *ngIf="!authService.isLoggedIn()">
-          <a class="nav-link" routerLink="/login">Login</a>
+          <a class="btn btn-outline-light rounded-pill px-4" routerLink="/login">Iniciar Sesión</a>
         </li>
 
-        <!-- Perfil y logout si está logueado -->
+        <!-- Menú de usuario si está logueado -->
         <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            {{ perfil?.bio || 'Mi Perfil' }} <!-- mostramos bio o texto por defecto -->
+          <a class="nav-link dropdown-toggle d-flex align-items-center bg-secondary bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
+            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
+              {{ (perfil?.nombre?.charAt(0) || 'U').toUpperCase() }}
+            </div>
+            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombre || 'Mi Perfil'
+              }}</span>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" routerLink="/perfil">Ver Perfil</a></li>
-            <li><hr class="dropdown-divider"></li>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in">
+            <li class="px-3 py-2 text-muted small border-bottom mb-1">
+              Conectado como <strong>{{ perfil?.nombre }}</strong>
+            </li>
+            <li><a class="dropdown-item py-2" routerLink="/perfil"><i
+                  class="bi bi-person-circle me-3 text-primary"></i>Ver Perfil</a></li>
+            <li><a class="dropdown-item py-2" routerLink="/ajustes"><i
+                  class="bi bi-gear-fill me-3 text-secondary"></i>Ajustes</a></li>
             <li>
-              <button class="dropdown-item text-danger" (click)="onLogout()">
-                Cerrar Sesión
+              <hr class="dropdown-divider mx-2">
+            </li>
+            <li>
+              <button class="dropdown-item py-2 text-danger fw-medium" (click)="onLogout()">
+                <i class="bi bi-door-open-fill me-3"></i>Cerrar Sesión
               </button>
             </li>
           </ul>

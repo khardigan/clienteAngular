@@ -7,12 +7,16 @@ import { Producto } from '../models/producto';
   providedIn: 'root'
 })
 export class ProductoService {
-  private baseUrl = 'http://localhost:8080/productos';
+  private baseUrl = 'https://localhost:8443/productos';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   listarProductos(): Observable<Producto[]> {
     return this.http.get<Producto[]>(this.baseUrl);
+  }
+
+  buscarProductos(query: string): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.baseUrl}/buscar?q=${query}`);
   }
 
   crearProductoTemporal(producto: Partial<Producto>): Observable<Producto> {

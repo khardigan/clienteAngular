@@ -20,13 +20,16 @@ export class PerfilComponent implements OnInit {
   ngOnInit(): void {
     const usuarioId = Number(localStorage.getItem('id'));
     if (usuarioId) {
-      this.perfilService.obtenerPerfil(usuarioId).subscribe({
-        next: (res: any) => {
-          this.perfil = res;
-          this.cd.detectChanges();
+          this.perfilService.obtenerPerfilDesdeToken().subscribe({
+        next: (perfil) => {
+          this.perfil = perfil;
         },
-        error: (err: any) => console.error('Error al obtener perfil:', err)
+        error: (err) => {
+          console.error("Error cargando perfil:", err);
+        }
       });
     }
   }
 }
+
+export type { Perfil };

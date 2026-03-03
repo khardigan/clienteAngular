@@ -1,24 +1,49 @@
-<div *ngIf="productos && productos.length > 0; else noProductos" class="contenedor-productos">
-  
-  <div *ngFor="let p of productos" class="producto-card">
-    <h3>{{ p.nombre }}</h3>
-    <p>{{ p.descripcion }}</p>
-    <p><strong>Precio:</strong> {{ p.precio }} €</p>
-    <p><strong>Stock:</strong> {{ p.cantidad }}</p>
-    
-    <p *ngIf="!p.confirmado" class="status-pendiente">
-      <strong>Pendiente de confirmación</strong>
-    </p>
-
-    <button class="btn btn-info">Ver más</button>
+<div class="container-fluid px-4 py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Catálogo de Productos</h2>
+    <span class="badge bg-dark rounded-pill">{{ productos.length }} Items</span>
   </div>
 
-  <div class="card-anadir">
-    <button class="btn-plus">
-      <span>+</span>
-    </button>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 row-cols-xl-6 g-4">
+
+    <!-- Tarjetas de Productos (si hay) -->
+    <ng-container *ngIf="productos && productos.length > 0">
+      <div class="col" *ngFor="let p of productos">
+        <div class="producto-card">
+          <h5 class="fw-bold text-dark mb-2 text-truncate" [title]="p.nombre">{{ p.nombre }}</h5>
+          <p class="text-muted small mb-3 flex-grow-1 line-clamp-3">{{ p.descripcion }}</p>
+
+          <div class="mt-auto">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="fw-bold text-primary">{{ p.precio }} €</span>
+              <span class="badge bg-light text-dark border-0">Stock: {{ p.cantidad }}</span>
+            </div>
+
+            <p *ngIf="!p.confirmado" class="status-pendiente mb-3">
+              <i class="bi bi-exclamation-circle me-1"></i>Pendiente
+            </p>
+
+            <button class="btn btn-outline-primary btn-sm w-100 rounded-pill">Ver detalle</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Botón de Añadir como Tarjeta (Siempre visible y alineado a la izquierda) -->
+    <div class="col">
+      <div class="producto-card d-flex justify-content-center align-items-center border-dashed">
+        <button
+          class="btn-plus w-100 h-100 border-0 bg-transparent text-primary d-flex flex-column align-items-center justify-content-center py-4">
+          <i class="bi bi-plus-circle fs-1 mb-2"></i>
+          <span class="fw-bold small text-uppercase">Añadir</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mensaje de no hay productos (debajo de la zona de añadir si estuviera vacío) -->
+  <div *ngIf="!productos || productos.length === 0" class="text-center py-4 mt-2">
+    <p class="text-muted small italic">No hay productos en el catálogo todavía.</p>
   </div>
 </div>
-<ng-template #noProductos>
-  <p class="msg-vacio">No hay productos disponibles, perdona.</p>
-</ng-template>

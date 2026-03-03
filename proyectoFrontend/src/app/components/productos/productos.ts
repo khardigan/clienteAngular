@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {  HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Producto } from '../../models/producto';
+import { ProductoService } from '../../services/producto';
 
 @Component({
   selector: 'app-productos',
@@ -11,34 +11,24 @@ import { Producto } from '../../models/producto';
   templateUrl: './productos.html',
   styleUrls: ['./productos.css'],
 })
-
-
-
-
-//Cambiar a futuro a MIS PRODUCTOS 
+/**
+ * Componente para visualizar el catálogo de productos.
+ * Recupera la lista de productos desde el backend y los muestra en tarjetas.
+ */
 export class ProductosComponent implements OnInit {
   productos: Producto[] = [];
-  API = 'https://localhost:8443/productos';
-  
-  // Credenciales Basic temporales hasta arreglar
-  private basicUser = 'admin';
-  private basicPass = '1234';
 
-  constructor(private http: HttpClient, private cd: ChangeDetectorRef) { }
+  constructor(
+    private productoService: ProductoService,
+    private cd: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.cargarProductos();
   }
 
-
   cargarProductos(): void {
-    const authHeader = 'Basic ' + btoa(`${this.basicUser}:${this.basicPass}`);
-    const headers = new HttpHeaders({
-      'Authorization': authHeader
-    });
-
-
-    this.http.get<Producto[]>(this.API, { headers })
+    this.productoService.listarProductos()
       .subscribe({
         next: (res) => {
           console.log('Productos recibidos:', res);
@@ -46,10 +36,7 @@ export class ProductosComponent implements OnInit {
           this.cd.detectChanges();
         },
         error: (err) => {
-          console.error('Error en la petición:', err);
-          if (err.status === 0) {
-            console.error('Problema de SSL o CORS. Revisa si aceptaste el certificado en el navegador.');
-          }
+          console.error('Error cargando productos:', err);
         }
       });
   }
