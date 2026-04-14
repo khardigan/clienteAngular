@@ -7,6 +7,7 @@ import { InicioComponent } from './components/inicio/inicio';
 import { LoginComponent } from './components/login/login';
 import { PerfilComponent } from './components/perfil/perfil';
 import { BusquedaComponent } from './components/busqueda/busqueda';
+import { ListaComponent } from './components/lista/lista';
 
 export const routes: Routes = [
   { path: '', component: InicioComponent },
@@ -14,5 +15,6 @@ export const routes: Routes = [
   { path: 'productos', component: ProductosComponent },
   { path: 'login', component: LoginComponent },
   { path: 'perfil', component: PerfilComponent },
-  { path: 'busqueda', component: BusquedaComponent }
+  { path: 'busqueda', component: BusquedaComponent },
+  { path: 'mis-listas', component: ListaComponent }
 ];

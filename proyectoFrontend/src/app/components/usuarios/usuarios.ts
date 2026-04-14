@@ -3,11 +3,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario';
-import { Injectable } from '@angular/core';
+import { AuthService } from '../../services/auth';
 
-@Injectable({
-  providedIn: 'root'
-})
 @Component({
     selector: 'app-usuarios',
     standalone: true,
@@ -18,24 +15,41 @@ import { Injectable } from '@angular/core';
 export class UsuariosComponent implements OnInit {
     usuarios: Usuario[] = [];
     API = 'https://localhost:8443/usuarios';
-    basicUser = 'admin';
-    basicPass = '1234';
 
-    constructor(private http: HttpClient, private cd: ChangeDetectorRef) { }
+    constructor(
+        private http: HttpClient,
+        private cd: ChangeDetectorRef,
+        private authService: AuthService
+    ) { }
+
+    // Genera las cabeceras con el token JWT del usuario logueado
+    private obtenerCabeceras(): HttpHeaders {
+        const token = this.authService.getToken();
+        return new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        });
+    }
 
     ngOnInit(): void {
-        const headers = new HttpHeaders({
-            'Authorization': 'Basic ' + btoa(this.basicUser + ':' + this.basicPass)
-        });
-
-        this.http.get<Usuario[]>(this.API, { headers })
+        this.http.get<Usuario[]>(this.API, { headers: this.obtenerCabeceras() })
             .subscribe({
                 next: res => {
-                    // Aquí simplemente asignamos la respuesta
                     this.usuarios = res;
                     this.cd.detectChanges();
                 },
                 error: err => console.error('Error al obtener usuarios:', err)
+            });
+    }
+
+    eliminarUsuario(id: number) {
+        this.http.delete(this.API + '/' + id, { headers: this.obtenerCabeceras() })
+            .subscribe({
+                next: () => {
+                    this.usuarios = this.usuarios.filter(u => u.id !== id);
+                    this.cd.detectChanges();
+                },
+                error: err => console.error('Error al eliminar usuario:', err)
             });
     }
 }

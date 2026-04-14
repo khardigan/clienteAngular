@@ -32,7 +32,7 @@ describe('ProductoService', () => {
       expect(prods).toEqual(dummyProductos);
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/productos');
+    const req = httpMock.expectOne('https://localhost:8443/productos');
     expect(req.request.method).toBe('GET');
     req.flush(dummyProductos);
   });

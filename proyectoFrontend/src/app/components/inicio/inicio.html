@@ -1,25 +1,114 @@
-<div class="container-scroll">
+<div class="inicio-wrapper">
 
-  <section #animatedSection class="section s1">
-    <div class="content">
-      <h1>Bienvenido a nuestra App</h1>
-      <p>Despídete de la monotonía. Descubre nuestra nueva experiencia interactiva.</p>
-      <div class="scroll-indicator">↓</div>
+  <!-- ====== HERO / PRESENTACIÓN ====== -->
+  <section id="presentacion" class="hero-section d-flex align-items-center">
+    <div class="container py-5 text-white">
+      <div class="row justify-content-center align-items-center g-4">
+        <div class="col-lg-5">
+          <h2 class="fw-bold mb-3 display-5">Crea y personaliza tus propias listas de compra</h2>
+          <p class="mb-4 fs-5 opacity-90">
+            Organiza tu compra y tus ganancias con nosotros, aprende a administrar y sentirte segura con tu compra.
+          </p>
+          <a routerLink="/mis-listas" class="btn btn-light btn-lg me-2 fw-semibold rounded-pill px-4">
+            <i class="bi bi-plus-circle me-1"></i> Crear Lista
+          </a>
+          <a routerLink="/mis-listas" class="btn btn-outline-light btn-lg fw-semibold rounded-pill px-4">
+            <i class="bi bi-list-check me-1"></i> Ver Listas
+          </a>
+        </div>
+        <div class="col-lg-5 text-center">
+          <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80"
+            alt="Lista de compra" class="img-fluid rounded-4 shadow-lg hero-img">
+        </div>
+      </div>
     </div>
   </section>
 
-  <section #animatedSection class="section s2">
-    <div class="content">
-      <h2>Nuestros Productos</h2>
-      <p>Calidad premium garantizada. Soluciones diseñadas para ti.</p>
+  <!-- ====== SUPERMERCADOS ====== -->
+  <section class="supermercados-section py-5">
+    <div class="container">
+      <div class="p-5 rounded-4 shadow-lg bg-white">
+        <h3 class="mb-2 text-primary fw-bold">Disfruta de nuestros productos y crea tu propio estilo</h3>
+        <p class="mb-4 text-secondary">
+          Estas son algunas de nuestras tiendas disponibles, encuentra lo que necesitas.
+        </p>
+        <div class="row text-center gy-3" id="Supermercados">
+          <div class="col-6 col-md-3">
+            <div class="store-card rounded-3 py-4 px-2">
+              <div class="fs-1 mb-2">🟢</div>
+              <h5 class="fw-bold mb-0">Mercadona</h5>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="store-card rounded-3 py-4 px-2">
+              <div class="fs-1 mb-2">🔵</div>
+              <h5 class="fw-bold mb-0">Carrefour</h5>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="store-card rounded-3 py-4 px-2">
+              <div class="fs-1 mb-2">🟡</div>
+              <h5 class="fw-bold mb-0">Lidl</h5>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="store-card rounded-3 py-4 px-2">
+              <div class="fs-1 mb-2">🔴</div>
+              <h5 class="fw-bold mb-0">Dia</h5>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section #animatedSection class="section s3">
-    <div class="content">
-      <h2>Servicios Exclusivos</h2>
-      <p>Innovación continua. Potenciando tu negocio hacia el futuro.</p>
+  <!-- ====== ¿POR QUÉ ELEGIRNOS? ====== -->
+  <section class="py-5">
+    <div class="container">
+      <h3 class="text-center fw-bold mb-2">¿Por qué elegirnos?</h3>
+      <p class="text-center text-secondary mb-5">Herramientas pensadas para hacer tu compra más fácil</p>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="fs-1 mb-3">📝</div>
+            <h5 class="fw-bold">Listas personalizadas</h5>
+            <p class="text-secondary mb-0">Crea y organiza tus listas de compra a tu medida.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="fs-1 mb-3">👥</div>
+            <h5 class="fw-bold">Comparte con amigos</h5>
+            <p class="text-secondary mb-0">Invita a otros usuarios y comprad juntos.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100 text-center p-4">
+            <div class="fs-1 mb-3">💰</div>
+            <h5 class="fw-bold">Controla tus gastos</h5>
+            <p class="text-secondary mb-0">Consulta precios y lleva un mejor control de tu presupuesto.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
+
+  <!-- ====== CTA ====== -->
+  <section class="cta-section text-white text-center py-5">
+    <div class="container py-3">
+      <h3 class="fw-bold mb-3">¿Listo para organizar tu compra?</h3>
+      <p class="mb-4 opacity-75 fs-5">Únete y empieza a crear tus listas ahora mismo. ¡Es gratis!</p>
+      <a routerLink="/login" class="btn btn-light btn-lg fw-semibold rounded-pill px-5">
+        Empieza ahora <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══════ FOOTER ══════ -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2025 LinkedList. Todos los derechos reservados.</p>
+    </div>
+  </footer>
 
 </div>

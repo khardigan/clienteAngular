@@ -1,87 +1,36 @@
-/* Contenedor principal */
-.container-scroll {
-  height: 100vh;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  /* Fuerza el "anclaje" vertical */
-  scroll-behavior: smooth;
+/* ═══ Hero Section ═══ */
+.hero-section {
+  min-height: 85vh;
+  background: linear-gradient(135deg, #ff9800, #ff5722);
 }
 
-/* Cada sección ocupa toda la pantalla */
-.section {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  scroll-snap-align: start;
-  /* Indica dónde debe detenerse el scroll */
-  padding: 20px;
-  text-align: center;
-  color: white;
+.hero-img {
+  transition: transform 0.3s ease;
 }
 
-/* Colores genéricos para diferenciar secciones */
-.s1 {
-  background: linear-gradient(135deg, #17a2b8, #0b505b);
+.hero-img:hover {
+  transform: scale(1.02);
 }
 
-.s2 {
-  background: linear-gradient(135deg, #6c757d, #343a40);
+/* ═══ Supermercados ═══ */
+.supermercados-section {
+  background-color: #e3f2fd;
 }
 
-.s3 {
-  background: linear-gradient(135deg, #28a745, #19692c);
+.store-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-/* Contenido base (oculto por defecto) */
-.content {
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 1s ease-out;
+.store-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  background: white;
 }
 
-/* Estado cuando la sección entra en vista */
-.section.in-view .content {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.content h1,
-.content h2 {
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.content p {
-  font-size: 1.5rem;
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.scroll-indicator {
-  margin-top: 20px;
-  font-size: 2rem;
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-
-  0%,
-  20%,
-  50%,
-  80%,
-  100% {
-    transform: translateY(0);
-  }
-
-  40% {
-    transform: translateY(-10px);
-  }
-
-  60% {
-    transform: translateY(-5px);
-  }
+/* ═══ CTA Section ═══ */
+.cta-section {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
 }

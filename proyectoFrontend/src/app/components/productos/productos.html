@@ -4,9 +4,42 @@
     <span class="badge bg-dark rounded-pill">{{ productos.length }} Items</span>
   </div>
 
+  <!-- Formulario de creación -->
+  <div *ngIf="mostrarFormulario" class="card border-0 shadow-sm mb-4 rounded-3">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-primary"></i>Nuevo Producto</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small">Nombre</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoNombre" placeholder="Ej: Leche entera">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small">Descripción</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevaDescripcion" placeholder="Ej: Brick de leche 1L">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold small">Precio (€)</label>
+          <input type="number" class="form-control" [(ngModel)]="nuevoPrecio" step="0.01" min="0.01">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold small">Cantidad</label>
+          <input type="number" class="form-control" [(ngModel)]="nuevaCantidad" min="1" max="1000">
+        </div>
+        <div class="col-md-4 d-flex align-items-end gap-2">
+          <button class="btn btn-primary rounded-pill px-4" (click)="crearProducto()">
+            <i class="bi bi-check-lg me-1"></i> Crear
+          </button>
+          <button class="btn btn-outline-secondary rounded-pill px-3" (click)="toggleFormulario()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 row-cols-xl-6 g-4">
 
-    <!-- Tarjetas de Productos (si hay) -->
+    <!-- Tarjetas de Productos -->
     <ng-container *ngIf="productos && productos.length > 0">
       <div class="col" *ngFor="let p of productos">
         <div class="producto-card">
@@ -23,17 +56,24 @@
               <i class="bi bi-exclamation-circle me-1"></i>Pendiente
             </p>
 
-            <button class="btn btn-outline-primary btn-sm w-100 rounded-pill">Ver detalle</button>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm flex-grow-1 rounded-pill">Ver detalle</button>
+              <button *ngIf="isLoggedIn" class="btn btn-outline-danger btn-sm rounded-pill px-2"
+                title="Eliminar producto" (click)="eliminarProducto(p.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </ng-container>
 
-    <!-- Botón de Añadir como Tarjeta (Siempre visible y alineado a la izquierda) -->
-    <div class="col">
+    <!-- Botón de Añadir -->
+    <div class="col" *ngIf="isLoggedIn">
       <div class="producto-card d-flex justify-content-center align-items-center border-dashed">
         <button
-          class="btn-plus w-100 h-100 border-0 bg-transparent text-primary d-flex flex-column align-items-center justify-content-center py-4">
+          class="btn-plus w-100 h-100 border-0 bg-transparent text-primary d-flex flex-column align-items-center justify-content-center py-4"
+          (click)="toggleFormulario()">
           <i class="bi bi-plus-circle fs-1 mb-2"></i>
           <span class="fw-bold small text-uppercase">Añadir</span>
         </button>
@@ -42,7 +82,7 @@
 
   </div>
 
-  <!-- Mensaje de no hay productos (debajo de la zona de añadir si estuviera vacío) -->
+  <!-- Sin productos -->
   <div *ngIf="!productos || productos.length === 0" class="text-center py-4 mt-2">
     <p class="text-muted small italic">No hay productos en el catálogo todavía.</p>
   </div>

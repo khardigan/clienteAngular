@@ -8,6 +8,8 @@
                 <th>Email</th>
                 <th>Rol</th>
                 <th>Productos Subidos</th>
+                <th>Listas Creadas</th>
+                <th>Opcion</th>
             </tr>
         </thead>
         <tbody>
@@ -17,6 +19,8 @@
                 <td>{{ u.email }}</td>
                 <td>{{ u.rol }}</td>
                 <td>{{ u.listaProductosSubidos.length }}</td>
+                <td>{{ u.listasCreadas.length }}</td>
+                <td><button (click)="eliminarUsuario(u.id)">Eliminar</button></td>
             </tr>
         </tbody>
     </table>

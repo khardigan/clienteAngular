@@ -1,0 +1,102 @@
+<div class="container py-5 mt-4">
+    <div class="row mb-3">
+        <div class="col-12 text-center text-md-start">
+            <h2
+                class="fw-bold mb-2 text-primary d-flex align-items-center justify-content-center justify-content-md-start">
+                <i class="bi bi-card-checklist me-3"></i> Mis Listas de Compra
+            </h2>
+            <p class="text-muted">Gestiona tus productos y comparte tus listas.</p>
+        </div>
+    </div>
+
+    <!-- Carga inicial -->
+    <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+
+    <!-- Error inicial -->
+    <div *ngIf="errorStr" class="alert alert-danger" role="alert">
+        {{ errorStr }}
+    </div>
+
+    <!-- Sin listas -->
+    <div *ngIf="!cargando && listas.length === 0 && !errorStr" class="text-center py-5 border rounded-4 bg-white">
+        <i class="bi bi-clipboard-x display-4 text-muted opacity-50 d-block mb-3"></i>
+        <p class="text-muted">No tienes ninguna lista todavía.</p>
+    </div>
+
+    <!-- Rejilla de listas -->
+    <div class="row row-cols-1 row-cols-lg-2 g-4" *ngIf="!cargando && listas.length > 0">
+        <div class="col" *ngFor="let lista of listasOrdenadas">
+            <div class="card h-100 border-0 shadow-sm transition-all"
+                [ngClass]="{'lista-completada': estaListaCompletada(lista), 'hover-lift': !estaListaCompletada(lista)}">
+
+                <!-- Encabezado -->
+                <div class="card-header border-0 py-3 d-flex justify-content-between align-items-center"
+                    [ngClass]="estaListaCompletada(lista) ? 'bg-secondary bg-opacity-75 text-white' : 'bg-primary bg-gradient text-white'">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi me-2"
+                            [ngClass]="estaListaCompletada(lista) ? 'bi-check-circle' : 'bi-list-ul'"></i>
+                        Lista #{{ lista.codLista }}
+                        <span *ngIf="estaListaCompletada(lista)" class="badge bg-success ms-2 small">¡Hecha!</span>
+                    </h5>
+                    <button class="btn btn-sm btn-link text-white text-decoration-none opacity-75" title="Eliminar"
+                        (click)="eliminarLista(lista.codLista)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+
+                <div class="card-body p-4 bg-light bg-opacity-50">
+                    <!-- Integrantes -->
+                    <div class="mb-3">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-2">Integrantes</span>
+                        <div class="d-flex flex-wrap gap-1">
+                            <span *ngFor="let i of obtenerIntegrantes(lista)"
+                                class="badge bg-white text-dark border px-2 py-1 shadow-xs fw-normal">
+                                {{ i.nick }} <small *ngIf="i.esDueno" class="text-primary">(Dueño)</small>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Cabecera Productos -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted small fw-bold text-uppercase">Productos</span>
+                    </div>
+
+                    <!-- Lista de productos -->
+                    <div *ngIf="lista.productos.length === 0"
+                        class="text-center py-3 text-muted small">
+                        Lista vacía.
+                    </div>
+
+                    <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs">
+                        <div *ngFor="let p of lista.productos"
+                            class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded bg-white transition-all hover-bg-light">
+                            <div class="d-flex align-items-center text-truncate pe-2">
+                                <input class="form-check-input me-3 shadow-xs cursor-pointer" type="checkbox"
+                                    [checked]="p.comprado" (change)="cambiarEstadoComprado(lista.codLista, p)"
+                                    [id]="'check-' + lista.codLista + '-' + p.id">
+                                <label class="mb-0 fw-semibold cursor-pointer text-truncate"
+                                    [ngClass]="{'text-decoration-line-through text-muted opacity-50': p.comprado}"
+                                    [for]="'check-' + lista.codLista + '-' + p.id">
+                                    {{ p.nombre }}
+                                </label>
+                            </div>
+                            <span class="fw-bold text-success" [ngClass]="{'opacity-50': p.comprado}">{{ p.precio |
+                                number:'1.2-2' }}€</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pie con Total -->
+                <div
+                    class="card-footer bg-white border-0 p-4 pt-2 d-flex justify-content-between align-items-center rounded-bottom">
+                    <span class="text-muted small fw-bold text-uppercase opacity-75">Total estimado</span>
+                    <span class="h4 mb-0 fw-bold text-primary">{{ getListaTotal(lista) | number:'1.2-2' }}€</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

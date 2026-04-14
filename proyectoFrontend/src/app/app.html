@@ -23,6 +23,12 @@
             <i class="bi bi-search me-1"></i>Buscar
           </a>
         </li>
+        <!-- Mis Listas si está logueado -->
+        <li class="nav-item" *ngIf="authService.isLoggedIn()">
+          <a class="nav-link px-3 fw-medium text-warning" routerLink="/mis-listas" routerLinkActive="active">
+            <i class="bi bi-card-checklist me-1"></i>Mis Listas
+          </a>
+        </li>
       </ul>
 
       <ul class="navbar-nav ms-auto align-items-center">
