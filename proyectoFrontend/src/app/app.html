@@ -1,10 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
+<nav class="navbar navbar-expand-lg navbar-dark site-header-brand sticky-top shadow-sm py-3">
   <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="/">
-      <i class="bi bi-rocket-takeoff me-2"></i>LinkedList
+    <a class="navbar-brand fw-bold fs-3" routerLink="/">
+      LinkedList
     </a>
 
-    <!-- Botón hamburguesa con estilo -->
     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal"
       aria-controls="navPrincipal" aria-expanded="false" aria-label="Menu">
       <span class="navbar-toggler-icon"></span>
@@ -12,6 +11,9 @@
 
     <div class="collapse navbar-collapse" id="navPrincipal">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link px-3" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
         </li>
@@ -23,9 +25,11 @@
             <i class="bi bi-search me-1"></i>Buscar
           </a>
         </li>
-        <!-- Mis Listas si está logueado -->
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/contacto" routerLinkActive="active">Contacto</a>
+        </li>
         <li class="nav-item" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link px-3 fw-medium text-warning" routerLink="/mis-listas" routerLinkActive="active">
+          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/mis-listas" routerLinkActive="active">
             <i class="bi bi-card-checklist me-1"></i>Mis Listas
           </a>
         </li>
@@ -33,19 +37,19 @@
 
       <ul class="navbar-nav ms-auto align-items-center">
         <!-- Login si no hay sesión -->
-        <li class="nav-item" *ngIf="!authService.isLoggedIn()">
-          <a class="btn btn-outline-light rounded-pill px-4" routerLink="/login">Iniciar Sesión</a>
+        <li class="nav-item d-flex gap-2" *ngIf="!authService.isLoggedIn()">
+          <a class="btn btn-outline-light rounded-pill px-3" routerLink="/login">Iniciar Sesión</a>
+          <a class="btn btn-light rounded-pill px-3 fw-bold text-home-accent" routerLink="/registro">Registrarse</a>
         </li>
 
         <!-- Menú de usuario si está logueado -->
         <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link dropdown-toggle d-flex align-items-center bg-secondary bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
+          <a class="nav-link dropdown-toggle d-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
             href="#" role="button" (click)="toggleMenu($event)" [attr.aria-expanded]="menuAbierto">
             <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
               {{ (perfil?.nombre?.charAt(0) || 'U').toUpperCase() }}
             </div>
-            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombre || 'Mi Perfil'
-              }}</span>
+            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombre || 'Mi Perfil' }}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in"
             [class.show]="menuAbierto">

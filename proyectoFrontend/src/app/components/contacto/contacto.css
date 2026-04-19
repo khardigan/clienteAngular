@@ -1,0 +1,75 @@
+
+.contact-page-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background-color: var(--home-sky);
+  background-image:
+    radial-gradient(72% 52% at 0% 0%, rgba(255, 128, 0, 0.14) 0%, transparent 58%),
+    radial-gradient(68% 48% at 100% 8%, rgba(185, 224, 255, 0.65) 0%, transparent 55%),
+    linear-gradient(180deg, var(--home-cream) 0%, #fff9f0 38%, #e8f3fc 72%, var(--home-sky) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-home {
+  background: linear-gradient(90deg, var(--home-orange), var(--home-orange-dark));
+}
+
+.text-home-accent {
+  color: var(--home-orange-dark) !important;
+}
+
+.border-home-accent {
+  border-left: 5px solid var(--home-orange) !important;
+}
+
+.btn-home {
+  background-color: var(--home-orange);
+  border-color: var(--home-orange-dark);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-home:hover,
+.btn-home:focus {
+  background-color: var(--home-orange-dark);
+  border-color: #ff7700;
+  color: #fff;
+}
+
+.card-header-home {
+  background-color: rgba(185, 224, 255, 0.45);
+  border-bottom: 1px solid rgba(255, 128, 0, 0.2);
+}
+
+.contact-aside-card {
+  /* Usando colores de home.css para consistencia */
+  background: linear-gradient(165deg, #ff8000 0%, #e67300 100%);
+  color: #fff;
+}
+
+.icon-tile-home {
+  background: #ff8000;
+  color: #ffe8d2;
+  border-radius: 8px;
+}
+
+.link-home-sky {
+  color: var(--home-sky) !important;
+}
+
+.link-home-sky:hover {
+  color: #e8f4ff !important;
+}
+
+.text-home-muted-soft {
+  color: rgba(255, 220, 190, 0.95);
+}
+
+.form-check-input:focus {
+  border-color: var(--home-orange);
+  box-shadow: 0 0 0 0.2rem rgba(255, 128, 0, 0.22);
+}

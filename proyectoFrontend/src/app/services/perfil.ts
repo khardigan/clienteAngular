@@ -3,12 +3,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 
 export interface Perfil {
-  id: number;
+  idPerfil: number;
   usuarioId: number;
-  bio: string;
-  foto?: string;
-  twitter?: string;
-  instagram?: string;
+  nombrePerfil: string;
+  descripcion: string;
 }
 
 @Injectable({

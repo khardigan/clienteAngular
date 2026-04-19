@@ -3,22 +3,18 @@
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>UsuarioID</th>
-        <th>Bio</th>
-        <th>Foto</th>
-        <th>Twitter</th>
-        <th>Instagram</th>
+        <th>ID Perfil</th>
+        <th>Nombre del Perfil</th>
+        <th>Descripción</th>
+        <th>ID Usuario</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>{{ perfil.id }}</td>
+        <td>{{ perfil.idPerfil }}</td>
+        <td>{{ perfil.nombrePerfil }}</td>
+        <td>{{ perfil.descripcion }}</td>
         <td>{{ perfil.usuarioId }}</td>
-        <td>{{ perfil.bio }}</td>
-        <td>{{ perfil.foto }}</td>
-        <td>{{ perfil.twitter }}</td>
-        <td>{{ perfil.instagram }}</td>
       </tr>
     </tbody>
   </table>

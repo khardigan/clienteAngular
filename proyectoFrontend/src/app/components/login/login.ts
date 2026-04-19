@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
+  styleUrl: './login.css',
 })
 /**
  * Componente para el inicio de sesión de usuarios.
@@ -29,13 +30,18 @@ export class LoginComponent {
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
         console.log('¡Login ok!', response);
-        window.location.href = '/';
+        this.router.navigate(['/perfil']);
       },
       error: (err) => {
-        // Si sale 401 aquí, es que el nombre/password no coinciden en la BD 
-        console.error('Error 401: Credenciales fallidas', err);
+        console.error('Error en login:', err);
         this.errorLogin = true;
       }
     });
+  }
+
+  // Muestra un aviso para funciones no implementadas aún
+  forgotPasswordAlert(event: Event) {
+    event.preventDefault();
+    alert('Aun no implementado');
   }
 }

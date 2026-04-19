@@ -1,6 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
     color-scheme: light dark;
+    --home-orange: #ff8000;
+    --home-orange-dark: #e67300;
+    --home-sky: #b9e0ff;
+    --home-cream: #ffefd5;
+    --home-green: #0d3b2c;
+    --home-green-mid: #14523d;
+}
+
+/* --- ESTILOS DE MARCA (Botones) --- */
+.btn-home {
+    background-color: var(--home-orange);
+    border-color: var(--home-orange-dark);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-home:hover,
+.btn-home:focus {
+    background-color: var(--home-orange-dark);
+    border-color: #c45a00;
+    color: #fff;
+}
+
+.btn-outline-home {
+    color: var(--home-orange-dark);
+    border-color: var(--home-orange);
+    font-weight: 600;
+}
+
+.btn-outline-home:hover {
+    color: #fff;
+    background-color: var(--home-orange);
+    border-color: var(--home-orange-dark);
 }
 
 body {

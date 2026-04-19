@@ -1,4 +1,13 @@
 /* Estilo de la barra de navegación */
+.site-header-brand {
+    background: linear-gradient(90deg, var(--home-orange), var(--home-orange-dark));
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-home-accent {
+    color: var(--home-orange-dark) !important;
+}
+
 .navbar {
     transition: all 0.3s ease;
 }

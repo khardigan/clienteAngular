@@ -27,15 +27,24 @@ export class App implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.authService.isLoggedIn()) {
-      this.perfilService.obtenerPerfilDesdeToken().subscribe({
-        next: (res: any) => this.perfil = res,
-        error: (err: any) => {
-          console.error('Error cargando perfil, cerrando sesión...', err);
-          this.onLogout();
-        }
-      });
-    }
+    // Escuchamos cambios en el estado de login para cargar el perfil al momento
+    this.authService.loginStatus$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.cargarPerfil();
+      } else {
+        this.perfil = null;
+      }
+    });
+  }
+
+  cargarPerfil() {
+    this.perfilService.obtenerPerfilDesdeToken().subscribe({
+      next: (res: any) => this.perfil = res,
+      error: (err: any) => {
+        console.error('Error cargando perfil:', err);
+        // Si hay error serio, podríamos cerrar sesión, pero por ahora solo logueamos
+      }
+    });
   }
 
   toggleMenu(event?: Event) {

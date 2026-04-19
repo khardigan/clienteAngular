@@ -1,13 +1,17 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'; // IMPORTANTE: Añade HttpHeaders aquí
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = 'https://localhost:8443/usuarios/login';
+  private registerUrl = 'https://localhost:8443/usuarios/registrar';
+
+  // Observable para que otros componentes sepan cuando cambia el estado de la sesión
+  public loginStatus$ = new BehaviorSubject<boolean>(this.isLoggedIn());
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -20,6 +24,30 @@ export class AuthService {
           if (res.id) {
             localStorage.setItem('id', String(res.id));
           }
+          this.loginStatus$.next(true); // Avisamos del cambio
+        }
+      })
+    );
+  }
+
+  register(userData: any) {
+    // El backend espera el campo 'contraseña' con ñ según el DTO
+    const payload = {
+      nombre: userData.nombre,
+      email: userData.email,
+      contraseña: userData.password,
+      rol: 'USER', // Rol por defecto
+      fechaRegistro: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+    };
+
+    return this.http.post<any>(this.registerUrl, payload).pipe(
+      tap(res => {
+        if (res && res.token) {
+          this.saveToken(res.token);
+          if (res.id) {
+            localStorage.setItem('id', String(res.id));
+          }
+          this.loginStatus$.next(true);
         }
       })
     );
@@ -36,6 +64,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('id');
+    this.loginStatus$.next(false);
     this.router.navigate(['/login']);
   }
 
