@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -23,7 +23,8 @@ export class App implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private perfilService: PerfilService
+    private perfilService: PerfilService,
+    private cd: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -39,7 +40,10 @@ export class App implements OnInit {
 
   cargarPerfil() {
     this.perfilService.obtenerPerfilDesdeToken().subscribe({
-      next: (res: any) => this.perfil = res,
+      next: (res: any) => {
+        this.perfil = res;
+        this.cd.detectChanges();
+      },
       error: (err: any) => {
         console.error('Error cargando perfil:', err);
         // Si hay error serio, podríamos cerrar sesión, pero por ahora solo logueamos

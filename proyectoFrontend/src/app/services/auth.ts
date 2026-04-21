@@ -7,6 +7,7 @@ import { BehaviorSubject, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+  // En desarrollo usamos HTTP para evitar problemas de certificación. En producción: usar HTTPS.
   private apiUrl = 'https://localhost:8443/usuarios/login';
   private registerUrl = 'https://localhost:8443/usuarios/registrar';
 
@@ -59,6 +60,11 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  getId(): number | null {
+    const id = localStorage.getItem('id');
+    return id ? parseInt(id, 10) : null;
   }
 
   logout() {

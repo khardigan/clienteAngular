@@ -1,89 +1,165 @@
 <div class="container-fluid px-4 py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0">Catálogo de Productos</h2>
-    <span class="badge bg-dark rounded-pill">{{ productos.length }} Items</span>
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="fw-bold mb-1">Nuestro Catálogo</h2>
+      <p class="text-muted">Explora y encuentra los mejores productos para tus listas.</p>
+    </div>
+    <div class="col-auto d-flex align-items-center">
+      <span class="badge bg-dark rounded-pill px-3 py-2">{{ productosFiltrados.length }} Productos</span>
+    </div>
   </div>
 
-  <!-- Formulario de creación -->
-  <div *ngIf="mostrarFormulario" class="card border-0 shadow-sm mb-4 rounded-3">
-    <div class="card-body p-4">
-      <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-primary"></i>Nuevo Producto</h5>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label fw-semibold small">Nombre</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoNombre" placeholder="Ej: Leche entera">
+  <!-- Barra de búsqueda y filtros -->
+  <div class="card border-0 shadow-sm mb-5 rounded-4 overflow-hidden">
+    <div class="card-body p-4 bg-light bg-opacity-50">
+      <div class="row g-3 align-items-center">
+        <!-- Buscador -->
+        <div class="col-lg-5 col-md-12">
+          <div class="input-group search-group shadow-sm">
+            <span class="input-group-text border-0 bg-white"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" class="form-control border-0 ps-0" placeholder="¿Qué estás buscando hoy?" [(ngModel)]="searchQuery">
+          </div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label fw-semibold small">Descripción</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevaDescripcion" placeholder="Ej: Brick de leche 1L">
+        
+        <!-- Rango de precio -->
+        <div class="col-lg-2 col-md-6 col-6">
+          <input type="number" class="form-control border-0 shadow-sm" placeholder="Min €" [(ngModel)]="minPrice">
         </div>
-        <div class="col-md-4">
-          <label class="form-label fw-semibold small">Precio (€)</label>
-          <input type="number" class="form-control" [(ngModel)]="nuevoPrecio" step="0.01" min="0.01">
+        <div class="col-lg-2 col-md-6 col-6">
+          <input type="number" class="form-control border-0 shadow-sm" placeholder="Max €" [(ngModel)]="maxPrice">
         </div>
-        <div class="col-md-4">
-          <label class="form-label fw-semibold small">Cantidad</label>
-          <input type="number" class="form-control" [(ngModel)]="nuevaCantidad" min="1" max="1000">
-        </div>
-        <div class="col-md-4 d-flex align-items-end gap-2">
-          <button class="btn btn-primary rounded-pill px-4" (click)="crearProducto()">
-            <i class="bi bi-check-lg me-1"></i> Crear
-          </button>
-          <button class="btn btn-outline-secondary rounded-pill px-3" (click)="toggleFormulario()">
-            Cancelar
+
+        <!-- Botón de añadir (Solo si está logueado) -->
+        <div class="col-lg-3 col-md-12 text-lg-end">
+          <button *ngIf="isLoggedIn" class="btn btn-home rounded-pill px-4 py-2 w-100 w-lg-auto shadow-sm" (click)="toggleFormulario()">
+            <i class="bi bi-plus-circle me-1"></i> Publicar Producto
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 row-cols-xl-6 g-4">
+  <!-- Formulario de creación rápida -->
+  <div *ngIf="mostrarFormulario" class="card border-0 shadow-lg mb-5 rounded-4 animate-fade-in">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4 text-home-green">Nuevo Producto Sugerido</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold">Nombre</label>
+          <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevoNombre">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold">Descripción</label>
+          <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevaDescripcion">
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Precio (€)</label>
+          <input type="number" class="form-control bg-light border-0" [(ngModel)]="nuevoPrecio" step="0.01">
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Cantidad Inicial</label>
+          <input type="number" class="form-control bg-light border-0" [(ngModel)]="nuevaCantidad">
+        </div>
+        <div class="col-md-4 d-flex align-items-end gap-2">
+          <button class="btn btn-home rounded-pill flex-grow-1" (click)="crearProducto()">Crear</button>
+          <button class="btn btn-light rounded-pill px-3" (click)="toggleFormulario()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Tarjetas de Productos -->
-    <ng-container *ngIf="productos && productos.length > 0">
-      <div class="col" *ngFor="let p of productos">
-        <div class="producto-card">
-          <h5 class="fw-bold text-dark mb-2 text-truncate" [title]="p.nombre">{{ p.nombre }}</h5>
-          <p class="text-muted small mb-3 flex-grow-1 line-clamp-3">{{ p.descripcion }}</p>
+  <!-- Grid de Productos -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4" *ngIf="productosFiltrados.length > 0">
+    <div class="col" *ngFor="let p of productosFiltrados">
+      <div class="producto-card border-0 shadow-sm hover-up overflow-hidden h-100 bg-white">
+        
+        <!-- Contenedor de Imagen -->
+        <div class="card-img-container position-relative overflow-hidden">
+          
+          <!-- Badge Supermercado (Opcional) -->
+          <div *ngIf="p.supermercado" class="position-absolute top-0 start-0 m-3 z-3">
+            <span class="badge bg-supermarket text-white rounded-pill px-3 py-1 shadow-sm small fw-bold">
+              <i class="bi bi-shop me-1"></i>{{ p.supermercado }}
+            </span>
+          </div>
+
+          <img [src]="getImagenProducto(p.nombre)" 
+               class="card-img-top object-fit-cover" 
+               [alt]="p.nombre"
+               style="height: 180px; transition: transform 0.5s ease;">
+          
+          <!-- Badge de Precio flotante -->
+          <div class="position-absolute top-0 end-0 m-3">
+            <span class="badge bg-glass text-white rounded-pill px-3 py-2 shadow-sm fw-bold">
+              {{ p.precio }} €
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body d-flex flex-column p-4">
+          <div class="mb-2">
+            <h5 class="fw-bold mb-1 text-truncate" [title]="p.nombre || 'Producto sin nombre'">
+              {{ p.nombre || 'Sin nombre' }}
+            </h5>
+            <span class="text-home-orange small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">
+              Sugerencia de Usuario
+            </span>
+          </div>
+          
+          <p class="text-muted small mb-4 line-clamp-3" style="min-height: 3em;">
+            {{ p.descripcion || 'Este producto aún no cuenta con una descripción detallada.' }}
+          </p>
 
           <div class="mt-auto">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <span class="fw-bold text-primary">{{ p.precio }} €</span>
-              <span class="badge bg-light text-dark border-0">Stock: {{ p.cantidad }}</span>
+              <span class="badge bg-light text-dark rounded-pill border-0 px-2 py-1 small">
+                <i class="bi bi-box-seam me-1"></i>Stock: {{ p.cantidad }}
+              </span>
+              <!-- Estado Pendiente para Admin -->
+              <span *ngIf="!p.confirmado" class="badge status-badge-pending rounded-pill px-2 py-1 small animate-pulse">
+                <i class="bi bi-clock-history me-1"></i>Pendiente
+              </span>
             </div>
 
-            <p *ngIf="!p.confirmado" class="status-pendiente mb-3">
-              <i class="bi bi-exclamation-circle me-1"></i>Pendiente
-            </p>
+            <div class="d-flex gap-2 w-100 mt-2">
+              <!-- Botón Ver Detalle -->
+              <button class="btn btn-outline-home btn-sm flex-fill rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+                [routerLink]="['/productos', p.id]"
+                title="Ver información detallada de este producto">
+                <i class="bi bi-eye"></i>
+                <span class="small">Detalle</span>
+              </button>
+              
+              <!-- Acción Confirmar para Administradores -->
+              <button *ngIf="isAdmin && !p.confirmado" 
+                class="btn btn-success btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 animate-fade-in"
+                (click)="confirmarProducto(p.id)" 
+                title="Validar este producto para que aparezca en el catálogo público">
+                <i class="bi bi-check2-all"></i>
+                <span class="small">Validar</span>
+              </button>
 
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary btn-sm flex-grow-1 rounded-pill">Ver detalle</button>
-              <button *ngIf="isLoggedIn" class="btn btn-outline-danger btn-sm rounded-pill px-2"
-                title="Eliminar producto" (click)="eliminarProducto(p.id)">
-                <i class="bi bi-trash"></i>
+              <!-- Botón de Borrado (Solo Usuarios Registrados) -->
+              <button *ngIf="isLoggedIn" 
+                class="btn btn-outline-danger btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2"
+                (click)="eliminarProducto(p.id)" 
+                title="Eliminar este producto de la base de datos definitivamente">
+                <i class="bi bi-trash3"></i>
+                <span class="small">Borrar</span>
               </button>
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
-
-    <!-- Botón de Añadir -->
-    <div class="col" *ngIf="isLoggedIn">
-      <div class="producto-card d-flex justify-content-center align-items-center border-dashed">
-        <button
-          class="btn-plus w-100 h-100 border-0 bg-transparent text-primary d-flex flex-column align-items-center justify-content-center py-4"
-          (click)="toggleFormulario()">
-          <i class="bi bi-plus-circle fs-1 mb-2"></i>
-          <span class="fw-bold small text-uppercase">Añadir</span>
-        </button>
-      </div>
     </div>
-
   </div>
 
-  <!-- Sin productos -->
-  <div *ngIf="!productos || productos.length === 0" class="text-center py-4 mt-2">
-    <p class="text-muted small italic">No hay productos en el catálogo todavía.</p>
+  <!-- Estado vacío -->
+  <div *ngIf="productosFiltrados.length === 0" class="text-center py-5">
+    <div class="py-5 bg-light rounded-4 border-dashed mx-auto" style="max-width: 500px">
+      <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+      <h5 class="text-muted">No hemos encontrado resultados</h5>
+      <p class="text-muted small">Prueba a ajustar los filtros o buscar otro término.</p>
+    </div>
   </div>
-</div>
+</div>

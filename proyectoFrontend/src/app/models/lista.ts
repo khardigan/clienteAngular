@@ -1,3 +1,5 @@
+import { ProductoPropio } from "./producto";
+
 // Representa la información básica de un usuario (para listas compartidas)
 export interface UsuarioMinimo {
     id: number;
@@ -20,6 +22,10 @@ export interface ListaDetalle {
     nombreDuenoNick: string;
     usuariosCompartida: UsuarioMinimo[]; // Usuarios con los que se ha compartido la lista
     productos: ProductoEstado[]; // Listado de productos incluidos
+    productoPropios: ProductoPropio[];
+    nombre: string;
+    publicada: boolean;
+    codigo?: string;
     total?: number; // Total opcional (calculado en el frontend)
 }
 

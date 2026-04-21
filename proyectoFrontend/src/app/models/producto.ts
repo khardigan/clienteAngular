@@ -7,4 +7,15 @@ export interface Producto {
   usuarioRegistradorId?: number;
   confirmado?: boolean;
   listas?: number[];
+  supermercado?: string;
+}
+
+export interface ProductoPropio {
+  id: number;
+  nombre: string;
+  precioObjetivo?: number;
+  notas?: string;
+  listaId?: number;
+  supermercado?: string;
+  cantidad?: number;
 }

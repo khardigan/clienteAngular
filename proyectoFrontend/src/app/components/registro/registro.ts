@@ -1,3 +1,7 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -17,7 +21,7 @@ export class RegistroComponent {
   };
   errorRegistro: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   onRegister() {
     if (this.user.password !== this.user.passwordConfirm) {
@@ -26,7 +30,7 @@ export class RegistroComponent {
     }
 
     console.log('Iniciando registro para:', this.user.nombre);
-    
+
     this.authService.register(this.user).subscribe({
       next: (res) => {
         console.log('¡Registro exitoso!', res);

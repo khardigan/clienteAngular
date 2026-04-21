@@ -31,6 +31,13 @@ export class ListaService {
             headers: this.obtenerCabeceras()
         });
     }
+    // Unirse a una lista compartida mediante código de invitación
+    unirseALista(codigo: string): Observable<any> {
+        // Ahora enviamos el código en un objeto JSON para mayor compatibilidad con el servidor (evita errores 400).
+        return this.http.post(`${this.apiUrl}/unirse`, { codigo: codigo }, {
+            headers: this.obtenerCabeceras()
+        });
+    }
 
     // Cambiar el estado 'comprado' de un producto en la lista
     cambiarEstadoComprado(listaId: number, productoId: number, estado: boolean): Observable<any> {
@@ -40,11 +47,20 @@ export class ListaService {
         });
     }
 
-    // Crear una nueva lista con productos seleccionados
-    crearLista(productosIds: number[], usuariosIds: number[] = []): Observable<any> {
+    // Cambiar la cantidad de un producto en la lista
+    cambiarCantidadProducto(listaId: number, productoId: number, nuevaCantidad: number): Observable<any> {
+        return this.http.patch(`${this.apiUrl}/${listaId}/productos/${productoId}/cantidad?cantidad=${nuevaCantidad}`, {}, {
+            headers: this.obtenerCabeceras()
+        });
+    }
+
+    // Crear una nueva lista de la compra
+    crearLista(nombre?: string): Observable<any> {
+        // Crea una lista vacía con el nombre indicado o el nombre por defecto del servidor.
         return this.http.post(this.apiUrl, {
-            productosEnLista: productosIds,
-            usuariosCompartida: usuariosIds
+            nombre: nombre,
+            productosEnLista: [],
+            usuariosCompartida: []
         }, {
             headers: this.obtenerCabeceras()
         });
@@ -56,7 +72,21 @@ export class ListaService {
             headers: this.obtenerCabeceras()
         });
     }
+    publicarLista(listaId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${listaId}/publicar`, {}, {
+            headers: this.obtenerCabeceras()
+        });
+    }
 
+    getListasPublicas(): Observable<ListaDetalle[]> {
+        return this.http.get<ListaDetalle[]>(`${this.apiUrl}/publicas`);
+    }
+
+    copiarLista(listaId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${listaId}/copiar`, {}, {
+            headers: this.obtenerCabeceras()
+        });
+    }
     // Actualizar una lista (por ejemplo para añadir productos)
     actualizarLista(id: number, request: any): Observable<any> {
         return this.http.put(`${this.apiUrl}/${id}`, request, {
@@ -67,6 +97,12 @@ export class ListaService {
     // Obtener el total de una lista
     obtenerTotalLista(listaId: number): Observable<number> {
         return this.http.get<number>(`${this.apiUrl}/${listaId}/total`, {
+            headers: this.obtenerCabeceras()
+        });
+    }
+
+    cambiarNombreLista(listaId: number, nuevoNombre: string): Observable<any> {
+        return this.http.patch(`${this.apiUrl}/${listaId}/nombre?nuevoNombre=${nuevoNombre}`, {}, {
             headers: this.obtenerCabeceras()
         });
     }

@@ -1,0 +1,67 @@
+.btn-back {
+    background-color: white !important;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-back:hover {
+    background-color: #fff !important;
+    transform: rotate(-10deg) scale(1.1);
+    color: #ff8000;
+}
+
+.text-home-green {
+    color: #14523d;
+}
+
+.btn-home-orange {
+    background-color: #ff8000;
+    color: white;
+    border: none;
+}
+
+.btn-home-orange:hover {
+    background-color: #e67300;
+    color: white;
+}
+
+.border-home-orange {
+    border-color: #ff8000 !important;
+}
+
+.bg-supermarket {
+    background-color: rgba(255, 128, 0, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hover-up-sm {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-up-sm:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(255, 128, 0, 0.15) !important;
+}
+
+.animate-fade-in {
+    animation: fadeInPage 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    font-size: 1.2rem;
+    line-height: 1;
+    vertical-align: middle;
+}

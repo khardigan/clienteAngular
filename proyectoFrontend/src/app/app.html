@@ -14,23 +14,21 @@
         <li class="nav-item">
           <a class="nav-link px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="authService.isAdmin()">
           <a class="nav-link px-3" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
         </li>
         <li class="nav-item">
           <a class="nav-link px-3" routerLink="/productos" routerLinkActive="active">Productos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/busqueda" routerLinkActive="active">
-            <i class="bi bi-search me-1"></i>Buscar
-          </a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link px-3" routerLink="/contacto" routerLinkActive="active">Contacto</a>
         </li>
-        <li class="nav-item" *ngIf="authService.isLoggedIn()">
+        <li class="nav-item d-flex gap-2" *ngIf="authService.isLoggedIn()">
           <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/mis-listas" routerLinkActive="active">
             <i class="bi bi-card-checklist me-1"></i>Mis Listas
+          </a>
+          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/comunidad" routerLinkActive="active">
+            <i class="bi bi-people me-1"></i>Comunidad
           </a>
         </li>
       </ul>
@@ -47,14 +45,14 @@
           <a class="nav-link dropdown-toggle d-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
             href="#" role="button" (click)="toggleMenu($event)" [attr.aria-expanded]="menuAbierto">
             <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
-              {{ (perfil?.nombre?.charAt(0) || 'U').toUpperCase() }}
+              {{ (perfil?.nombrePerfil?.charAt(0) || 'U').toUpperCase() }}
             </div>
-            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombre || 'Mi Perfil' }}</span>
+            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombrePerfil || 'Mi Perfil' }}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in"
             [class.show]="menuAbierto">
             <li class="px-3 py-2 text-muted small border-bottom mb-1">
-              Conectado como <strong>{{ perfil?.nombre }}</strong>
+              Conectado como <strong>{{ perfil?.nombrePerfil }}</strong>
             </li>
             <li><a class="dropdown-item py-2" routerLink="/perfil" (click)="menuAbierto = false"><i
                   class="bi bi-person-circle me-3 text-primary"></i>Ver Perfil</a></li>
