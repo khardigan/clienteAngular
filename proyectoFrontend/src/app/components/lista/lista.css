@@ -42,15 +42,93 @@
     filter: grayscale(30%);
 }
 
+.card-header,
+.card-body {
+    margin: 0;
+    /* O ajusta a tus necesidades */
+    padding: 0;
+    /* O ajusta a tus necesidades */
+}
+
 /* Necesario para que los paneles flotantes no queden cortados */
 .lista-card {
+    padding: 15px;
+    /* Ajusta según sea necesario */
     overflow: visible !important;
 }
 
-.col {
-    margin-bottom: 120px;
-    /* o 16px si quieres más aire */
+.row {
+    display: flex;
+    /* O usa grid si prefieres */
+    flex-wrap: wrap;
+    align-items: flex-start;
+    /* Alinea todas las tarjetas en la parte superior */
 }
+
+.col {
+    flex: 0 1 48%;
+    /* Ancho */
+    margin-bottom: 0;
+    /* Elimina el margen */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.listas-masonry {
+    column-count: 1;
+    column-gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .listas-masonry {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 1200px) {
+    .listas-masonry {
+        column-count: 3;
+    }
+}
+
+/* IMPORTANTE */
+.listas-masonry .col {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* =====================================================
    Animaciones
