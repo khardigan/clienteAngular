@@ -255,58 +255,67 @@
     </div>
 
     <section class="container-fluid py-5 bg-home-sky">
-        <div class="container">
-            <div class="text-center mb-5">
-                <p class="text-uppercase text-home-accent fw-semibold small mb-2 text-home-eyebrow">Blog</p>
-                <h2 class="fw-bold mb-3">Listas recomendadas</h2>
-                <p class="mx-auto text-secondary col-lg-8 mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse varius enim in eros elementum tristique.</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <article class="h-100 p-4 rounded-4 shadow-sm bg-white border">
-                        <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
-                            <span>Category</span>
-                            <span aria-hidden="true">·</span>
-                            <span>5 min read</span>
-                        </div>
-                        <h3 class="h5 fw-bold mb-3">Blog title heading will go here</h3>
-                        <p class="text-secondary small mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Suspendisse varius enim in eros.</p>
-                        <a href="#" class="fw-semibold text-decoration-none text-home-accent">Read more</a>
-                    </article>
-                </div>
-                <div class="col-md-4">
-                    <article class="h-100 p-4 rounded-4 shadow-sm bg-white border">
-                        <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
-                            <span>Category</span>
-                            <span aria-hidden="true">·</span>
-                            <span>5 min read</span>
-                        </div>
-                        <h3 class="h5 fw-bold mb-3">Blog title heading will go here</h3>
-                        <p class="text-secondary small mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Suspendisse varius enim in eros.</p>
-                        <a href="#" class="fw-semibold text-decoration-none text-home-accent">Read more</a>
-                    </article>
-                </div>
-                <div class="col-md-4">
-                    <article class="h-100 p-4 rounded-4 shadow-sm bg-white border">
-                        <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
-                            <span>Category</span>
-                            <span aria-hidden="true">·</span>
-                            <span>5 min read</span>
-                        </div>
-                        <h3 class="h5 fw-bold mb-3">Blog title heading will go here</h3>
-                        <p class="text-secondary small mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            Suspendisse varius enim in eros.</p>
-                        <a href="#" class="fw-semibold text-decoration-none text-home-accent">Read more</a>
-                    </article>
-                </div>
-            </div>
-            <div class="text-center mt-5">
-                <a href="#" class="btn btn-outline-home px-4">View all</a>
-            </div>
+
+        <div class="container text-center mb-5">
+            <h2 class="fw-bold mb-3">Listas recomendadas</h2>
+            <p class="text-secondary">
+                Estas son algunas de las listas más populares de nuestra comunidad.
+            </p>
         </div>
+
+        <!-- LOADING -->
+        <div *ngIf="cargando" class="text-center">
+            <div class="spinner-border text-primary"></div>
+        </div>
+
+        <!-- LISTAS -->
+        <div class="row g-4" *ngIf="!cargando && listas.length > 0">
+
+            <div class="col-md-4" *ngFor="let lista of listas">
+
+                <article class="h-100 p-4 rounded-4 shadow-sm bg-white border">
+
+                    <!-- HEADER -->
+                    <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
+                        <span>{{ lista.nombre }}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{{ lista.productos.length || 0 }} productos</span>
+                    </div>
+
+                    <!-- TITULO -->
+                    <h3 class="h5 fw-bold mb-3">
+                        {{ lista.nombre }}
+                    </h3>
+
+                    <!-- PRODUCTOS -->
+                    <div class="mb-3" *ngIf="lista.productos">
+
+                        <div *ngFor="let p of lista.productos.slice(0,2)">
+                            • {{ p.nombre }}
+                        </div>
+
+                        <div *ngIf="lista.productos.length > 2" class="text-primary small">
+                            +{{ lista.productos.length - 2 }} más...
+                        </div>
+
+                    </div>
+
+                    <!-- LINK -->
+                    <a routerLink="/listaspublicadas" class="fw-semibold text-decoration-none text-home-accent">
+                        Ver más
+                    </a>
+
+                </article>
+
+            </div>
+
+        </div>
+
+        <!-- SIN LISTAS -->
+        <div *ngIf="!cargando && listas.length === 0" class="text-center text-muted">
+            No hay listas disponibles
+        </div>
+
     </section>
 </main>
 
