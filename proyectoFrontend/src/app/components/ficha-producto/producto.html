@@ -1,0 +1,132 @@
+<div class="container py-5 mt-5" *ngIf="!cargando && producto">
+
+    <!-- 🔥 TOAST DE MENSAJE (VISIBLE SIEMPRE ARRIBA) -->
+    <div *ngIf="mensaje"
+        class="position-fixed start-50 translate-middle-x alert shadow-lg px-4 py-3 d-flex align-items-center gap-2"
+        [ngClass]="{
+    'alert-success': tipoMensaje === 'success',
+    'alert-danger': tipoMensaje === 'error'
+  }" style="z-index: 99999; min-width: 320px; top: 90px;">
+
+        <i class="bi" [ngClass]="{
+         'bi-check-circle-fill text-success': tipoMensaje === 'success',
+         'bi-x-circle-fill text-danger': tipoMensaje === 'error'
+       }"></i>
+
+        <div class="flex-grow-1">
+            <strong class="me-1">
+                {{ tipoMensaje === 'success' ? '¡Éxito!' : 'Error' }}
+            </strong>
+            {{ mensaje }}
+        </div>
+
+    </div>
+
+    <section class="product-card p-4 shadow-lg rounded-4 bg-white">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <small class="text-muted">
+                <i class="bi bi-box-seam"></i> Producto
+            </small>
+
+            <span class="badge bg-success rounded-pill px-3 py-2">
+                {{ producto.supermercado || 'Sin supermercado' }}
+            </span>
+        </div>
+
+        <div class="row g-4 align-items-center">
+
+            <!-- IMAGEN -->
+            <div class="col-lg-6 text-center position-relative p-4 rounded-4" style="background: linear-gradient(135deg, #fff7f0, #fff1e6);">
+
+                <img [src]="getImagen(producto.nombre)" class="img-fluid rounded-4 shadow-sm main-img"
+                    [alt]="producto.nombre" style="min-height: 420px; width: 100%; object-fit: cover;">
+
+                <button (click)="volver()"
+                    class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle shadow-sm">
+                    <i class="bi bi-arrow-left fs-4"></i>
+                </button>
+
+                <div class="position-absolute top-0 start-0 m-3" *ngIf="producto.supermercado">
+                    <span class="badge bg-dark px-3 py-2 rounded-pill">
+                        <i class="bi bi-shop me-1"></i> {{ producto.supermercado }}
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- INFO -->
+            <div class="col-lg-6 ps-lg-4">
+
+                <h2 class="fw-bold mb-2">
+                    {{ producto.nombre || 'Producto sin nombre' }}
+                </h2>
+
+                <p class="text-muted mb-3">
+                    {{ producto.descripcion || 'Sin descripción disponible' }}
+                </p>
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="fs-2 fw-bold text-success">
+                        {{ producto.precio }} €
+                    </div>
+
+                    <small class="text-muted">
+                        <i class="bi bi-box"></i> {{ producto.cantidad }} unidades
+                    </small>
+                </div>
+
+                <hr class="my-4 text-secondary opacity-25">
+
+                <div class="alert alert-light border rounded-3 mb-3">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Producto seleccionado de nuestro catálogo local.
+                </div>
+
+                <!-- SELECT + BOTÓN -->
+                <h6 class="fw-semibold mb-2">
+                    <i class="bi bi-list-check"></i> Añadir a lista
+                </h6>
+
+                <div class="d-flex gap-2 align-items-center mb-3">
+
+                    <select class="form-select rounded-pill" [(ngModel)]="listaSeleccionada">
+
+                        <option [ngValue]="null">
+                            Selecciona una lista
+                        </option>
+
+                        <option *ngFor="let lista of listas" [ngValue]="lista">
+                            {{ lista.nombre }}
+                        </option>
+
+                    </select>
+
+                    <button class="btn btn-success rounded-pill px-4" [disabled]="!listaSeleccionada"
+                        (click)="confirmarAgregarALista()">
+
+                        <i class="bi bi-check-lg"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+</div>
+
+<!-- LOADING -->
+<div class="text-center py-5" *ngIf="cargando">
+    <div class="spinner-border text-success"></div>
+    <p class="mt-3">Cargando producto...</p>
+</div>
+
+<!-- ERROR -->
+<div class="text-center py-5" *ngIf="error && !cargando">
+    <h3>No se encontró el producto</h3>
+    <button class="btn btn-primary mt-3" (click)="volver()">
+        Volver
+    </button>
+</div>

@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './contacto.css'
 })
 export class ContactoComponent {
-  constructor() {}
+  constructor() { }
 
   onSubmit() {
     alert('Mensaje enviado (simulación)');

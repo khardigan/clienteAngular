@@ -14,10 +14,8 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-/**
- * Componente para el inicio de sesión de usuarios.
- * Maneja el formulario de credenciales y la comunicación con el servicio de autenticación.
- */
+// Componente para el inicio de sesión de usuarios.
+// Maneja el formulario de credenciales y la comunicación con el servicio de autenticación.
 export class LoginComponent {
   // Cambiamos 'username' por 'nombre' para que coincida con tu JSON
   credentials = { nombre: '', password: '' };
@@ -25,6 +23,7 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
+  // Manda el usuario y la contraseña al servidor para entrar en la cuenta.
   onLogin() {
     console.log('Enviando esto al server:', this.credentials);
     this.authService.login(this.credentials).subscribe({
@@ -40,6 +39,7 @@ export class LoginComponent {
   }
 
   // Muestra un aviso para funciones no implementadas aún
+  // Aviso de que todavía no hemos hecho la parte de recuperar contraseña.
   forgotPasswordAlert(event: Event) {
     event.preventDefault();
     alert('Aun no implementado');

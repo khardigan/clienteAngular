@@ -1,120 +1,4 @@
-/* El contenedor que envuelve a todos los productos */
-.contenedor-productos {
-    display: flex;
-    /* Activa el modo horizontal */
-    flex-wrap: wrap;
-    /* Si no caben, saltan a la siguiente línea */
-    gap: 20px;
-    /* Espacio entre cards sin usar margin-left manual */
-    padding: 20px;
-    justify-content: flex-start;
-    /* Alinea al principio */
-}
-
-/* Los estilos de .producto-card y .status-pendiente ahora están en styles.css */
-
-.msg-vacio {
-    padding: 20px;
-    font-style: italic;
-}
-
-
-
-/*estilos del boton añadir */
-
-/* La tarjeta que contiene el botón + */
-.card-anadir {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 250px;
-    min-height: 200px;
-    /* Ajustar a la altura de tus otras cards */
-}
-
-/* El botón circular o estilizado */
-.btn-plus {
-    background-color: transparent;
-    border: 2px dashed #17a2b8;
-    /* Estilo info de Bootstrap */
-    color: #17a2b8;
-    border-radius: 12px;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.btn-plus span {
-    font-size: 3rem;
-    line-height: 1;
-    margin-bottom: 10px;
-}
-
-.btn-plus p {
-    margin: 0;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-}
-
-/* Efecto al pasar el ratón */
-.btn-plus:hover {
-    background-color: rgba(23, 162, 184, 0.1);
-    border-style: solid;
-    transform: scale(1.02);
-}
-
-/* Estilos para la barra de búsqueda y filtros */
-.search-group {
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 3px;
-    transition: box-shadow 0.3s ease;
-}
-
-.search-group:focus-within {
-    box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.15) !important;
-}
-
-.search-group input:focus {
-    box-shadow: none;
-}
-
-/* Animaciones suaves */
-.animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.hover-up {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-up:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
-}
-
-/* Variantes de botones y badges */
-.text-home-green {
-    color: #14523d;
-}
-
-.border-dashed {
-    border: 2px dashed #dee2e6 !important;
-}
-
-/* Truncar texto */
+/* Truncar texto a 3 líneas */
 .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -123,23 +7,14 @@
     overflow: hidden;
 }
 
-/* Efectos Premium */
+/* Efectos Premium (para el precio) */
 .bg-glass {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
 
-.status-badge-pending {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: #997404;
-    border: 1px solid rgba(255, 193, 7, 0.2);
-}
-
-.animate-pulse {
-    animation: pulse 2s infinite;
-}
-
+/* Fondo especial para supermercado */
 .bg-supermarket {
     background-color: rgba(255, 128, 0, 0.9);
     backdrop-filter: blur(4px);
@@ -147,66 +22,4 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     letter-spacing: 0.5px;
     z-index: 10;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 1; }
-}
-
-.card-img-container {
-    background-color: #f8f9fa;
-}
-
-.card-img-container img {
-    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.producto-card:hover .card-img-top {
-    transform: scale(1.08);
-}
-
-.ls-wide {
-    letter-spacing: 0.1em;
-}
-
-/* Botón Danger Soft */
-.btn-outline-danger {
-    border-color: #ffcaca !important;
-    color: #dc3545 !important;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545 !important;
-    color: #fff !important;
-}
-
-/* Alineación Perfecta de Botones */
-.producto-card .d-flex.gap-2.w-100 .btn {
-    flex-basis: 0;
-    flex-grow: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.producto-card .d-flex.gap-2.w-100 .btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    filter: brightness(1.05);
-}
-
-.producto-card .d-flex.gap-2.w-100 .btn i {
-    font-size: 1.1rem;
-}
-
-.producto-card .d-flex.gap-2.w-100 .btn .small {
-    font-weight: 600;
 }

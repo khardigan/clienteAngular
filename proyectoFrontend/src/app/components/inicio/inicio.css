@@ -1,8 +1,3 @@
-
-.site-header-home {
-  background: linear-gradient(90deg, var(--home-orange), var(--home-orange-dark));
-}
-
 .text-home-accent {
   color: var(--home-orange-dark) !important;
 }
@@ -45,36 +40,9 @@
   background-color: var(--home-orange) !important;
 }
 
-.home-card-stores {
-  border: 1px solid rgba(255, 128, 0, 0.35) !important;
-}
-
-/* Tiendas: hover/focus de Bootstrap (list-group-item-action) + ligera elevación y acento marca */
-#Supermercados .home-store-tile {
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, color 0.18s ease;
-}
-
-#Supermercados .home-store-tile:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0.5rem 1.1rem rgba(0, 0, 0, 0.12) !important;
-  border-color: var(--home-orange) !important;
-  color: var(--home-orange-dark) !important;
-}
-
-#Supermercados .home-store-tile:focus-visible {
-  border-color: var(--home-orange) !important;
-  color: var(--home-orange-dark) !important;
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(255, 128, 0, 0.35);
-}
-
 .home-hero {
   min-height: 80vh;
   background-color: var(--home-orange);
-}
-
-.home-section-border-top {
-  border-top: 3px solid rgba(0, 0, 0, 0.1);
 }
 
 .home-img-wide {
@@ -100,48 +68,6 @@
   .home-img-side {
     height: 240px;
   }
-}
-
-.home-testimonial {
-  min-height: 400px;
-  background-color: var(--home-sky);
-  display: flex;
-  flex-direction: column;
-}
-
-.home-testimonial__quote {
-  flex: 1 1 auto;
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.home-testimonial__text {
-  line-height: 1.8;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.4rem;
-  font-style: italic;
-}
-
-.home-testimonial__footer {
-  flex: 1 1 auto;
-}
-
-.home-cta {
-  padding-top: 4.5rem;
-  padding-bottom: 4.5rem;
-}
-
-.home-faq-callout {
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 0.5rem;
-}
-
-.border-home-faq {
-  border-left: 4px solid var(--home-orange);
-  padding-left: 15px;
 }
 
 .home-video-wrap {

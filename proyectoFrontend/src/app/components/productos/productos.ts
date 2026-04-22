@@ -13,13 +13,12 @@ import { AuthService } from '../../services/auth';
   templateUrl: './productos.html',
   styleUrls: ['./productos.css'],
 })
-/**
- * Componente para visualizar el catálogo de productos.
- * Recupera la lista de productos desde el backend y los muestra en tarjetas.
- */
+// Componente para visualizar el catálogo de productos.
+// Recupera la lista de productos desde el backend y los muestra en tarjetas.
 export class ProductosComponent implements OnInit {
   productos: Producto[] = [];
   mostrarFormulario = false;
+  mensajeExito = '';
 
   // Filtros
   searchQuery = '';
@@ -30,6 +29,7 @@ export class ProductosComponent implements OnInit {
   nuevaDescripcion = '';
   nuevoPrecio: number | null = null;
   nuevaCantidad: number = 1;
+  nuevoSupermercado = ''; // Nuevo campo
 
   constructor(
     private productoService: ProductoService,
@@ -87,18 +87,7 @@ export class ProductosComponent implements OnInit {
       });
   }
 
-  confirmarProducto(id: number): void {
-    this.productoService.confirmarProducto(id).subscribe({
-      next: (actualizado) => {
-        const index = this.productos.findIndex(p => p.id === id);
-        if (index !== -1) {
-          this.productos[index] = actualizado;
-          this.cd.detectChanges();
-        }
-      },
-      error: (err) => console.error('Error confirmando producto:', err)
-    });
-  }
+
 
   toggleFormulario(): void {
     this.mostrarFormulario = !this.mostrarFormulario;
@@ -111,7 +100,8 @@ export class ProductosComponent implements OnInit {
       nombre: this.nuevoNombre,
       descripcion: this.nuevaDescripcion,
       precio: this.nuevoPrecio,
-      cantidad: this.nuevaCantidad
+      cantidad: this.nuevaCantidad,
+      supermercado: this.nuevoSupermercado || undefined
     }).subscribe({
       next: (producto) => {
         this.productos.push(producto);
@@ -119,22 +109,20 @@ export class ProductosComponent implements OnInit {
         this.nuevaDescripcion = '';
         this.nuevoPrecio = null;
         this.nuevaCantidad = 1;
+        this.nuevoSupermercado = '';
         this.mostrarFormulario = false;
+
+        // Mostrar mensaje de éxito
+        this.mensajeExito = '✓ Producto creado correctamente. Espera a que sea confirmado por un administrador.';
+        setTimeout(() => {
+          this.mensajeExito = '';
+        }, 5000);
+
         this.cd.detectChanges();
       },
       error: (err) => console.error('Error al crear producto:', err)
     });
   }
 
-  eliminarProducto(id: number): void {
-    if (!confirm('¿Seguro que quieres eliminar este producto?')) return;
 
-    this.productoService.eliminarProducto(id).subscribe({
-      next: () => {
-        this.productos = this.productos.filter(p => p.id !== id);
-        this.cd.detectChanges();
-      },
-      error: (err) => console.error('Error al eliminar producto:', err)
-    });
-  }
 }

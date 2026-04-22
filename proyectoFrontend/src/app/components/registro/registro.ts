@@ -23,6 +23,7 @@ export class RegistroComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
+  // Manda los datos del nuevo usuario al servidor para crear la cuenta.
   onRegister() {
     if (this.user.password !== this.user.passwordConfirm) {
       this.errorRegistro = 'Las contraseñas no coinciden';

@@ -1,7 +1,8 @@
 <div class="container py-5 mt-4">
     <div class="row mb-4">
         <div class="col-12 text-center text-md-start">
-            <h2 class="fw-bold mb-2 text-primary d-flex align-items-center justify-content-center justify-content-md-start">
+            <h2
+                class="fw-bold mb-2 text-primary d-flex align-items-center justify-content-center justify-content-md-start">
                 <i class="bi bi-people-fill me-3"></i> Comunidad de Listas
             </h2>
             <p class="text-muted">Descubre y copia listas útiles compartidas por otros usuarios.</p>
@@ -9,8 +10,11 @@
     </div>
 
     <!-- Mensajes de feedback -->
-    <div *ngIf="mensaje" class="alert alert-{{ tipoMensaje }} animate-fade-in shadow-sm border-0 rounded-4 p-3 mb-4 d-flex align-items-center" role="alert">
-        <i class="bi" [ngClass]="tipoMensaje === 'success' ? 'bi-check-circle-fill me-2' : 'bi-exclamation-triangle-fill me-2'"></i>
+    <div *ngIf="mensaje"
+        class="alert alert-{{ tipoMensaje }} animate-fade-in shadow-sm border-0 rounded-4 p-3 mb-4 d-flex align-items-center"
+        role="alert">
+        <i class="bi"
+            [ngClass]="tipoMensaje === 'success' ? 'bi-check-circle-fill me-2' : 'bi-exclamation-triangle-fill me-2'"></i>
         <div>{{ mensaje }}</div>
     </div>
 
@@ -31,17 +35,27 @@
         </div>
     </div>
 
-    <!-- Rejilla de listas públicas -->
+    <!-- Rejilla de listas públicas con boton de eliminar de publicacion -->
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" *ngIf="!cargando && listas.length > 0">
         <div class="col" *ngFor="let lista of listas">
             <div class="card h-100 border-0 shadow-sm hover-lift bg-white rounded-4 overflow-hidden">
+                <div *ngIf="isLoggedIn && isAdmin">
+                    <button
+                        class="btn btn-danger btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2"
+                        (click)="eliminarDeListasPublicas(lista.codLista)"
+                        title="Eliminar esta lista de la base de datos definitivamente">
+                        <i class="bi bi-trash3"></i>
+                        <span class="small">Eliminar</span>
+                    </button>
+                </div>
                 <div class="card-header bg-primary bg-gradient text-white border-0 py-3">
                     <h5 class="mb-0 fw-bold d-flex align-items-center">
                         <i class="bi bi-journal-bookmark-fill me-2"></i>
                         {{ lista.nombre || 'Lista Compartida' }}
                     </h5>
                 </div>
-                
+
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="flex-shrink-0">
@@ -50,7 +64,8 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Compartida por</small>
+                            <small class="text-muted d-block text-uppercase fw-bold"
+                                style="font-size: 0.7rem;">Compartida por</small>
                             <span class="fw-bold text-dark">{{ lista.nombreDuenoNick }}</span>
                         </div>
                     </div>
@@ -58,7 +73,8 @@
                     <div class="mb-4">
                         <span class="text-muted small fw-bold text-uppercase d-block mb-2">Contenido</span>
                         <div class="small text-dark">
-                            <div *ngFor="let p of lista.productos.slice(0, 3)" class="d-flex justify-content-between mb-1">
+                            <div *ngFor="let p of lista.productos.slice(0, 3)"
+                                class="d-flex justify-content-between mb-1">
                                 <span><i class="bi bi-dot"></i> {{ p.nombre }}</span>
                                 <span class="text-muted">{{ p.cantidad }} ud.</span>
                             </div>
@@ -70,7 +86,8 @@
 
                     <div class="d-flex justify-content-between align-items-end">
                         <div>
-                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.7rem;">Total estimado</small>
+                            <small class="text-muted d-block fw-bold text-uppercase" style="font-size: 0.7rem;">Total
+                                estimado</small>
                             <span class="fs-4 fw-bold text-primary">{{ getListaTotal(lista) | number:'1.2-2' }}€</span>
                         </div>
                         <button class="btn btn-outline-primary rounded-pill px-4 shadow-sm fw-bold transition-all"

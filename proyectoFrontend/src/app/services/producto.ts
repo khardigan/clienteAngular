@@ -31,6 +31,14 @@ export class ProductoService {
     });
   }
 
+  // Productos que el usuario ha subido al catálogo global (pendientes o confirmados)
+  listarProductosCatalogSubidosPorUsuario(usuarioId: number): Observable<Producto[]> {
+    const t = new Date().getTime();
+    return this.http.get<Producto[]>(`https://localhost:8443/usuarios/${usuarioId}/productos?t=${t}`, {
+      headers: this.obtenerCabeceras()
+    });
+  }
+
   crearProductoPropio(
     usuarioId: number,
     nombre: string,
@@ -38,10 +46,11 @@ export class ProductoService {
     notas?: string,
     listaId?: number | null,
     supermercado?: string,
-    cantidad?: number
+    cantidad?: number,
+    comprado?: boolean
   ): Observable<ProductoPropio> {
     return this.http.post<ProductoPropio>(`${this.baseUrl2}/${usuarioId}`,
-      { nombre, precioObjetivo, notas, listaId, supermercado, cantidad },
+      { nombre, precioObjetivo, notas, listaId, supermercado, cantidad, comprado },
       { headers: this.obtenerCabeceras() }
     );
   }
@@ -49,7 +58,7 @@ export class ProductoService {
   // Actualiza los campos de un producto propio (se usa para cambiarle la lista asignada)
   actualizarProductoPropio(
     id: number,
-    dto: { nombre: string; precioObjetivo?: number; notas?: string; listaId?: number | null; supermercado?: string; cantidad?: number }
+    dto: { nombre: string; precioObjetivo?: number; notas?: string; listaId?: number | null; supermercado?: string; cantidad?: number; comprado?: boolean }
   ): Observable<ProductoPropio> {
     return this.http.put<ProductoPropio>(`${this.baseUrl2}/${id}`, dto, {
       headers: this.obtenerCabeceras()
@@ -60,7 +69,7 @@ export class ProductoService {
     return this.http.get<Producto[]>(`${this.baseUrl}/buscar?q=${query}`);
   }
 
-  crearProducto(producto: { nombre: string, descripcion: string, precio: number, cantidad: number }): Observable<Producto> {
+  crearProducto(producto: { nombre: string, descripcion: string, precio: number, cantidad: number, supermercado?: string }): Observable<Producto> {
     return this.http.post<Producto>(`${this.baseUrl}/pending`, producto, {
       headers: this.obtenerCabeceras()
     });

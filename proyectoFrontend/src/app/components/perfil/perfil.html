@@ -1,21 +1,114 @@
-<div class="container mt-4" *ngIf="perfil">
-  <h1>Perfil de Usuario</h1>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>ID Perfil</th>
-        <th>Nombre del Perfil</th>
-        <th>Descripción</th>
-        <th>ID Usuario</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{ perfil.idPerfil }}</td>
-        <td>{{ perfil.nombrePerfil }}</td>
-        <td>{{ perfil.descripcion }}</td>
-        <td>{{ perfil.usuarioId }}</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="container mt-3" *ngIf="mensajeSuccess">
+  <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i> {{ mensajeSuccess }}
+  </div>
 </div>
+<div class="container mt-3" *ngIf="mensajeError">
+  <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ mensajeError }}
+  </div>
+</div>
+
+<!-- Titulo y icono de perfil de boostrap-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<h1 class="text-center size-2 my-4">Perfil <i class="bi bi-person-circle"></i></h1>
+
+<section class="section about-section gray-bg" id="about">
+  <div class="container" *ngIf="perfil">
+    <div class="row align-items-center flex-row-reverse">
+      <div class="col-lg-6">
+        <div class="about-text go-to">
+          <label class="small text-muted mb-1">Nombre Público</label>
+          <input type="text" class="form-control form-control-lg dark-color fw-bold border-0 bg-transparent p-0 mb-2"
+            [(ngModel)]="perfil.nombrePerfil" placeholder="Tu nombre público...">
+
+          <label class="small text-muted mb-1">Subtítulo / Profesión</label>
+          <input type="text" class="form-control theme-color lead border-0 bg-transparent p-0 mb-3"
+            [(ngModel)]="perfil.subtitulo" placeholder="Ej: Diseñador de UX/UI...">
+
+          <label class="small text-muted mb-1">Sobre mí</label>
+          <textarea class="form-control border-0 bg-white shadow-sm rounded-3 p-3 mb-4" rows="4"
+            [(ngModel)]="perfil.descripcion" placeholder="Cuéntanos algo sobre ti..."></textarea>
+
+          <div class="row about-list">
+            <div class="col-md-6">
+              <div class="media">
+                <label>Cumpleaños</label>
+                <input type="date" class="form-control form-control-sm border-0 bg-transparent"
+                  [(ngModel)]="perfil.fechaNacimiento">
+              </div>
+              <div class="media">
+                <label>Edad</label>
+                <div class="d-flex align-items-center">
+                  <input type="number" class="form-control form-control-sm border-0 bg-transparent w-25"
+                    [(ngModel)]="perfil.edad" placeholder="0">
+                  <span class="small text-muted ms-1">Años</span>
+                </div>
+              </div>
+              <div class="media">
+                <label>Residencia</label>
+                <input type="text" class="form-control form-control-sm border-0 bg-transparent"
+                  [(ngModel)]="perfil.residencia" placeholder="Madrid, España">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="media">
+                <label>E-mail</label>
+                <input type="email" class="form-control form-control-sm border-0 bg-transparent"
+                  [(ngModel)]="perfil.email" placeholder="email@ejemplo.com">
+              </div>
+              <div class="media">
+                <label>Teléfono</label>
+                <input type="text" class="form-control form-control-sm border-0 bg-transparent"
+                  [(ngModel)]="perfil.telefono" placeholder="600 000 000">
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-2">
+            <button class="btn btn-primary rounded-pill px-4 py-2 shadow-sm fw-bold" (click)="guardarCambios()">
+              <i class="bi bi-save me-2"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="about-avatar text-center">
+          <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="rounded-circle shadow-lg" alt="Avatar">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de estadísticas dinámicas (Fuera del *ngIf de perfil) -->
+  <div class="container">
+    <div class="counter mt-5">
+      <div class="row">
+        <div class="col-6 col-lg-3">
+          <div class="count-data text-center">
+            <h6 class="count h2">{{ totalListas() }}</h6>
+            <p class="m-0px font-w-600">Listas Creadas</p>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="count-data text-center">
+            <h6 class="count h2">{{ totalProductos() }}</h6>
+            <p class="m-0px font-w-600">Productos Añadidos</p>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="count-data text-center">
+            <h6 class="count h2">{{ totalColaboraciones() }}</h6>
+            <p class="m-0px font-w-600">Colaboraciones</p>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="count-data text-center">
+            <h6 class="count h2">{{ totalPublicas() }}</h6>
+            <p class="m-0px font-w-600">Listas publicadas en comunidad</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

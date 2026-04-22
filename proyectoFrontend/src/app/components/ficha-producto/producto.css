@@ -1,0 +1,76 @@
+:root {
+    --primary: #ff7a00;
+    --primary-soft: #fff1e6;
+    --text-dark: #1f1f1f;
+    --text-muted: #6c757d;
+}
+
+/* ===== BODY (Fondo decorativo) ===== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ff9a3c, #ffd6a5);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+body::before,
+body::after {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 0;
+}
+
+body::before {
+    background: #ffffff;
+    top: -150px;
+    left: -150px;
+    opacity: 0.25;
+}
+
+body::after {
+    background: #ff7a00;
+    bottom: -150px;
+    right: -150px;
+    opacity: 0.18;
+}
+
+/* ===== ANIMACIONES ===== */
+.alert {
+    animation: fadeInDown 0.25s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* ===== CARD ===== */
+.product-card {
+    position: relative;
+    z-index: 1;
+    max-width: 950px;
+    width: 100%;
+}
+
+/* Barra lateral naranja nativa */
+.product-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff7a00, #ffb347);
+}

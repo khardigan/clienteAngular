@@ -8,6 +8,8 @@ export interface Producto {
   confirmado?: boolean;
   listas?: number[];
   supermercado?: string;
+  comprado?: boolean;
+
 }
 
 export interface ProductoPropio {
@@ -18,4 +20,6 @@ export interface ProductoPropio {
   listaId?: number;
   supermercado?: string;
   cantidad?: number;
+  comprado?: boolean;
+  usuarioId?: number; // ID del dueño del producto
 }

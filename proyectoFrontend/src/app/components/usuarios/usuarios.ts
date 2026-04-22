@@ -31,6 +31,7 @@ export class UsuariosComponent implements OnInit {
         });
     }
 
+    // Carga la lista de todos los usuarios al abrir la página.
     ngOnInit(): void {
         this.http.get<Usuario[]>(this.API, { headers: this.obtenerCabeceras() })
             .subscribe({
@@ -42,6 +43,7 @@ export class UsuariosComponent implements OnInit {
             });
     }
 
+    // Borra a un usuario del sistema por su ID.
     eliminarUsuario(id: number) {
         this.http.delete(this.API + '/' + id, { headers: this.obtenerCabeceras() })
             .subscribe({

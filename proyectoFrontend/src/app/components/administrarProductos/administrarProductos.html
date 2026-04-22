@@ -1,0 +1,60 @@
+<div class="container mt-4">
+    <h1>Lista de Productos</h1>
+    <p>Total productos: {{ productos.length }}</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Estado</th>
+                <th>Opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let p of productos" [style.background-color]="p.confirmado ? 'transparent' : '#f0fdf4'"
+                [style.border-left]="p.confirmado ? '4px solid #e5e7eb' : '4px solid #22c55e'">
+                <td><strong [style.color]="p.confirmado ? '#374151' : '#16a34a'">{{ p.nombre }}</strong></td>
+                <td>{{ p.descripcion }}</td>
+                <td>{{ p.precio }}</td>
+                <td>{{ p.cantidad }}</td>
+                <td>
+                    <span *ngIf="!p.confirmado"
+                        style="display: inline-block; background: #22c55e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                        PENDIENTE
+                    </span>
+                    <span *ngIf="p.confirmado"
+                        style="display: inline-block; background: #9ca3af; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                        CONFIRMADO
+                    </span>
+                </td>
+
+                <td>
+                    <button *ngIf="isLoggedIn"
+                        class="btn btn-outline-danger btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2"
+                        (click)="eliminarProducto(p.id)"
+                        title="Eliminar este producto de la base de datos definitivamente">
+                        <i class="bi bi-trash3"></i>
+                        <span class="small">Eliminar</span>
+                    </button>
+                    <button *ngIf="isAdmin && !p.confirmado"
+                        class="btn btn-success btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 animate-fade-in"
+                        (click)="confirmarProducto(p.id)"
+                        title="Validar este producto para que aparezca en el catálogo público">
+                        <i class="bi bi-check2-all"></i>
+                        <span class="small">Validar</span>
+                    </button>
+                </td>
+
+
+
+                <!-- Acción Confirmar para Administradores -->
+
+
+                <!-- Botón de Borrado (Solo Usuarios Registrados) -->
+
+            </tr>
+        </tbody>
+    </table>
+</div>

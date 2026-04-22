@@ -26,8 +26,15 @@ export class ListaService {
 
     // Obtener las listas detalladas del usuario actual (mis-listas)
     obtenerMisListas(): Observable<ListaDetalle[]> {
-        // Llama al servidor para descargar las listas de la compra donde el usuario es dueño o invitado.
-        return this.http.get<ListaDetalle[]>(`${this.apiUrl}/mis-listas`, {
+        // Cache-buster para evitar que el navegador devuelva datos antiguos en navegación interna
+        const t = new Date().getTime();
+        return this.http.get<ListaDetalle[]>(`${this.apiUrl}/mis-listas?t=${t}`, {
+            headers: this.obtenerCabeceras()
+        });
+    }
+
+    eliminarDeListasPublicas(id: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${id}/despublicar`, {}, {
             headers: this.obtenerCabeceras()
         });
     }

@@ -43,6 +43,7 @@ export class ListaComponent implements OnInit {
     };
 
     guardando = false; // Estado loading al crear producto
+    editandoProductoId: number | null = null; // ID del producto propio que se está editando
 
     // ===================== PRODUCTOS OFICIALES =====================
 
@@ -71,6 +72,9 @@ export class ListaComponent implements OnInit {
 
     confirmandoBorradoListaId: number | null = null;
 
+    // ID del usuario actual (para controlar quién puede editar un producto propio)
+    currentUserId: number | null = null;
+
     constructor(
         private listaService: ListaService,
         private productoService: ProductoService,
@@ -83,9 +87,17 @@ export class ListaComponent implements OnInit {
      * - Carga listas
      * - Carga productos propios
      */
+    // Carga las listas del usuario y sus productos propios al empezar.
     ngOnInit(): void {
+        this.currentUserId = this.authService.getId();
         this.cargarListas();
         this.cargarProductosPropios();
+    }
+
+    // Devuelve true si el usuario actual es el dueño del producto propio
+    // Necesario porque Angular no puede usar Number() directamente en los templates
+    esDuenioProducto(pp: any): boolean {
+        return this.currentUserId !== null && Number(this.currentUserId) === Number(pp.usuarioId);
     }
 
     // ===================== ORDENACIÓN =====================
@@ -102,10 +114,20 @@ export class ListaComponent implements OnInit {
             return aComp - bComp;
         });
     }
-
     /**
-     * Prepara UI para modificar nombre
+     * Apaño para ordenarlas en dos columnas:
+     *  - Pares
+     *  - Impares
      */
+    get listasPares(): ListaDetalle[] {
+        return this.listasOrdenadas.filter((_, i) => i % 2 === 0);
+    }
+
+    get listasImpares(): ListaDetalle[] {
+        return this.listasOrdenadas.filter((_, i) => i % 2 !== 0);
+    }
+
+    // Prepara UI para modificar nombre
     prepararModificarNombre(lista: ListaDetalle): void {
         this.confirmandoModificarNombreListaId = lista.codLista;
         this.inputNuevoNombre = lista.nombre || '';
@@ -124,12 +146,15 @@ export class ListaComponent implements OnInit {
         this.confirmandoBorradoListaId = null;
     }
 
-    /**
-     * Indica si una lista está completamente comprada
-     */
+    // Dice si ya has comprado todo lo que había en la lista. Se considera completa si tiene items y todos están marcados.
     estaListaCompletada(lista: ListaDetalle): boolean {
-        return lista.productos.length > 0 &&
-            lista.productos.every(p => p.comprado);
+        const totalItems = lista.productos.length + (lista.productoPropios ? lista.productoPropios.length : 0);
+        if (totalItems === 0) return false;
+
+        const todosOficialesComprados = lista.productos.every(p => p.comprado);
+        const todosPropiosComprados = (lista.productoPropios || []).every(pp => pp.comprado);
+
+        return todosOficialesComprados && todosPropiosComprados;
     }
 
     /**
@@ -144,10 +169,7 @@ export class ListaComponent implements OnInit {
 
     // ===================== CARGA DATOS =====================
 
-    /**
-     * Obtiene listas del usuario
-     * Servicio devuelve: Observable<ListaDetalle[]>
-     */
+    // Trae todas las listas donde participas desde el servidor.
     cargarListas(): void {
         this.cargando = true;
 
@@ -167,10 +189,8 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Obtiene productos propios del usuario
-     * Servicio devuelve: Observable<ProductoPropio[]>
-     */
+    // Obtiene productos propios del usuario
+    // Servicio devuelve: Observable<ProductoPropio[]>
     cargarProductosPropios(): void {
         const usuarioId = this.authService.getId();
         if (!usuarioId) return;
@@ -190,25 +210,23 @@ export class ListaComponent implements OnInit {
 
     // ===================== PRODUCTOS PROPIOS =====================
 
-    /**
-     * Abre/cierra panel de productos propios
-     */
+    // Abre/cierra panel de productos propios
     togglePanelProductoPropio(codLista: number): void {
         if (this.panelPropioAbiertoEnLista === codLista) {
             this.panelPropioAbiertoEnLista = null;
             this.mostrarFormNuevo = false;
+            this.editandoProductoId = null;
         } else {
             this.panelPropioAbiertoEnLista = codLista;
             this.panelOficialAbiertoEnLista = null;
             this.mostrarFormNuevo = false;
+            this.editandoProductoId = null;
             this.resetFormNuevo();
         }
     }
 
-    /**
-     * Elimina producto propio de la BD
-     * Servicio devuelve: Observable<void>
-     */
+    // Elimina producto propio de la BD
+    // Servicio devuelve: Observable<void>
     eliminarProductoPropio(productoId: number, event: MouseEvent): void {
         event.stopPropagation();
 
@@ -224,9 +242,8 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Quita producto de la lista (no lo elimina de BD)
-     */
+
+    // Saca un producto inventado de una lista, pero lo deja guardado en tu cuenta.
     quitarDeListaPropio(producto: ProductoPropio, event: MouseEvent): void {
         event.stopPropagation();
 
@@ -246,10 +263,8 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
- * Elimina un producto oficial de la lista (NO del catálogo global)
- * Servicio devuelve: Observable<void>
- */
+    // Elimina un producto oficial de la lista (NO del catálogo global)
+    // Servicio devuelve: Observable<void>
     eliminarProducto(lista: ListaDetalle, producto: ProductoEstado, event: MouseEvent): void {
         event.stopPropagation();
 
@@ -275,9 +290,8 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Añade un producto propio existente a una lista
-     */
+
+    // Mete un producto propio tuyo en una lista concreta.
     agregarProductoPropioALista(lista: ListaDetalle, producto: ProductoPropio): void {
         this.productoService.actualizarProductoPropio(producto.id, {
             nombre: producto.nombre,
@@ -298,10 +312,8 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Cambia cantidad de producto oficial
-     * Servicio devuelve: Observable<void>
-     */
+    // Cambia cantidad de producto oficial
+    // Servicio devuelve: Observable<void>
     cambiarCantidad(listaId: number, producto: ProductoEstado, delta: number): void {
         const nuevaCantidad = (producto.cantidad || 1) + delta;
         if (nuevaCantidad < 1) return;
@@ -317,9 +329,7 @@ export class ListaComponent implements OnInit {
             });
     }
 
-    /**
-     * Cambia cantidad de producto propio
-     */
+    // Cambia cantidad de producto propio
     cambiarCantidadPropio(producto: ProductoPropio, delta: number): void {
         const nuevaCantidad = (producto.cantidad || 1) + delta;
         if (nuevaCantidad < 1) return;
@@ -340,10 +350,7 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Crea un producto propio y lo añade a la lista
-     * Servicio devuelve: Observable<ProductoPropio>
-     */
+    // Crea un producto propio y lo añade a la lista o lo actualiza si estamos editando
     crearYAgregarProductoPropio(lista: ListaDetalle): void {
         if (!this.nuevoProducto.nombre.trim()) return;
 
@@ -352,34 +359,98 @@ export class ListaComponent implements OnInit {
 
         this.guardando = true;
 
-        this.productoService.crearProductoPropio(
-            usuarioId,
-            this.nuevoProducto.nombre.trim(),
-            this.nuevoProducto.precioObjetivo,
-            this.nuevoProducto.notas || undefined,
-            lista.codLista,
-            this.nuevoProducto.supermercado || undefined
-        ).subscribe({
-            next: (creado) => {
-                this.guardando = false;
-                this.productosPropios.push(creado);
-                this.mostrarFormNuevo = false;
-                this.resetFormNuevo();
-                this.panelPropioAbiertoEnLista = null;
-                this.cargarListas();
-                this.cdr.detectChanges();
-            },
+        if (this.editandoProductoId) {
+            // Modo EDICIÓN
+            this.productoService.actualizarProductoPropio(this.editandoProductoId, {
+                nombre: this.nuevoProducto.nombre.trim(),
+                precioObjetivo: this.nuevoProducto.precioObjetivo,
+                notas: this.nuevoProducto.notas || undefined,
+                listaId: lista.codLista,
+                supermercado: this.nuevoProducto.supermercado || undefined,
+                cantidad: 1 // o mantener la que tenía si fuera necesario
+            }).subscribe({
+                next: () => {
+                    this.guardando = false;
+                    this.mostrarFormNuevo = false;
+                    this.editandoProductoId = null;
+                    this.resetFormNuevo();
+                    this.panelPropioAbiertoEnLista = null;
+                    this.cargarListas();
+                    this.cargarProductosPropios();
+                    this.cdr.detectChanges();
+                },
+                error: () => {
+                    this.guardando = false;
+                    this.errorStr = 'No se pudo actualizar el producto.';
+                    this.cdr.detectChanges();
+                }
+            });
+        } else {
+            // Modo CREACIÓN
+            this.productoService.crearProductoPropio(
+                usuarioId,
+                this.nuevoProducto.nombre.trim(),
+                this.nuevoProducto.precioObjetivo,
+                this.nuevoProducto.notas || undefined,
+                lista.codLista,
+                this.nuevoProducto.supermercado || undefined
+            ).subscribe({
+                next: (creado) => {
+                    this.guardando = false;
+                    this.productosPropios.push(creado);
+                    this.mostrarFormNuevo = false;
+                    this.resetFormNuevo();
+                    this.panelPropioAbiertoEnLista = null;
+                    this.cargarListas();
+                    this.cdr.detectChanges();
+                },
+                error: () => {
+                    this.guardando = false;
+                    this.errorStr = 'No se pudo crear el producto propio.';
+                    this.cdr.detectChanges();
+                }
+            });
+        }
+    }
+
+    // Prepara el formulario para editar un producto propio existente
+    editarProductoPropio(codLista: number, producto: ProductoPropio): void {
+        this.panelPropioAbiertoEnLista = codLista;
+        this.mostrarFormNuevo = true;
+        this.editandoProductoId = producto.id;
+        this.nuevoProducto = {
+            nombre: producto.nombre,
+            precioObjetivo: producto.precioObjetivo,
+            notas: producto.notas || '',
+            supermercado: producto.supermercado || ''
+        };
+        this.cdr.detectChanges();
+    }
+
+    // Cambia estado comprado de producto propio
+    cambiarEstadoCompradoPropio(listaId: number, producto: ProductoPropio): void {
+        const nuevoEstado = !producto.comprado;
+        producto.comprado = nuevoEstado; // Cambio optimista
+        this.cdr.detectChanges();
+
+        this.productoService.actualizarProductoPropio(producto.id, {
+            nombre: producto.nombre,
+            precioObjetivo: producto.precioObjetivo,
+            notas: producto.notas,
+            listaId: listaId,
+            supermercado: producto.supermercado,
+            cantidad: producto.cantidad,
+            comprado: nuevoEstado
+        }).subscribe({
+            next: () => this.cargarListas(),
             error: () => {
-                this.guardando = false;
-                this.errorStr = 'No se pudo crear el producto propio.';
+                producto.comprado = !nuevoEstado; // revertir
                 this.cdr.detectChanges();
             }
         });
     }
 
-    /**
-     * Resetea formulario de producto nuevo
-     */
+    // Resetea formulario de producto nuevo
     resetFormNuevo(): void {
         this.nuevoProducto = {
             nombre: '',
@@ -404,10 +475,8 @@ export class ListaComponent implements OnInit {
         }
     }
 
-    /**
-     * Búsqueda con debounce
-     * Servicio devuelve: Observable<Producto[]>
-     */
+
+    // Busca productos oficiales en el catálogo general mientras escribes.
     onBusquedaProducto(): void {
         clearTimeout(this.searchTimer);
 
@@ -437,9 +506,7 @@ export class ListaComponent implements OnInit {
         }, 350);
     }
 
-    /**
-     * Añade producto oficial a lista
-     */
+    // Añade producto oficial a lista
     agregarProductoOficialALista(lista: ListaDetalle, producto: Producto): void {
         const currentIds = lista.productos.map(p => p.id);
 
@@ -470,9 +537,7 @@ export class ListaComponent implements OnInit {
 
     // ===================== ACCIONES LISTA =====================
 
-    /**
-     * Devuelve integrantes de la lista
-     */
+    // Saca la lista de personas (dueño e invitados) de una lista.
     obtenerIntegrantes(lista: ListaDetalle): IntegranteLista[] {
         const integrantes: IntegranteLista[] = [];
 
@@ -495,9 +560,7 @@ export class ListaComponent implements OnInit {
         return integrantes;
     }
 
-    /**
-     * Cambia estado comprado (optimista)
-     */
+    // Cambia estado comprado (optimista)
     cambiarEstadoComprado(listaId: number, producto: ProductoEstado): void {
         const nuevoEstado = !producto.comprado;
 
@@ -517,9 +580,7 @@ export class ListaComponent implements OnInit {
             });
     }
 
-    /**
-     * Elimina lista
-     */
+    // Elimina lista
     eliminarLista(listaId: number): void {
         this.listaService.eliminarLista(listaId).subscribe({
             next: () => {
@@ -530,9 +591,7 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Modifica nombre lista
-     */
+    // Modifica nombre lista
     onModificarNombre(lista: ListaDetalle): void {
         const nuevoNombre = this.inputNuevoNombre.trim();
         if (!nuevoNombre) return;
@@ -549,9 +608,7 @@ export class ListaComponent implements OnInit {
             });
     }
 
-    /**
-     * Publica lista
-     */
+    // Publica lista
     onPublicar(listaId: number): void {
         this.listaService.publicarLista(listaId).subscribe({
             next: () => {
@@ -571,9 +628,17 @@ export class ListaComponent implements OnInit {
         this.cdr.detectChanges();
     }
 
+    // ===================== TOGGLES (INTERRUPTORES UI) =====================
+    
+    // EXPLICACIÓN: "Toggle" significa alternar entre dos estados (como un interruptor de luz encendido/apagado).
+    // Usamos esto para abrir/cerrar los paneles superiores de crear o unirse a una lista sin tener que recargar la web.
+
     togglePanelCrear(): void {
+        // Invierte el estado: Si estaba false pasa a true (se abre), si estaba true pasa a false (se cierra)
         this.panelCrearAbierto = !this.panelCrearAbierto;
 
+        // Si lo abrimos, por seguridad nos aseguramos de que el panel de "Unirse" se cierre automáticamente
+        // y le limpiamos el campo de texto para que esté como nuevo.
         if (this.panelCrearAbierto) {
             this.panelUnirseAbierto = false;
             this.inputNombreLista = '';
@@ -581,8 +646,10 @@ export class ListaComponent implements OnInit {
     }
 
     togglePanelUnirse(): void {
+        // Invierte el estado
         this.panelUnirseAbierto = !this.panelUnirseAbierto;
 
+        // Si lo abrimos, cerramos el panel de "Crear"
         if (this.panelUnirseAbierto) {
             this.panelCrearAbierto = false;
             this.inputCodigoUnirse = '';
@@ -591,9 +658,7 @@ export class ListaComponent implements OnInit {
 
     // ===================== CREAR / UNIRSE =====================
 
-    /**
-     * Unirse a lista por código
-     */
+    // Unirse a lista por código
     onAnadirLista(): void {
         const codigo = this.inputCodigoUnirse.trim().toUpperCase();
 
@@ -627,9 +692,7 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    /**
-     * Crear nueva lista
-     */
+    // Crear nueva lista
     onCreateLista(): void {
         // Limpiamos input y evitamos espacios
         const nombre = this.inputNombreLista.trim() || undefined;
@@ -662,9 +725,7 @@ export class ListaComponent implements OnInit {
             });
     }
 
-    /**
-     * Calcula total de la lista
-     */
+    // Calcula el total de la lista
     getListaTotal(lista: ListaDetalle): number {
         if (!lista) return 0;
 

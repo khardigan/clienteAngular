@@ -12,10 +12,15 @@
     <div class="collapse navbar-collapse" id="navPrincipal">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+          <a class="nav-link px-3" routerLink="/" routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}">Inicio</a>
         </li>
         <li class="nav-item" *ngIf="authService.isAdmin()">
           <a class="nav-link px-3" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
+        </li>
+        <li class="nav-item" *ngIf="authService.isAdmin()">
+          <a class="nav-link px-3" routerLink="/administrarProductos" routerLinkActive="active">Administrar
+            Productos</a>
         </li>
         <li class="nav-item">
           <a class="nav-link px-3" routerLink="/productos" routerLinkActive="active">Productos</a>
@@ -24,11 +29,13 @@
           <a class="nav-link px-3" routerLink="/contacto" routerLinkActive="active">Contacto</a>
         </li>
         <li class="nav-item d-flex gap-2" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/mis-listas" routerLinkActive="active">
+          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/mis-listas"
+            routerLinkActive="active">
             <i class="bi bi-card-checklist me-1"></i>Mis Listas
           </a>
-          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/comunidad" routerLinkActive="active">
-            <i class="bi bi-people me-1"></i>Comunidad
+          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/comunidad"
+            routerLinkActive="active">
+            <i class="bi bi-people me-1"></i>Listas Publicas
           </a>
         </li>
       </ul>
@@ -47,7 +54,8 @@
             <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
               {{ (perfil?.nombrePerfil?.charAt(0) || 'U').toUpperCase() }}
             </div>
-            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombrePerfil || 'Mi Perfil' }}</span>
+            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombrePerfil || 'Mi
+              Perfil' }}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in"
             [class.show]="menuAbierto">
@@ -56,8 +64,6 @@
             </li>
             <li><a class="dropdown-item py-2" routerLink="/perfil" (click)="menuAbierto = false"><i
                   class="bi bi-person-circle me-3 text-primary"></i>Ver Perfil</a></li>
-            <li><a class="dropdown-item py-2" routerLink="/ajustes" (click)="menuAbierto = false"><i
-                  class="bi bi-gear-fill me-3 text-secondary"></i>Ajustes</a></li>
             <li>
               <hr class="dropdown-divider mx-2">
             </li>

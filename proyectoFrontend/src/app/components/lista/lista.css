@@ -1,29 +1,25 @@
+/*Estilo de fondo a conservar porque me gusta mucho*/
+.lista-page-wrapper {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    background-color: var(--home-sky);
+    background-image:
+        radial-gradient(72% 52% at 0% 0%, rgba(255, 128, 0, 0.14) 0%, transparent 58%),
+        radial-gradient(68% 48% at 100% 8%, rgba(185, 224, 255, 0.65) 0%, transparent 55%),
+        linear-gradient(180deg, var(--home-cream) 0%, #fff9f0 38%, #e8f3fc 72%, var(--home-sky) 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
 /* =====================================================
    Utils
    ===================================================== */
-.hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
-}
-
-.transition-all {
-    transition: all 0.2s ease-in-out;
-}
-
-.hover-bg-light:hover {
-    background-color: #f8f9fa !important;
-}
-
 .cursor-pointer {
     cursor: pointer;
-}
-
-.shadow-xs {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 /* =====================================================
@@ -34,53 +30,14 @@
     border-color: var(--bs-success);
 }
 
-/* =====================================================
-   Lista completada
-   ===================================================== */
 .lista-completada {
     opacity: 0.8;
     filter: grayscale(30%);
 }
 
-.card-header,
-.card-body {
-    margin: 0;
-    /* O ajusta a tus necesidades */
-    padding: 0;
-    /* O ajusta a tus necesidades */
-}
-
-/* Necesario para que los paneles flotantes no queden cortados */
-.lista-card {
-    padding: 15px;
-    /* Ajusta según sea necesario */
-    overflow: visible !important;
-}
-
-.row {
-    display: flex;
-    /* O usa grid si prefieres */
-    flex-wrap: wrap;
-    align-items: flex-start;
-    /* Alinea todas las tarjetas en la parte superior */
-}
-
-.col {
-    flex: 0 1 48%;
-    /* Ancho */
-    margin-bottom: 0;
-    /* Elimina el margen */
-}
-
-
-
-
-
-
-
-
-
-
+/* =====================================================
+   Lista completada
+   ===================================================== */
 
 
 
@@ -118,55 +75,19 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* =====================================================
-   Animaciones
-   ===================================================== */
-.animate-fade-in {
-    animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* =====================================================
-   Botón productos oficiales (turquesa)
+   Botón productos oficiales
    ===================================================== */
 .btn-oficial {
-    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    background-color: #06b6d4;
     color: #fff;
     border: none;
     transition: all 0.2s;
 }
 
-.btn-oficial:hover {
-    background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.35);
-}
 
 /* =====================================================
-   Panel Productos OFICIALES (turquesa)
+   Panel Productos OFICIALES
    ===================================================== */
 .panel-oficial {
     position: absolute;
@@ -174,48 +95,7 @@
     left: 0;
     right: 0;
     z-index: 300;
-    background: #fff;
-    border: 1.5px solid #06b6d4;
-    border-radius: 14px;
-    box-shadow: 0 8px 32px rgba(8, 145, 178, 0.18);
-    overflow: hidden;
     min-width: 260px;
-}
-
-.panel-oficial-header {
-    display: flex;
-    align-items: center;
-    padding: 10px 14px 8px;
-    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
-    color: #fff;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #0e7490;
-}
-
-.panel-oficial-search {
-    padding: 8px 10px 6px;
-    background: #f0faff;
-    border-bottom: 1px solid #e0f5fb;
-}
-
-.panel-oficial-search .input-group-text {
-    border-color: #06b6d4;
-}
-
-.panel-oficial-search .form-control {
-    border-color: #06b6d4;
-    font-size: 0.82rem;
-}
-
-.panel-oficial-search .form-control:focus {
-    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2) !important;
-    border-color: #0891b2 !important;
-}
-
-.panel-oficial-lista {
-    max-height: 190px;
-    overflow-y: auto;
-    padding: 6px 10px;
 }
 
 .panel-oficial-lista::-webkit-scrollbar {
@@ -229,21 +109,7 @@
 
 }
 
-.panel-oficial-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    margin-bottom: 2px;
-    transition: background 0.15s;
-}
 
-.panel-oficial-item:hover {
-    background: #e0f9ff;
-}
 
 /* =====================================================
    Panel Productos PROPIOS 
@@ -254,22 +120,7 @@
     left: 0;
     right: 0;
     z-index: 300;
-    background: #fff;
-    border: 1.5px solid #ffc107;
-    border-radius: 14px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    overflow: hidden;
     min-width: 260px;
-}
-
-.panel-propio-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px 8px;
-    background: linear-gradient(135deg, #fff3cd 0%, #ffe08060 100%);
-    border-bottom: 1px solid #ffe08088;
-    font-size: 0.9rem;
 }
 
 .panel-propio-lista {
@@ -284,124 +135,55 @@
 }
 
 .panel-propio-lista::-webkit-scrollbar-thumb {
-    background: #ffc10750;
+    background: #e8630a50;
     border-radius: 10px;
-
 }
 
-.panel-propio-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    margin-bottom: 2px;
-    transition: background 0.15s;
-}
 
-.panel-propio-item:hover {
-    background: #fff3cd;
-}
-
-.panel-propio-footer {
-    padding: 10px 12px;
-    border-top: 1px solid #ffe08055;
-    background: #fffdf5;
-}
 
 /* =====================================================
-   Botón cerrar panel 
+   Botones y textos color naranja suave (reemplaza btn-warning en productos propios)
    ===================================================== */
-.btn-cerrar-panel {
-    background: none;
+.btn-propio {
+    background-color: #e8630a;
+    color: #fff;
     border: none;
-    color: inherit;
-    opacity: 0.7;
-    cursor: pointer;
-    font-size: 0.9rem;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 6px;
-    transition: opacity 0.15s, background 0.15s;
+    transition: all 0.2s;
 }
 
-.btn-cerrar-panel:hover {
-    opacity: 1;
-    background: rgba(0, 0, 0, 0.08);
-}
 
-.panel-oficial-header .btn-cerrar-panel {
+.btn-propio:disabled {
+    background-color: rgba(232, 99, 10, 0.5);
     color: #fff;
 }
 
-/* =====================================================
-   Formulario inline nuevo producto propio
-   ===================================================== */
-.form-nuevo-propio {
-    padding: 4px 0 0;
-}
-
-.form-nuevo-propio .form-control {
-    border-color: #ffc107;
-    font-size: 0.8rem;
-}
-
-.form-nuevo-propio .form-control:focus {
-    border-color: #d4a01a !important;
-    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2) !important;
+.text-propio {
+    color: #e8630a !important;
 }
 
 /* =====================================================
    Productos Propios 
    ===================================================== */
+.producto-propio-item:hover {
+    background-color: #a5d4ff !important;
+}
+
 .producto-propio-item {
     background-color: var(--home-sky) !important;
     border-left: 4px solid var(--home-orange) !important;
     transition: all 0.2s ease-in-out;
 }
 
-.producto-propio-item:hover {
-    background-color: #a5d4ff !important;
-    transform: translateX(4px);
-}
-
 /* =====================================================
    Listas compartidas
    ===================================================== */
 .bg-compartida {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    background-color: #059669 !important;
     color: #fff !important;
 
 }
 
-/* =====================================================
-   Código de invitación
-   ===================================================== */
-.invite-code-container {
-    padding: 8px;
-    background-color: #f8f9fa;
-    border-top: 1px dashed #dee2e6;
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 1px;
-}
-
-.invite-code-label {
-    text-transform: uppercase;
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #adb5bd;
-    margin-bottom: 2px;
-}
-
-.invite-code-value {
-    font-size: 0.85rem;
-    color: #6c757d;
-    font-weight: bold;
-}
-
-/* =====================================================
+/* ====================================
    Panel Superior (Cabecera)
    ===================================================== */
 .panel-superior {
@@ -409,24 +191,7 @@
     top: calc(100% + 12px);
     right: 0;
     z-index: 2000;
-    /* Mucho más alto para asegurar visibilidad */
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    overflow: visible;
-    /* Cambiado de hidden a visible */
     width: 280px;
-}
-
-.panel-superior-header {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #f1f3f5;
-    font-size: 0.95rem;
-    color: var(--bs-primary);
 }
 
 @media (max-width: 768px) {
@@ -439,41 +204,4 @@
         width: 90vw;
         max-width: 320px;
     }
-}
-
-/* =====================================================
-   Notificaciones (Inline) - Prominentes
-   ===================================================== */
-.alert {
-    border: none;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border-radius: 16px !important;
-}
-
-.alert-success {
-    background: linear-gradient(135deg, #d1e7dd 0%, #a3cfbb 100%);
-    color: #0a3622;
-    border-left: 6px solid #198754 !important;
-}
-
-.alert-danger {
-    background: linear-gradient(135deg, #f8d7da 0%, #f1aeb5 100%);
-    color: #58151c;
-    border-left: 6px solid #dc3545 !important;
-}
-
-@keyframes fadeInRow {
-    from {
-        opacity: 0;
-        transform: translateY(-15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fadeInRow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

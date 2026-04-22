@@ -15,12 +15,13 @@
       <div class="row g-3 align-items-center">
         <!-- Buscador -->
         <div class="col-lg-5 col-md-12">
-          <div class="input-group search-group shadow-sm">
+          <div class="input-group shadow-sm rounded-3 p-1 bg-white">
             <span class="input-group-text border-0 bg-white"><i class="bi bi-search text-muted"></i></span>
-            <input type="text" class="form-control border-0 ps-0" placeholder="¿Qué estás buscando hoy?" [(ngModel)]="searchQuery">
+            <input type="text" class="form-control border-0 ps-0 shadow-none" placeholder="¿Qué estás buscando hoy?"
+              [(ngModel)]="searchQuery">
           </div>
         </div>
-        
+
         <!-- Rango de precio -->
         <div class="col-lg-2 col-md-6 col-6">
           <input type="number" class="form-control border-0 shadow-sm" placeholder="Min €" [(ngModel)]="minPrice">
@@ -31,7 +32,8 @@
 
         <!-- Botón de añadir (Solo si está logueado) -->
         <div class="col-lg-3 col-md-12 text-lg-end">
-          <button *ngIf="isLoggedIn" class="btn btn-home rounded-pill px-4 py-2 w-100 w-lg-auto shadow-sm" (click)="toggleFormulario()">
+          <button *ngIf="isLoggedIn" class="btn btn-home rounded-pill px-4 py-2 w-100 w-lg-auto shadow-sm"
+            (click)="toggleFormulario()">
             <i class="bi bi-plus-circle me-1"></i> Publicar Producto
           </button>
         </div>
@@ -39,10 +41,15 @@
     </div>
   </div>
 
+  <!-- Mensaje de éxito -->
+  <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+    {{ mensajeExito }}
+  </div>
+
   <!-- Formulario de creación rápida -->
-  <div *ngIf="mostrarFormulario" class="card border-0 shadow-lg mb-5 rounded-4 animate-fade-in">
+  <div *ngIf="mostrarFormulario" class="card border-0 shadow-lg mb-5 rounded-4">
     <div class="card-body p-4">
-      <h5 class="fw-bold mb-4 text-home-green">Nuevo Producto Sugerido</h5>
+      <h5 class="fw-bold mb-4 text-success">Nuevo Producto Sugerido</h5>
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label small fw-bold">Nombre</label>
@@ -60,7 +67,12 @@
           <label class="form-label small fw-bold">Cantidad Inicial</label>
           <input type="number" class="form-control bg-light border-0" [(ngModel)]="nuevaCantidad">
         </div>
-        <div class="col-md-4 d-flex align-items-end gap-2">
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Supermercado (Opcional)</label>
+          <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevoSupermercado"
+            placeholder="ej: Mercadona, Carrefour">
+        </div>
+        <div class="col-md-4 col-6 d-flex align-items-end gap-2">
           <button class="btn btn-home rounded-pill flex-grow-1" (click)="crearProducto()">Crear</button>
           <button class="btn btn-light rounded-pill px-3" (click)="toggleFormulario()">Cancelar</button>
         </div>
@@ -69,13 +81,14 @@
   </div>
 
   <!-- Grid de Productos -->
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4" *ngIf="productosFiltrados.length > 0">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4"
+    *ngIf="productosFiltrados.length > 0">
     <div class="col" *ngFor="let p of productosFiltrados">
-      <div class="producto-card border-0 shadow-sm hover-up overflow-hidden h-100 bg-white">
-        
+      <div class="producto-card border border-light shadow-sm overflow-hidden h-100 bg-white rounded-4">
+
         <!-- Contenedor de Imagen -->
-        <div class="card-img-container position-relative overflow-hidden">
-          
+        <div class="card-img-container bg-light position-relative overflow-hidden">
+
           <!-- Badge Supermercado (Opcional) -->
           <div *ngIf="p.supermercado" class="position-absolute top-0 start-0 m-3 z-3">
             <span class="badge bg-supermarket text-white rounded-pill px-3 py-1 shadow-sm small fw-bold">
@@ -83,11 +96,9 @@
             </span>
           </div>
 
-          <img [src]="getImagenProducto(p.nombre)" 
-               class="card-img-top object-fit-cover" 
-               [alt]="p.nombre"
-               style="height: 180px; transition: transform 0.5s ease;">
-          
+          <img [src]="getImagenProducto(p.nombre)" class="card-img-top object-fit-cover" [alt]="p.nombre"
+            style="height: 180px;">
+
           <!-- Badge de Precio flotante -->
           <div class="position-absolute top-0 end-0 m-3">
             <span class="badge bg-glass text-white rounded-pill px-3 py-2 shadow-sm fw-bold">
@@ -105,7 +116,7 @@
               Sugerencia de Usuario
             </span>
           </div>
-          
+
           <p class="text-muted small mb-4 line-clamp-3" style="min-height: 3em;">
             {{ p.descripcion || 'Este producto aún no cuenta con una descripción detallada.' }}
           </p>
@@ -116,37 +127,21 @@
                 <i class="bi bi-box-seam me-1"></i>Stock: {{ p.cantidad }}
               </span>
               <!-- Estado Pendiente para Admin -->
-              <span *ngIf="!p.confirmado" class="badge status-badge-pending rounded-pill px-2 py-1 small animate-pulse">
+              <span *ngIf="!p.confirmado" class="badge text-warning bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-pill px-2 py-1 small">
                 <i class="bi bi-clock-history me-1"></i>Pendiente
               </span>
             </div>
 
             <div class="d-flex gap-2 w-100 mt-2">
               <!-- Botón Ver Detalle -->
-              <button class="btn btn-outline-home btn-sm flex-fill rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
-                [routerLink]="['/productos', p.id]"
-                title="Ver información detallada de este producto">
+              <button
+                class="btn btn-outline-home btn-sm flex-fill rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+                [routerLink]="['/productos', p.id]" title="Ver información detallada de este producto">
                 <i class="bi bi-eye"></i>
                 <span class="small">Detalle</span>
               </button>
-              
-              <!-- Acción Confirmar para Administradores -->
-              <button *ngIf="isAdmin && !p.confirmado" 
-                class="btn btn-success btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 animate-fade-in"
-                (click)="confirmarProducto(p.id)" 
-                title="Validar este producto para que aparezca en el catálogo público">
-                <i class="bi bi-check2-all"></i>
-                <span class="small">Validar</span>
-              </button>
 
-              <!-- Botón de Borrado (Solo Usuarios Registrados) -->
-              <button *ngIf="isLoggedIn" 
-                class="btn btn-outline-danger btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2"
-                (click)="eliminarProducto(p.id)" 
-                title="Eliminar este producto de la base de datos definitivamente">
-                <i class="bi bi-trash3"></i>
-                <span class="small">Borrar</span>
-              </button>
+
             </div>
           </div>
         </div>
@@ -156,10 +151,10 @@
 
   <!-- Estado vacío -->
   <div *ngIf="productosFiltrados.length === 0" class="text-center py-5">
-    <div class="py-5 bg-light rounded-4 border-dashed mx-auto" style="max-width: 500px">
+    <div class="py-5 bg-light rounded-4 border border-secondary border-opacity-25 mx-auto" style="max-width: 500px">
       <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
       <h5 class="text-muted">No hemos encontrado resultados</h5>
       <p class="text-muted small">Prueba a ajustar los filtros o buscar otro término.</p>
     </div>
   </div>
-</div>
+</div>

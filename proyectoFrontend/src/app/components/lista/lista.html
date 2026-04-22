@@ -1,461 +1,524 @@
-<div class="container py-5 mt-4">
-    <div class="row mb-4">
-        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-            <div class="text-center text-md-start">
-                <h2
-                    class="fw-bold mb-1 text-primary d-flex align-items-center justify-content-center justify-content-md-start">
-                    <i class="bi bi-card-checklist me-3"></i> Mis Listas de Compra
-                </h2>
-                <p class="text-muted mb-0">Gestiona tus productos y comparte tus listas.</p>
-            </div>
-            <div class="d-flex gap-2">
-                <!-- Panel Crear Lista -->
-                <div class="position-relative">
-                    <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-3 hover-lift"
-                        (click)="togglePanelCrear()">
-                        <i class="bi bi-plus-lg"></i>
-                        <span class="fw-bold">Crear lista</span>
+<div class="lista-page-wrapper">
+    <div class="container py-5 mt-4">
+        <div class="row mb-4">
+            <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <div class="text-center text-md-start">
+                    <h2
+                        class="fw-bold mb-1 text-primary d-flex align-items-center justify-content-center justify-content-md-start">
+                        <i class="bi bi-card-checklist me-3"></i> Mis Listas de Compra
+                    </h2>
+                    <p class="text-muted mb-0">Gestiona tus productos y comparte tus listas.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <!-- Botón de Refrescar (Sincronización Manual) -->
+                    <button class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm px-3"
+                        (click)="cargarListas()" title="Refrescar listas">
+                        <i class="bi bi-arrow-clockwise" [class.fa-spin]="cargando"></i>
+                        <span class="fw-bold d-none d-md-inline">Refrescar</span>
                     </button>
 
-                    <div *ngIf="panelCrearAbierto" class="panel-superior animate-fade-in shadow-lg">
-                        <div class="panel-superior-header">
-                            <i class="bi bi-journal-plus me-2"></i>
-                            <span class="fw-bold">Nueva lista</span>
-                            <button class="btn-cerrar-panel ms-auto" (click)="togglePanelCrear()">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                        <div class="p-3">
-                            <input type="text" class="form-control form-control-sm mb-3"
-                                placeholder="Nombre de la lista" [(ngModel)]="inputNombreLista"
-                                (keyup.enter)="onCreateLista()">
-                            <button
-                                class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
-                                [disabled]="procesandoAccion" (click)="onCreateLista()">
-                                <span *ngIf="procesandoAccion" class="spinner-border spinner-border-sm"></span>
-                                <i *ngIf="!procesandoAccion" class="bi bi-check2"></i>
-                                {{ procesandoAccion ? 'Creando...' : 'Crear lista' }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Panel Añadir Lista (Código) -->
-                <div class="position-relative">
-                    <button
-                        class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm px-3 bg-white hover-lift"
-                        (click)="togglePanelUnirse()">
-                        <i class="bi bi-person-plus-fill"></i>
-                        <span class="fw-bold">Añadir lista</span>
-                    </button>
-
-                    <div *ngIf="panelUnirseAbierto" class="panel-superior animate-fade-in shadow-lg">
-                        <div class="panel-superior-header">
-                            <i class="bi bi-qr-code me-2"></i>
-                            <span class="fw-bold">Unirse a lista</span>
-                            <button class="btn-cerrar-panel ms-auto" (click)="togglePanelUnirse()">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                        <div class="p-3">
-                            <input type="text" class="form-control form-control-sm mb-3 text-center fw-bold"
-                                placeholder="CÓDIGO (6 CARS)" [(ngModel)]="inputCodigoUnirse" maxlength="6"
-                                (keyup.enter)="onAnadirLista()" style="letter-spacing: 2px;">
-                            <button
-                                class="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
-                                [disabled]="procesandoAccion" (click)="onAnadirLista()">
-                                <span *ngIf="procesandoAccion" class="spinner-border spinner-border-sm"></span>
-                                <i *ngIf="!procesandoAccion" class="bi bi-link-45deg"></i>
-                                {{ procesandoAccion ? 'Uniéndote...' : 'Unirse ahora' }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sistema de Notificaciones (Feedback) - AHORA INLINE -->
-    <div *ngIf="feedbackMsg" class="mb-4 animate-fade-in">
-        <div class="alert shadow-sm d-flex align-items-center gap-3 px-4 py-3 border-start border-4"
-            [ngClass]="feedbackTipo === 'success' ? 'alert-success border-success' : 'alert-danger border-danger'"
-            role="alert" style="border-radius: 12px;">
-            <i class="bi"
-                [ngClass]="feedbackTipo === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"
-                style="font-size: 1.2rem;"></i>
-            <div class="flex-grow-1">
-                <strong class="d-none d-md-inline">{{ feedbackTipo === 'success' ? '¡Éxito!' : 'Información:'
-                    }}</strong>
-                {{ feedbackMsg }}
-            </div>
-            <button type="button" class="btn-close" (click)="feedbackMsg = ''" aria-label="Cerrar"></button>
-        </div>
-    </div>
-
-    <!-- Carga inicial -->
-    <div *ngIf="cargando" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
-        </div>
-    </div>
-
-    <!-- Error -->
-    <div *ngIf="errorStr" class="alert alert-danger" role="alert">
-        {{ errorStr }}
-    </div>
-
-    <!-- Sin listas -->
-    <div *ngIf="!cargando && listas.length === 0 && !errorStr" class="text-center py-5 border rounded-4 bg-white">
-        <i class="bi bi-clipboard-x display-4 text-muted opacity-50 d-block mb-3"></i>
-        <p class="text-muted">No tienes ninguna lista todavía.</p>
-    </div>
-
-    <!-- Rejilla de listas -->
-    <div class="row row-cols-1 row-cols-lg-2 g-3" *ngIf="!cargando && listas.length > 0">
-
-        <div class="col" *ngFor="let lista of listasOrdenadas">
-
-            <!-- Botones de cabecera de lista -->
-            <div class="d-flex justify-content-end gap-2 mb-2">
-                <button *ngIf="puedePubilcar(lista)" class="btn btn-sm btn-outline-primary"
-                    (click)="onPublicar(lista.codLista)">
-                    <i class="bi bi-send me-1"></i>Publicar
-                </button>
-                <span *ngIf="(lista.productoPropios && lista.productoPropios.length > 0) && !lista.publicada"
-                    class="badge bg-warning text-dark d-flex align-items-center px-2"
-                    title="Contiene productos propios: no se puede publicar">
-                    <i class="bi bi-lock me-1"></i>No publicable
-                </span>
-                <span *ngIf="lista.publicada" class="badge bg-success d-flex align-items-center px-2">
-                    <i class="bi bi-check-circle me-1"></i>Publicada
-                </span>
-
-                <!-- Edición de nombre Inline -->
-                <div *ngIf="confirmandoModificarNombreListaId === lista.codLista; else btnRenombrar"
-                    class="d-flex gap-1 animate-fade-in">
-                    <input type="text" class="form-control form-control-sm" [(ngModel)]="inputNuevoNombre"
-                        style="width: 120px;">
-                    <button class="btn btn-sm btn-success" (click)="onModificarNombre(lista)"><i
-                            class="bi bi-check"></i></button>
-                    <button class="btn btn-sm btn-light" (click)="cancelarModificarNombre()"><i
-                            class="bi bi-x"></i></button>
-                </div>
-                <ng-template #btnRenombrar>
-                    <button class="btn btn-sm btn-outline-secondary" (click)="prepararModificarNombre(lista)"
-                        title="Renombrar">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                </ng-template>
-            </div>
-
-            <!-- Tarjeta -->
-            <div class="card h-100 border-0 shadow-sm transition-all lista-card"
-                [ngClass]="{'lista-completada': estaListaCompletada(lista), 'hover-lift': !estaListaCompletada(lista)}">
-
-                <!-- Header -->
-                <div class="card-header border-0 py-3 d-flex justify-content-between align-items-center"
-                    [ngClass]="estaListaCompletada(lista) ? 'bg-secondary bg-opacity-75 text-white' : (lista.usuariosCompartida.length > 0 ? 'bg-compartida text-white' : 'bg-primary bg-gradient text-white')">
-                    <h5 class="mb-0 fw-bold">
-                        <i class="bi me-2"
-                            [ngClass]="estaListaCompletada(lista) ? 'bi-check-circle' : 'bi-list-ul'"></i>
-                        {{ lista.nombre || ('Lista #' + lista.codLista) }}
-                    </h5>
-                    <!-- Borrado de lista Inline -->
-                    <div *ngIf="confirmandoBorradoListaId === lista.codLista; else btnBorrarLista"
-                        class="d-flex align-items-center gap-1 animate-fade-in">
-                        <span class="small fw-bold me-1">¿Borrar?</span>
-                        <button class="btn btn-xs btn-danger" (click)="eliminarLista(lista.codLista)">SÍ</button>
-                        <button class="btn btn-xs btn-light" (click)="cancelarBorradoLista()">NO</button>
-                    </div>
-                    <ng-template #btnBorrarLista>
-                        <button class="btn btn-sm btn-danger border-0" (click)="prepararBorradoLista(lista.codLista)"
-                            title="Eliminar lista completa">
-                            <i class="bi bi-trash-fill"></i>
+                    <!-- Panel Crear Lista -->
+                    <div class="position-relative">
+                        <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-3"
+                            (click)="togglePanelCrear()">
+                            <i class="bi bi-plus-lg"></i>
+                            <span class="fw-bold">Crear lista</span>
                         </button>
-                    </ng-template>
-                </div>
 
-                <div class="card-body p-4 bg-light bg-opacity-50">
-
-                    <!-- Integrantes -->
-                    <div class="mb-3">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-2">Integrantes</span>
-                        <div class="d-flex flex-wrap gap-1">
-                            <span *ngFor="let i of obtenerIntegrantes(lista)"
-                                class="badge bg-white text-dark border px-2 py-1 shadow-xs fw-normal">
-
-                                {{ i.nick }} <small *ngIf="i.esDueno" class="text-primary">(Dueño)</small>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Productos oficiales -->
-                    <span class="text-muted small fw-bold text-uppercase d-block mb-2">Productos</span>
-                    <div *ngIf="lista.productos.length === 0 && (!lista.productoPropios || lista.productoPropios.length === 0)"
-                        class="text-center py-2 text-muted small">Lista vacía.</div>
-
-                    <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs mb-2">
-                        <div *ngFor="let p of lista.productos"
-                            class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded bg-white transition-all hover-bg-light">
-                            <div class="d-flex align-items-center text-truncate pe-2">
-                                <input class="form-check-input me-3 shadow-xs cursor-pointer" type="checkbox"
-                                    [checked]="p.comprado" (change)="cambiarEstadoComprado(lista.codLista, p)"
-                                    [id]="'check-' + lista.codLista + '-' + p.id">
-                                <label class="mb-0 fw-semibold cursor-pointer text-truncate"
-                                    [ngClass]="{'text-decoration-line-through text-muted opacity-50': p.comprado}"
-                                    [for]="'check-' + lista.codLista + '-' + p.id">
-                                    {{ p.nombre }}
-                                </label>
+                        <div *ngIf="panelCrearAbierto"
+                            class="panel-superior bg-white border rounded-4 shadow-lg overflow-visible">
+                            <div
+                                class="d-flex align-items-center p-3 bg-light border-bottom text-primary fw-bold rounded-top-4">
+                                <i class="bi bi-journal-plus me-2"></i>
+                                <span>Nueva lista</span>
+                                <button type="button" class="btn-close ms-auto" aria-label="Close"
+                                    (click)="togglePanelCrear()"></button>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <!-- Controles de Cantidad -->
-                                <div
-                                    class="d-flex align-items-center bg-light rounded-pill px-2 me-3 shadow-sm border border-secondary border-opacity-25">
-                                    <button class="btn btn-sm text-secondary p-0 px-1 hover-scale"
-                                        (click)="cambiarCantidad(lista.codLista, p, -1); $event.stopPropagation()">
-                                        <i class="bi bi-dash-lg fw-bold"></i>
-                                    </button>
-                                    <span class="mx-2 fw-bold text-dark" style="min-width: 20px; text-align: center;">
-                                        {{ p.cantidad || 1 }}
-                                    </span>
-                                    <button class="btn btn-sm text-secondary p-0 px-1 hover-scale"
-                                        (click)="cambiarCantidad(lista.codLista, p, 1); $event.stopPropagation()">
-                                        <i class="bi bi-plus-lg fw-bold"></i>
-                                    </button>
-                                </div>
-
-                                <span class="fw-bold text-success" [ngClass]="{'opacity-50': p.comprado}">
-                                    {{ (p.precio * (p.cantidad || 1)) | number:'1.2-2' }}€
-                                </span>
-                                <button class="btn btn-sm btn-outline-danger border-0 ms-2"
-                                    (click)="eliminarProducto(lista, p, $event)" title="Quitar de la lista">
-                                    <i class="bi bi-trash-fill"></i>
+                            <div class="p-3">
+                                <input type="text" class="form-control form-control-sm mb-3"
+                                    placeholder="Nombre de la lista" [(ngModel)]="inputNombreLista"
+                                    (keyup.enter)="onCreateLista()">
+                                <button
+                                    class="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                                    [disabled]="procesandoAccion" (click)="onCreateLista()">
+                                    <span *ngIf="procesandoAccion" class="spinner-border spinner-border-sm"></span>
+                                    <i *ngIf="!procesandoAccion" class="bi bi-check2"></i>
+                                    {{ procesandoAccion ? 'Creando...' : 'Crear lista' }}
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Productos propios de esta lista -->
-                    <div *ngIf="lista.productoPropios && lista.productoPropios.length > 0" class="mb-3">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">
-                            <i class="bi bi-person-check me-1"></i>Mis productos
-                        </span>
-                        <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs">
-                            <div *ngFor="let pp of lista.productoPropios"
-                                class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded producto-propio-item">
+                    <!-- Panel Añadir Lista (Código) -->
+                    <div class="position-relative">
+                        <button class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm px-3 bg-white"
+                            (click)="togglePanelUnirse()">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span class="fw-bold">Añadir lista</span>
+                        </button>
+
+                        <div *ngIf="panelUnirseAbierto"
+                            class="panel-superior bg-white border rounded-4 shadow-lg overflow-visible">
+                            <div
+                                class="d-flex align-items-center p-3 bg-light border-bottom text-primary fw-bold rounded-top-4">
+                                <i class="bi bi-qr-code me-2"></i>
+                                <span>Unirse a lista</span>
+                                <button type="button" class="btn-close ms-auto" aria-label="Close"
+                                    (click)="togglePanelUnirse()"></button>
+                            </div>
+                            <div class="p-3">
+                                <input type="text" class="form-control form-control-sm mb-3 text-center fw-bold"
+                                    placeholder="CÓDIGO (6 CARS)" [(ngModel)]="inputCodigoUnirse" maxlength="6"
+                                    (keyup.enter)="onAnadirLista()" style="letter-spacing: 2px;">
+                                <button
+                                    class="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                                    [disabled]="procesandoAccion" (click)="onAnadirLista()">
+                                    <span *ngIf="procesandoAccion" class="spinner-border spinner-border-sm"></span>
+                                    <i *ngIf="!procesandoAccion" class="bi bi-link-45deg"></i>
+                                    {{ procesandoAccion ? 'Uniéndote...' : 'Unirse ahora' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema de Notificaciones (Feedback) - AHORA INLINE -->
+        <div *ngIf="feedbackMsg" class="mb-4 animate-fade-in">
+            <div class="alert shadow-sm d-flex align-items-center gap-3 px-4 py-3 border-start border-4"
+                [ngClass]="feedbackTipo === 'success' ? 'alert-success border-success' : 'alert-danger border-danger'"
+                role="alert" style="border-radius: 12px;">
+                <i class="bi"
+                    [ngClass]="feedbackTipo === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"
+                    style="font-size: 1.2rem;"></i>
+                <div class="flex-grow-1">
+                    <strong class="d-none d-md-inline">{{ feedbackTipo === 'success' ? '¡Éxito!' : 'Información:'
+                        }}</strong>
+                    {{ feedbackMsg }}
+                </div>
+                <button type="button" class="btn-close" (click)="feedbackMsg = ''" aria-label="Cerrar"></button>
+            </div>
+        </div>
+
+        <!-- Carga inicial -->
+        <div *ngIf="cargando" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="errorStr" class="alert alert-danger" role="alert">
+            {{ errorStr }}
+        </div>
+
+        <!-- Sin listas -->
+        <div *ngIf="!cargando && listas.length === 0 && !errorStr" class="text-center py-5 border rounded-4 bg-white">
+            <i class="bi bi-clipboard-x display-4 text-muted opacity-50 d-block mb-3"></i>
+            <p class="text-muted">No tienes ninguna lista todavía.</p>
+        </div>
+
+        <!-- ==================== REJILLA MASONRY (2 COLUMNAS) ==================== -->
+        <div class="row g-3 mt-3 d-none d-lg-flex align-items-start" *ngIf="!cargando && listas.length > 0">
+            <div class="col-6">
+                <div *ngFor="let lista of listasPares" class="mb-3">
+                    <ng-container *ngTemplateOutlet="tarjetaLista; context: { lista: lista }"></ng-container>
+                </div>
+            </div>
+            <div class="col-6">
+                <div *ngFor="let lista of listasImpares" class="mb-3">
+                    <ng-container *ngTemplateOutlet="tarjetaLista; context: { lista: lista }"></ng-container>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== REJILLA MÓVIL (1 COLUMNA) ==================== -->
+        <div class="d-block d-lg-none mt-3" *ngIf="!cargando && listas.length > 0">
+            <div *ngFor="let lista of listasOrdenadas" class="mb-3">
+                <ng-container *ngTemplateOutlet="tarjetaLista; context: { lista: lista }"></ng-container>
+            </div>
+        </div>
+
+        <!-- ==================== TEMPLATE REUTILIZABLE TARJETA ==================== -->
+        <ng-template #tarjetaLista let-lista="lista">
+            <div class="w-100 d-flex flex-column h-100">
+
+                <!-- Botones de cabecera de lista -->
+                <div class="d-flex justify-content-end gap-2 mb-2">
+                    <button *ngIf="puedePubilcar(lista)" class="btn btn-sm btn-outline-primary"
+                        (click)="onPublicar(lista.codLista)">
+                        <i class="bi bi-send me-1"></i>Publicar
+                    </button>
+                    <span *ngIf="(lista.productoPropios && lista.productoPropios.length > 0) && !lista.publicada"
+                        class="badge bg-propio text-dark d-flex align-items-center px-2"
+                        title="Contiene productos propios: no se puede publicar">
+                        <i class="bi bi-lock me-1"></i>No publicable
+                    </span>
+                    <span *ngIf="lista.publicada" class="badge bg-success d-flex align-items-center px-2">
+                        <i class="bi bi-check-circle me-1"></i>Publicada
+                    </span>
+
+                    <!-- Edición de nombre Inline -->
+                    <div *ngIf="confirmandoModificarNombreListaId === lista.codLista; else btnRenombrar"
+                        class="d-flex gap-1 animate-fade-in">
+                        <input type="text" class="form-control form-control-sm" [(ngModel)]="inputNuevoNombre"
+                            style="width: 120px;">
+                        <button class="btn btn-sm btn-success" (click)="onModificarNombre(lista)"><i
+                                class="bi bi-check"></i></button>
+                        <button class="btn btn-sm btn-light" (click)="cancelarModificarNombre()"><i
+                                class="bi bi-x"></i></button>
+                    </div>
+                    <ng-template #btnRenombrar>
+                        <button class="btn btn-sm btn-outline-secondary" (click)="prepararModificarNombre(lista)"
+                            title="Renombrar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </ng-template>
+                </div>
+
+                <!-- Tarjeta -->
+                <div class="card border-0 shadow-sm lista-card"
+                    [ngClass]="{'lista-completada': estaListaCompletada(lista)}">
+
+                    <!-- Header -->
+                    <div class="card-header border-0 py-3 d-flex justify-content-between align-items-center"
+                        [ngClass]="estaListaCompletada(lista) ? 'bg-secondary bg-opacity-75 text-white' : (lista.usuariosCompartida.length > 0 ? 'bg-compartida text-white' : 'bg-primary bg-gradient text-white')">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="bi me-2"
+                                [ngClass]="estaListaCompletada(lista) ? 'bi-check-circle' : 'bi-list-ul'"></i>
+                            {{ lista.nombre || ('Lista #' + lista.codLista) }}
+                        </h5>
+                        <!-- Borrado de lista Inline -->
+                        <div *ngIf="confirmandoBorradoListaId === lista.codLista; else btnBorrarLista"
+                            class="d-flex align-items-center gap-1 animate-fade-in">
+                            <span class="small fw-bold me-1">¿Borrar?</span>
+                            <button class="btn btn-xs btn-danger" (click)="eliminarLista(lista.codLista)">SÍ</button>
+                            <button class="btn btn-xs btn-light" (click)="cancelarBorradoLista()">NO</button>
+                        </div>
+                        <ng-template #btnBorrarLista>
+                            <button class="btn btn-sm btn-danger border-0"
+                                (click)="prepararBorradoLista(lista.codLista)" title="Eliminar lista completa">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </ng-template>
+                    </div>
+
+                    <div class="card-body p-4 bg-light bg-opacity-50">
+
+                        <!-- Integrantes -->
+                        <div class="mb-3">
+                            <span class="text-muted small fw-bold text-uppercase d-block mb-2">Integrantes</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span *ngFor="let i of obtenerIntegrantes(lista)"
+                                    class="badge bg-white text-dark border px-2 py-1 shadow-xs fw-normal">
+
+                                    {{ i.nick }} <small *ngIf="i.esDueno" class="text-primary">(Dueño)</small>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Productos oficiales -->
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-2">Productos</span>
+                        <div *ngIf="lista.productos.length === 0 && (!lista.productoPropios || lista.productoPropios.length === 0)"
+                            class="text-center py-2 text-muted small">Lista vacía.</div>
+
+                        <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs mb-2">
+                            <div *ngFor="let p of lista.productos"
+                                class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded bg-white transition-all hover-bg-light">
                                 <div class="d-flex align-items-center text-truncate pe-2">
-                                    <i class="bi bi-tag me-2 text-warning"></i>
-                                    <span class="fw-semibold text-truncate">{{ pp.nombre }}</span>
-                                    <small *ngIf="pp.notas" class="text-muted ms-2 d-none d-md-inline">{{ pp.notas
-                                        }}</small>
+                                    <input class="form-check-input me-3 shadow-xs cursor-pointer" type="checkbox"
+                                        [checked]="p.comprado" (change)="cambiarEstadoComprado(lista.codLista, p)"
+                                        [id]="'check-' + lista.codLista + '-' + p.id">
+                                    <label class="mb-0 fw-semibold cursor-pointer text-truncate"
+                                        [ngClass]="{'text-decoration-line-through text-muted opacity-50': p.comprado}"
+                                        [for]="'check-' + lista.codLista + '-' + p.id">
+                                        {{ p.nombre }}
+                                    </label>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <!-- Controles de Cantidad Propia -->
+                                    <!-- Controles de Cantidad -->
                                     <div
                                         class="d-flex align-items-center bg-light rounded-pill px-2 me-3 shadow-sm border border-secondary border-opacity-25">
-                                        <button class="btn btn-sm text-secondary p-0 px-1"
-                                            (click)="cambiarCantidadPropio(pp, -1); $event.stopPropagation()">
-                                            <i class="bi bi-dash-lg"></i>
+                                        <button class="btn btn-sm text-secondary p-0 px-1 hover-scale"
+                                            (click)="cambiarCantidad(lista.codLista, p, -1); $event.stopPropagation()">
+                                            <i class="bi bi-dash-lg fw-bold"></i>
                                         </button>
-                                        <span class="mx-2 fw-bold text-dark small"
-                                            style="min-width: 15px; text-align: center;">
-                                            {{ pp.cantidad || 1 }}
+                                        <span class="mx-2 fw-bold text-dark"
+                                            style="min-width: 20px; text-align: center;">
+                                            {{ p.cantidad || 1 }}
                                         </span>
-                                        <button class="btn btn-sm text-secondary p-0 px-1"
-                                            (click)="cambiarCantidadPropio(pp, 1); $event.stopPropagation()">
-                                            <i class="bi bi-plus-lg"></i>
+                                        <button class="btn btn-sm text-secondary p-0 px-1 hover-scale"
+                                            (click)="cambiarCantidad(lista.codLista, p, 1); $event.stopPropagation()">
+                                            <i class="bi bi-plus-lg fw-bold"></i>
                                         </button>
                                     </div>
 
-                                    <span class="fw-bold text-warning">{{ ((pp.precioObjetivo || 0) * (pp.cantidad ||
-                                        1)) | number:'1.2-2' }}€</span>
+                                    <span class="fw-bold text-success" [ngClass]="{'opacity-50': p.comprado}">
+                                        {{ (p.precio * (p.cantidad || 1)) | number:'1.2-2' }}€
+                                    </span>
                                     <button class="btn btn-sm btn-outline-danger border-0 ms-2"
-                                        (click)="quitarDeListaPropio(pp, $event)" title="Quitar de la lista">
+                                        (click)="eliminarProducto(lista, p, $event)" title="Quitar de la lista">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- ======= Botones de añadir ======= -->
-                    <div class="d-flex gap-2 mt-3">
-
-                        <!-- === Botón Añadir producto NUESTRO (oficial) === -->
-                        <div class="position-relative flex-fill">
-                            <button
-                                class="btn btn-sm btn-oficial w-100 d-flex align-items-center justify-content-center gap-2"
-                                [id]="'btn-oficial-' + lista.codLista" (click)="togglePanelProducto(lista.codLista)">
-                                <i class="bi bi-shop"></i>
-                                Añadir producto
-                                <i class="bi"
-                                    [ngClass]="panelOficialAbiertoEnLista === lista.codLista ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                            </button>
-
-                            <!-- Panel búsqueda productos oficiales -->
-                            <div *ngIf="panelOficialAbiertoEnLista === lista.codLista"
-                                class="panel-oficial animate-fade-in">
-                                <div class="panel-oficial-header">
-                                    <i class="bi bi-shop me-2"></i>
-                                    <span class="fw-bold">Buscar producto</span>
-                                    <button class="btn-cerrar-panel ms-auto"
-                                        (click)="togglePanelProducto(lista.codLista)">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-
-                                <div class="panel-oficial-search">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text bg-white border-end-0">
-                                            <i class="bi bi-search text-muted"></i>
+                        <!-- Productos propios de esta lista -->
+                        <div *ngIf="lista.productoPropios && lista.productoPropios.length > 0" class="mb-3">
+                            <span class="text-muted small fw-bold text-uppercase d-block mb-1">
+                                <i class="bi bi-person-check me-1"></i>Mis productos
+                            </span>
+                            <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs">
+                                <div *ngFor="let pp of lista.productoPropios"
+                                    class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded producto-propio-item">
+                                    <div class="d-flex align-items-center text-truncate pe-2">
+                                        <input class="form-check-input me-3 shadow-xs cursor-pointer" type="checkbox"
+                                            [checked]="pp.comprado"
+                                            (change)="cambiarEstadoCompradoPropio(lista.codLista, pp)"
+                                            [id]="'check-propio-' + lista.codLista + '-' + pp.id">
+                                        <span class="fw-semibold text-truncate cursor-pointer"
+                                            [ngClass]="{'text-decoration-line-through text-muted opacity-50': pp.comprado}"
+                                            (click)="cambiarEstadoCompradoPropio(lista.codLista, pp)">
+                                            {{ pp.nombre }}
                                         </span>
-                                        <input type="text" class="form-control border-start-0 ps-0"
-                                            placeholder="Escribe al menos 2 letras..." [(ngModel)]="busquedaProducto"
-                                            (ngModelChange)="onBusquedaProducto()"
-                                            [id]="'busqueda-oficial-' + lista.codLista">
+                                        <small *ngIf="pp.notas" class="text-muted ms-2 d-none d-md-inline"
+                                            [ngClass]="{'opacity-50': pp.comprado}">{{ pp.notas }}</small>
                                     </div>
-                                </div>
-
-                                <div class="panel-oficial-lista">
-                                    <div *ngIf="buscando" class="text-center py-2">
-                                        <div class="spinner-border spinner-border-sm text-info"></div>
-                                    </div>
-                                    <div *ngIf="!buscando && busquedaProducto.length >= 2 && resultadosBusqueda.length === 0"
-                                        class="text-muted small text-center py-2">Sin resultados.</div>
-                                    <div *ngIf="!buscando && busquedaProducto.length < 2"
-                                        class="text-muted small text-center py-2">
-                                        <i class="bi bi-search me-1"></i>Busca un producto del catálogo
-                                    </div>
-                                    <div *ngFor="let prod of resultadosBusqueda" class="panel-oficial-item"
-                                        [class.ya-en-lista]="lista.productos && lista.productos.length > 0 && lista.productos[0].id === prod.id"
-                                        (click)="agregarProductoOficialALista(lista, prod)" title="Añadir a esta lista">
-                                        <div class="d-flex align-items-center gap-2 text-truncate">
-                                            <i class="bi bi-bag text-info"></i>
-                                            <span class="fw-semibold text-truncate">{{ prod.nombre }}</span>
-                                            <small *ngIf="prod.supermercado" class="text-muted">· {{ prod.supermercado
-                                                }}</small>
+                                    <div class="d-flex align-items-center">
+                                        <!-- Controles de Cantidad Propia -->
+                                        <div
+                                            class="d-flex align-items-center bg-light rounded-pill px-2 me-3 shadow-sm border border-secondary border-opacity-25">
+                                            <button class="btn btn-sm text-secondary p-0 px-1"
+                                                (click)="cambiarCantidadPropio(pp, -1); $event.stopPropagation()">
+                                                <i class="bi bi-dash-lg"></i>
+                                            </button>
+                                            <span class="mx-2 fw-bold text-dark small"
+                                                style="min-width: 15px; text-align: center;">
+                                                {{ pp.cantidad || 1 }}
+                                            </span>
+                                            <button class="btn btn-sm text-secondary p-0 px-1"
+                                                (click)="cambiarCantidadPropio(pp, 1); $event.stopPropagation()">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
                                         </div>
-                                        <span class="text-info fw-bold small flex-shrink-0">
-                                            {{ (prod.precio || 0) | number:'1.2-2' }}€
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- === Botón Añadir producto PROPIO === -->
-                        <div class="position-relative flex-fill">
-                            <button
-                                class="btn btn-sm btn-outline-warning w-100 d-flex align-items-center justify-content-center gap-2"
-                                [id]="'btn-propio-' + lista.codLista"
-                                (click)="togglePanelProductoPropio(lista.codLista)">
-                                <i class="bi bi-person-plus-fill"></i>
-                                Producto propio
-                                <i class="bi"
-                                    [ngClass]="panelPropioAbiertoEnLista === lista.codLista ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                            </button>
-
-                            <!-- Panel productos propios -->
-                            <div *ngIf="panelPropioAbiertoEnLista === lista.codLista"
-                                class="panel-propio animate-fade-in">
-                                <div class="panel-propio-header">
-                                    <span class="fw-bold"><i class="bi bi-collection me-2"></i>Mis productos</span>
-                                    <button class="btn-cerrar-panel"
-                                        (click)="togglePanelProductoPropio(lista.codLista)">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
-
-                                <div class="panel-propio-lista">
-                                    <div *ngIf="productosPropios.length === 0"
-                                        class="text-muted small text-center py-2">
-                                        Aún no tienes productos propios.
-                                    </div>
-                                    <div *ngFor="let pp of productosPropios" class="panel-propio-item"
-                                        (click)="agregarProductoPropioALista(lista, pp)" title="Añadir a esta lista">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-tag text-warning"></i>
-                                            <span class="fw-semibold">{{ pp.nombre }}</span>
-                                            <small *ngIf="pp.supermercado" class="text-muted">· {{ pp.supermercado
-                                                }}</small>
-                                        </div>
-                                        <span class="text-warning fw-bold small">{{ (pp.precioObjetivo || 0) |
-                                            number:'1.2-2' }}€</span>
-                                        <button class="btn btn-sm btn-outline-danger border-0"
-                                            (click)="eliminarProductoPropio(pp.id, $event)"
-                                            title="Borrar permanentemente">
+                                        <span class="fw-bold text-propio" [ngClass]="{'opacity-50': pp.comprado}">{{
+                                            ((pp.precioObjetivo || 0) * (pp.cantidad ||
+                                            1)) | number:'1.2-2' }}€</span>
+                                        <button class="btn btn-sm btn-outline-secondary border-0 ms-2"
+                                            *ngIf="esDuenioProducto(pp)"
+                                            (click)="editarProductoPropio(lista.codLista, pp)" title="Editar producto">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger border-0 ms-2"
+                                            (click)="quitarDeListaPropio(pp, $event)" title="Quitar de la lista">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="panel-propio-footer">
-                                    <button
-                                        class="btn btn-sm btn-warning w-100 d-flex align-items-center justify-content-center gap-2"
-                                        *ngIf="!mostrarFormNuevo" (click)="mostrarFormNuevo = true">
-                                        <i class="bi bi-plus-circle-fill"></i> Crear nuevo
-                                    </button>
+                        <!-- ======= Botones de añadir ======= -->
+                        <div class="d-flex gap-2 mt-3">
 
-                                    <div *ngIf="mostrarFormNuevo" class="form-nuevo-propio animate-fade-in">
-                                        <div class="mb-2">
-                                            <input type="text" class="form-control form-control-sm"
-                                                placeholder="Nombre del producto *" [(ngModel)]="nuevoProducto.nombre"
-                                                [id]="'nombre-nuevo-' + lista.codLista">
+                            <!-- === Botón Añadir producto NUESTRO (oficial) === -->
+                            <div class="position-relative flex-fill">
+                                <button
+                                    class="btn btn-sm btn-oficial w-100 d-flex align-items-center justify-content-center gap-2"
+                                    [id]="'btn-oficial-' + lista.codLista"
+                                    (click)="togglePanelProducto(lista.codLista)">
+                                    <i class="bi bi-shop"></i>
+                                    Añadir producto
+                                    <i class="bi"
+                                        [ngClass]="panelOficialAbiertoEnLista === lista.codLista ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                                </button>
+
+                                <!-- Panel búsqueda productos oficiales -->
+                                <div *ngIf="panelOficialAbiertoEnLista === lista.codLista"
+                                    class="panel-oficial bg-white border border-info rounded-4 shadow-sm overflow-hidden">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center p-3 bg-info text-white">
+                                        <span class="fw-bold"><i class="bi bi-shop me-2"></i>Buscar producto</span>
+                                        <button type="button" class="btn-close btn-close-white" aria-label="Close"
+                                            (click)="togglePanelProducto(lista.codLista)">
+                                        </button>
+                                    </div>
+
+                                    <div class="p-2 bg-light border-bottom border-info border-opacity-25">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white border-end-0 border-info">
+                                                <i class="bi bi-search text-muted"></i>
+                                            </span>
+                                            <input type="text"
+                                                class="form-control shadow-none border-info border-start-0 ps-0"
+                                                placeholder="Escribe al menos 2 letras..."
+                                                [(ngModel)]="busquedaProducto" (ngModelChange)="onBusquedaProducto()"
+                                                [id]="'busqueda-oficial-' + lista.codLista">
                                         </div>
-                                        <div class="row g-1 mb-2">
-                                            <div class="col-6">
-                                                <input type="number" class="form-control form-control-sm"
-                                                    placeholder="Precio (€)" [(ngModel)]="nuevoProducto.precioObjetivo"
-                                                    [id]="'precio-nuevo-' + lista.codLista" min="0" step="0.01">
+                                    </div>
+
+                                    <div class="panel-oficial-lista">
+                                        <div *ngIf="buscando" class="text-center py-2">
+                                            <div class="spinner-border spinner-border-sm text-info"></div>
+                                        </div>
+                                        <div *ngIf="!buscando && busquedaProducto.length >= 2 && resultadosBusqueda.length === 0"
+                                            class="text-muted small text-center py-2">Sin resultados.</div>
+                                        <div *ngIf="!buscando && busquedaProducto.length < 2"
+                                            class="text-muted small text-center py-2">
+                                            <i class="bi bi-search me-1"></i>Busca un producto del catálogo
+                                        </div>
+                                        <div *ngFor="let prod of resultadosBusqueda"
+                                            class="list-group-item list-group-item-action p-2 border-0 mb-1 rounded d-flex justify-content-between align-items-center cursor-pointer"
+                                            [class.ya-en-lista]="lista.productos && lista.productos.length > 0 && lista.productos[0].id === prod.id"
+                                            (click)="agregarProductoOficialALista(lista, prod)"
+                                            title="Añadir a esta lista">
+                                            <div class="d-flex align-items-center gap-2 text-truncate">
+                                                <i class="bi bi-bag text-info"></i>
+                                                <span class="fw-semibold text-truncate">{{ prod.nombre }}</span>
+                                                <small *ngIf="prod.supermercado" class="text-muted">· {{
+                                                    prod.supermercado
+                                                    }}</small>
                                             </div>
-                                            <div class="col-6">
-                                                <input type="text" class="form-control form-control-sm"
-                                                    placeholder="Supermercado" [(ngModel)]="nuevoProducto.supermercado"
-                                                    [id]="'super-nuevo-' + lista.codLista">
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <input type="text" class="form-control form-control-sm"
-                                                placeholder="Notas (opcional)" [(ngModel)]="nuevoProducto.notas"
-                                                [id]="'notas-nuevo-' + lista.codLista">
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-warning flex-fill"
-                                                [disabled]="!nuevoProducto.nombre.trim() || guardando"
-                                                (click)="crearYAgregarProductoPropio(lista)">
-                                                <span *ngIf="guardando"
-                                                    class="spinner-border spinner-border-sm me-1"></span>
-                                                <i *ngIf="!guardando" class="bi bi-check2 me-1"></i>
-                                                {{ guardando ? 'Guardando...' : 'Guardar y añadir' }}
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-secondary"
-                                                (click)="mostrarFormNuevo = false; resetFormNuevo()">Cancelar</button>
+                                            <span class="text-info fw-bold small flex-shrink-0">
+                                                {{ (prod.precio || 0) | number:'1.2-2' }}€
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- === Botón Añadir producto PROPIO === -->
+                            <div class="position-relative flex-fill">
+                                <button
+                                    class="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                                    [id]="'btn-propio-' + lista.codLista"
+                                    (click)="togglePanelProductoPropio(lista.codLista)">
+                                    <i class="bi bi-person-plus-fill"></i>
+                                    Producto propio
+                                    <i class="bi"
+                                        [ngClass]="panelPropioAbiertoEnLista === lista.codLista ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                                </button>
+
+                                <!-- Panel productos propios -->
+                                <div *ngIf="panelPropioAbiertoEnLista === lista.codLista"
+                                    class="panel-propio bg-white border border-warning rounded-4 shadow-sm overflow-hidden">
+                                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom border-warning border-opacity-25"
+                                        style="background-color: #fff0e6;">
+                                        <span class="fw-bold"><i class="bi bi-collection me-2 text-warning"></i>Mis
+                                            productos</span>
+                                        <button type="button" class="btn-close" aria-label="Close"
+                                            (click)="togglePanelProductoPropio(lista.codLista)">
+                                        </button>
+                                    </div>
+
+                                    <div class="panel-propio-lista">
+                                        <div *ngIf="productosPropios.length === 0"
+                                            class="text-muted small text-center py-2">
+                                            Aún no tienes productos propios.
+                                        </div>
+                                        <div *ngFor="let pp of productosPropios"
+                                            class="list-group-item list-group-item-action p-2 border-0 mb-1 rounded d-flex justify-content-between align-items-center cursor-pointer"
+                                            (click)="agregarProductoPropioALista(lista, pp)"
+                                            title="Añadir a esta lista">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-tag text-propio"></i>
+                                                <span class="fw-semibold">{{ pp.nombre }}</span>
+                                                <small *ngIf="pp.supermercado" class="text-muted">· {{ pp.supermercado
+                                                    }}</small>
+                                            </div>
+                                            <span class="text-propio fw-bold small">{{ (pp.precioObjetivo || 0) |
+                                                number:'1.2-2' }}€</span>
+                                            <button class="btn btn-sm btn-outline-danger border-0"
+                                                (click)="eliminarProductoPropio(pp.id, $event)"
+                                                title="Borrar permanentemente">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 border-top bg-light">
+                                        <button
+                                            class="btn btn-sm btn-propio w-100 d-flex align-items-center justify-content-center gap-2"
+                                            *ngIf="!mostrarFormNuevo"
+                                            (click)="mostrarFormNuevo = true; editandoProductoId = null; resetFormNuevo()">
+                                            <i class="bi bi-plus-circle-fill"></i> Crear nuevo
+                                        </button>
+
+                                        <div *ngIf="mostrarFormNuevo" class="form-nuevo-propio border-top pt-3 mt-2">
+                                            <div class="d-flex align-items-center mb-3 text-propio">
+                                                <i class="bi"
+                                                    [ngClass]="editandoProductoId ? 'bi-pencil-square' : 'bi-plus-circle-fill'"></i>
+                                                <span class="ms-2 fw-bold">{{ editandoProductoId ? 'Editando producto' :
+                                                    'Nuevo producto propio' }}</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    placeholder="Nombre del producto *"
+                                                    [(ngModel)]="nuevoProducto.nombre"
+                                                    [id]="'nombre-nuevo-' + lista.codLista">
+                                            </div>
+                                            <div class="row g-1 mb-2">
+                                                <div class="col-6">
+                                                    <input type="number" class="form-control form-control-sm"
+                                                        placeholder="Precio (€)"
+                                                        [(ngModel)]="nuevoProducto.precioObjetivo"
+                                                        [id]="'precio-nuevo-' + lista.codLista" min="0" step="0.01">
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        placeholder="Supermercado"
+                                                        [(ngModel)]="nuevoProducto.supermercado"
+                                                        [id]="'super-nuevo-' + lista.codLista">
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    placeholder="Notas (opcional)" [(ngModel)]="nuevoProducto.notas"
+                                                    [id]="'notas-nuevo-' + lista.codLista">
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm btn-propio flex-fill fw-bold"
+                                                    [disabled]="!nuevoProducto.nombre.trim() || guardando"
+                                                    (click)="crearYAgregarProductoPropio(lista)">
+                                                    <span *ngIf="guardando"
+                                                        class="spinner-border spinner-border-sm me-1"></span>
+                                                    <i *ngIf="!guardando" class="bi bi-check2-circle me-1"></i>
+                                                    {{ guardando ? 'Guardando...' : (editandoProductoId ? 'Guardar
+                                                    cambios'
+                                                    : 'Guardar y añadir') }}
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary"
+                                                    (click)="mostrarFormNuevo = false; editandoProductoId = null; resetFormNuevo()">Cancelar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
 
+                    <!-- Código de invitación con color diferente de fondo -->
+
+                    <div class="invite-code-container text-center color-primary bg-secondary" *ngIf="lista.codigo">
+                        <div class="invite-code-label">Código para compartir:</div>
+                        <div class="invite-code-value">{{ lista.codigo }}</div>
+                    </div>
+
+                    <!-- Pie total -->
+                    <div
+                        class="card-footer bg-white border-0 p-4 pt-2 d-flex justify-content-between align-items-center rounded-bottom">
+                        <span class="text-muted small fw-bold text-uppercase opacity-75">Total estimado</span>
+                        <span class="h4 mb-0 fw-bold text-primary">{{ getListaTotal(lista) | number:'1.2-2' }}€</span>
+                    </div>
                 </div>
 
-                <!-- Código de invitación -->
-                <div class="invite-code-container text-center" *ngIf="lista.codigo">
-                    <div class="invite-code-label">Código para compartir:</div>
-                    <div class="invite-code-value">{{ lista.codigo }}</div>
-                </div>
-
-                <!-- Pie total -->
-                <div
-                    class="card-footer bg-white border-0 p-4 pt-2 d-flex justify-content-between align-items-center rounded-bottom">
-                    <span class="text-muted small fw-bold text-uppercase opacity-75">Total estimado</span>
-                    <span class="h4 mb-0 fw-bold text-primary">{{ getListaTotal(lista) | number:'1.2-2' }}€</span>
-                </div>
             </div>
-
-        </div>
+        </ng-template>
 
     </div>
-
 </div>

@@ -7,6 +7,12 @@ export interface Perfil {
   usuarioId: number;
   nombrePerfil: string;
   descripcion: string;
+  subtitulo?: string;
+  fechaNacimiento?: string;
+  edad?: string;
+  residencia?: string;
+  email?: string;
+  telefono?: string;
 }
 
 @Injectable({
@@ -47,5 +53,15 @@ export class PerfilService {
 
     // Cambiado: Ahora apuntamos al endpoint de usuario que obtiene su propio perfil
     return this.http.get<Perfil>(`https://localhost:8443/usuarios/${usuarioId}/perfil`, { headers });
+  }
+
+  // Manda los datos del perfil actualizados al servidor.
+  actualizarPerfil(id: number, datos: Partial<Perfil>): Observable<Perfil> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    return this.http.put<Perfil>(`${this.API}/${id}`, datos, { headers });
   }
 }
