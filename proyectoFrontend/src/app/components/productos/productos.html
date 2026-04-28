@@ -1,4 +1,4 @@
-<div class="container-fluid px-4 py-5">
+<div class="container-fluid px-4 py-5 main-content-wrapper">
   <div class="row mb-4">
     <div class="col">
       <h2 class="fw-bold mb-1">Nuestro Catálogo</h2>
@@ -30,6 +30,23 @@
           <input type="number" class="form-control border-0 shadow-sm" placeholder="Max €" [(ngModel)]="maxPrice">
         </div>
 
+
+        <!--Supermercado-->
+        <div class="col-lg-2 col-md-4 col-6">
+          <select class="form-select border-0 shadow-sm" [(ngModel)]="selectedSupermarket">
+            <option value="">Todos los supermercados</option>
+            <option *ngFor="let supermercado of getSupermercados()" [value]="supermercado">{{ supermercado }}</option>
+          </select>
+        </div>
+
+        <!-- Categoría -->
+        <div class="col-lg-2 col-md-4 col-6">
+          <select class="form-select border-0 shadow-sm" [(ngModel)]="selectedCategory">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let cat of categoriasGenericas" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
         <!-- Botón de añadir (Solo si está logueado) -->
         <div class="col-lg-3 col-md-12 text-lg-end">
           <button *ngIf="isLoggedIn" class="btn btn-home rounded-pill px-4 py-2 w-100 w-lg-auto shadow-sm"
@@ -59,22 +76,40 @@
           <label class="form-label small fw-bold">Descripción</label>
           <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevaDescripcion">
         </div>
-        <div class="col-md-4 col-6">
+        <div class="col-md-6 col-6">
           <label class="form-label small fw-bold">Precio (€)</label>
           <input type="number" class="form-control bg-light border-0" [(ngModel)]="nuevoPrecio" step="0.01">
         </div>
         <div class="col-md-4 col-6">
-          <label class="form-label small fw-bold">Cantidad Inicial</label>
-          <input type="number" class="form-control bg-light border-0" [(ngModel)]="nuevaCantidad">
+          <label class="form-label small fw-bold">URL de Imagen (Opcional)</label>
+          <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevaImagenUrl"
+            placeholder="http://ejemplo.com/imagen.jpg">
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Categoría (Opcional)</label>
+          <select class="form-select bg-light border-0" [(ngModel)]="nuevaCategoria">
+            <option value="">Selecciona categoría...</option>
+            <option *ngFor="let cat of categoriasGenericas" [value]="cat">{{cat}}</option>
+          </select>
         </div>
         <div class="col-md-4 col-6">
           <label class="form-label small fw-bold">Supermercado (Opcional)</label>
           <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevoSupermercado"
-            placeholder="ej: Mercadona, Carrefour">
+            placeholder="Escribe o busca..." list="supermercadosList">
+          <datalist id="supermercadosList">
+            <option *ngFor="let s of supermercadosOficiales" [value]="s"></option>
+          </datalist>
         </div>
         <div class="col-md-4 col-6 d-flex align-items-end gap-2">
+          <!-- Botón de imagen -->
+          <button class="btn btn-outline-secondary rounded-pill px-3" type="button" (click)="triggerFileInput()"
+            title="Adjuntar imagen del producto">
+            <i class="bi bi-image"></i>
+          </button>
+          <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)">
+
           <button class="btn btn-home rounded-pill flex-grow-1" (click)="crearProducto()">Crear</button>
-          <button class="btn btn-light rounded-pill px-3" (click)="toggleFormulario()">Cancelar</button>
+          <button class="btn btn-light rounded-pill" (click)="toggleFormulario()">Cancelar</button>
         </div>
       </div>
     </div>
@@ -91,12 +126,22 @@
 
           <!-- Badge Supermercado (Opcional) -->
           <div *ngIf="p.supermercado" class="position-absolute top-0 start-0 m-3 z-3">
-            <span class="badge bg-supermarket text-white rounded-pill px-3 py-1 shadow-sm small fw-bold">
-              <i class="bi bi-shop me-1"></i>{{ p.supermercado }}
-            </span>
+            <ng-container *ngIf="isOficial(p.supermercado); else badgeText">
+              <span class="badge bg-white shadow-sm p-1 rounded-3 d-flex align-items-center justify-content-center"
+                style="width: 45px; height: 45px;">
+                <img [src]="getLogoSupermercado(p.supermercado)" class="img-fluid" [alt]="p.supermercado"
+                  style="max-height: 85%; max-width: 85%;">
+              </span>
+            </ng-container>
+            <ng-template #badgeText>
+              <span class="badge bg-supermarket text-white rounded-pill px-3 py-1 shadow-sm small fw-bold">
+                <i class="bi" [ngClass]="p.supermercado === 'Mercado Libre' ? 'bi-house' : 'bi-shop'"></i>
+                {{ p.supermercado }}
+              </span>
+            </ng-template>
           </div>
 
-          <img [src]="getImagenProducto(p.nombre)" class="card-img-top object-fit-cover" [alt]="p.nombre"
+          <img [src]="p.imagenUrl || getImagenProducto(p.nombre)" class="card-img-top object-fit-cover" [alt]="p.nombre"
             style="height: 180px;">
 
           <!-- Badge de Precio flotante -->
@@ -112,6 +157,31 @@
             <h5 class="fw-bold mb-1 text-truncate" [title]="p.nombre || 'Producto sin nombre'">
               {{ p.nombre || 'Sin nombre' }}
             </h5>
+            <div class="d-flex align-items-center mt-2">
+              <!-- Estrellas -->
+              <div class="d-flex text-warning me-2" style="font-size: 0.9rem;">
+                <span *ngFor="let star of getEstrellas(p.mediaPuntuacion)">
+                  {{ star === '½' ? '½' : (star === '☆' ? '☆' : '★') }}
+                </span>
+              </div>
+
+              <!-- Media puntuación y comentarios -->
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-dark fw-bold" style="font-size: 0.9rem;">
+                  {{ p.mediaPuntuacion?.toFixed(1) || '0.0' }}
+                </span>
+                <span class="text-muted" style="font-size: 0.8rem;">
+                  ({{ p.totalComentarios || 0 }}
+                  {{ p.totalComentarios === 1 ? 'valoración' : 'valoraciones' }})
+                </span>
+              </div>
+            </div>
+
+            <div *ngIf="p.categoria" class="mt-1">
+              <span class="badge bg-light text-dark border rounded-pill fw-normal" style="font-size: 0.75rem;">
+                {{ p.categoria }}
+              </span>
+            </div>
             <span class="text-home-orange small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">
               Sugerencia de Usuario
             </span>
@@ -123,11 +193,9 @@
 
           <div class="mt-auto">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <span class="badge bg-light text-dark rounded-pill border-0 px-2 py-1 small">
-                <i class="bi bi-box-seam me-1"></i>Stock: {{ p.cantidad }}
-              </span>
               <!-- Estado Pendiente para Admin -->
-              <span *ngIf="!p.confirmado" class="badge text-warning bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-pill px-2 py-1 small">
+              <span *ngIf="!p.confirmado"
+                class="badge text-warning bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-pill px-2 py-1 small">
                 <i class="bi bi-clock-history me-1"></i>Pendiente
               </span>
             </div>

@@ -39,6 +39,10 @@ export class ProductoService {
     });
   }
 
+  obtenerProductoPorId(id: number): Observable<Producto> {
+    return this.http.get<Producto>(`${this.baseUrl}/${id}`);
+  }
+
   crearProductoPropio(
     usuarioId: number,
     nombre: string,
@@ -46,11 +50,12 @@ export class ProductoService {
     notas?: string,
     listaId?: number | null,
     supermercado?: string,
-    cantidad?: number,
-    comprado?: boolean
+    comprado?: boolean,
+    imagenUrl?: string,
+    categoria?: string
   ): Observable<ProductoPropio> {
     return this.http.post<ProductoPropio>(`${this.baseUrl2}/${usuarioId}`,
-      { nombre, precioObjetivo, notas, listaId, supermercado, cantidad, comprado },
+      { nombre, precioObjetivo, notas, listaId, supermercado, comprado, imagenUrl, categoria },
       { headers: this.obtenerCabeceras() }
     );
   }
@@ -69,7 +74,7 @@ export class ProductoService {
     return this.http.get<Producto[]>(`${this.baseUrl}/buscar?q=${query}`);
   }
 
-  crearProducto(producto: { nombre: string, descripcion: string, precio: number, cantidad: number, supermercado?: string }): Observable<Producto> {
+  crearProducto(producto: { nombre: string, descripcion: string, precio: number, supermercado?: string, imagenUrl?: string, categoria?: string }): Observable<Producto> {
     return this.http.post<Producto>(`${this.baseUrl}/pending`, producto, {
       headers: this.obtenerCabeceras()
     });
@@ -98,6 +103,16 @@ export class ProductoService {
   // Obtiene los detalles de un solo producto por su ID
   obtenerProducto(id: number): Observable<Producto> {
     return this.http.get<Producto>(`${this.baseUrl}/${id}`);
+  }
+
+  // Obtiene la lista de categorías únicas desde la base de datos
+  listarCategorias(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/categorias`);
+  }
+
+  // Obtiene la lista de supermercados únicos desde la base de datos
+  listarSupermercados(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/supermercados`);
   }
 }
 

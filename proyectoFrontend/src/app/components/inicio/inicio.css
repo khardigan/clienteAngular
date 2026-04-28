@@ -1,3 +1,71 @@
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+
+/* Obligatorio para que Swiper sea visible */
+swiper-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* A veces los web components vienen como inline */
+
+  /* Variables de Swiper para colores de flechas/puntos */
+  --swiper-navigation-color: var(--home-orange-dark);
+  --swiper-pagination-color: var(--home-orange-dark);
+  --swiper-navigation-size: 30px;
+  --swiper-navigation-sides-offset: 10px;
+}
+
+/* Minimalist Comment Styles */
+.comment-swiper {
+  padding: 40px 0;
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.tracking-wider {
+  letter-spacing: 2px;
+}
+
+swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+
+.carrusel-title {
+  color: white;
+  /* Asegúrate de que no sea blanco sobre blanco */
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.hero-img-crop {
+  /* Define la altura máxima que quieres que tenga la imagen */
+  height: 650px;
+  /* Ajusta este valor (ej. 300px, 400px) a tu gusto */
+
+  /* Importante: asegura que la imagen cubra el área sin estirarse */
+  object-fit: cover;
+
+  /* Opcional: centra el recorte verticalmente (o usa 'top' o 'bottom') */
+  object-position: center;
+
+  /* Mantiene las esquinas redondeadas de Bootstrap */
+  border-radius: var(--bs-border-radius);
+  /* O usa tu valor de redondeado preferido */
+}
+
+
+
 .text-home-accent {
   color: var(--home-orange-dark) !important;
 }
@@ -83,4 +151,70 @@
 
 .text-home-eyebrow {
   letter-spacing: 0.12em;
+}
+
+.supermercado-btn {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease-in-out;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+  text-align: center;
+  background-repeat: no-repeat, no-repeat;
+  /* Por defecto, sin imagen (seguridad para móvil y tablets pequeñas) */
+  background-image: none;
+}
+
+/* --- SOLO MOSTRAR IMÁGENES EN PANTALLAS GRANDES (PC) --- */
+/* Si la pantalla es mayor a 1150px, ponemos los dos logos */
+@media (min-width: 1151px) {
+  .supermercado-btn {
+    background-position: 20px 50%, calc(100% - 20px) 50%;
+    background-size: auto 60%, auto 60%;
+  }
+
+  .btn-mercadona {
+    background-image: url('/images/Mercadona.png'), url('/images/Mercadona.png');
+  }
+
+  .btn-carrefour {
+    background-image: url('/images/Carrefour.svg'), url('/images/Carrefour.svg');
+  }
+
+  .btn-lidl {
+    background-image: url('/images/Lidl.png'), url('/images/Lidl.png');
+  }
+
+  .btn-dia {
+    background-image: url('/images/Dia.png'), url('/images/Dia.png');
+  }
+
+  .supermercado-btn:hover {
+    background-color: #fff !important;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* --- CUANDO LLEGA AL TAMAÑO CONFLICTIVO (O MENOR) --- */
+/* Entre 0px y 1150px, las imágenes son invisibles */
+@media (max-width: 1150px) {
+  .supermercado-btn {
+    background-image: none !important;
+    /* Forzamos invisibilidad */
+    min-height: 60px;
+    font-size: 0.95rem;
+    /* El botón ahora es solo texto, muy limpio para evitar el rectángulo blanco */
+  }
+}
+
+/* Opcional: un ajuste extra para móviles muy pequeños */
+@media (max-width: 576px) {
+  .supermercado-btn {
+    min-height: 50px;
+    padding: 5px !important;
+    font-size: 0.85rem;
+  }
 }

@@ -6,6 +6,7 @@ import { Perfil, PerfilService } from '../../services/perfil';
 import { ListaService } from '../../services/lista';
 import { ProductoService } from '../../services/producto';
 import { AuthService } from '../../services/auth';
+import { MensajeService } from '../../services/mensaje';
 
 @Component({
   selector: 'app-perfil',
@@ -31,9 +32,10 @@ export class PerfilComponent implements OnInit {
     private listaService: ListaService,
     private productoService: ProductoService,
     private authService: AuthService,
+    private mensajeService: MensajeService, // Inyectamos el servicio global
     private cd: ChangeDetectorRef,
     private zone: NgZone,
-    private appRef: ApplicationRef // Referencia a toda la aplicación para forzar refrescos manuales
+    private appRef: ApplicationRef
   ) { }
 
   ngOnInit(): void {
@@ -110,21 +112,21 @@ export class PerfilComponent implements OnInit {
   guardarCambios(): void {
     if (!this.perfil || !this.perfil.idPerfil) return;
 
+    // Validación básica antes de enviar
+    if (this.perfil.nombrePerfil && this.perfil.nombrePerfil.length < 3) {
+      this.mensajeService.mostrarError('El nombre público debe tener al menos 3 caracteres.');
+      return;
+    }
+
     this.perfilService.actualizarPerfil(this.perfil.idPerfil, this.perfil).subscribe({
       next: (actualizado) => {
         this.perfil = actualizado;
-        this.mensajeSuccess = '¡Perfil actualizado con éxito!';
-        this.mensajeError = '';
+        this.mensajeService.mostrarSuccess('¡Perfil actualizado con éxito!');
         this.cd.detectChanges();
-        setTimeout(() => {
-          this.mensajeSuccess = '';
-          this.cd.detectChanges();
-        }, 3000);
       },
       error: (err) => {
         console.error("Error al actualizar perfil:", err);
-        this.mensajeError = 'No se pudieron guardar los cambios.';
-        this.mensajeSuccess = '';
+        this.mensajeService.mostrarError('No se pudieron guardar los cambios en el servidor.');
         this.cd.detectChanges();
       }
     });

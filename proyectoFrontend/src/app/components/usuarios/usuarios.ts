@@ -4,6 +4,7 @@ import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http'
 import { FormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario';
 import { AuthService } from '../../services/auth';
+import { MensajeService } from '../../services/mensaje';
 
 @Component({
     selector: 'app-usuarios',
@@ -19,7 +20,8 @@ export class UsuariosComponent implements OnInit {
     constructor(
         private http: HttpClient,
         private cd: ChangeDetectorRef,
-        private authService: AuthService
+        private authService: AuthService,
+        private mensajeService: MensajeService
     ) { }
 
     // Genera las cabeceras con el token JWT del usuario logueado
@@ -45,13 +47,16 @@ export class UsuariosComponent implements OnInit {
 
     // Borra a un usuario del sistema por su ID.
     eliminarUsuario(id: number) {
-        this.http.delete(this.API + '/' + id, { headers: this.obtenerCabeceras() })
-            .subscribe({
-                next: () => {
-                    this.usuarios = this.usuarios.filter(u => u.id !== id);
-                    this.cd.detectChanges();
-                },
-                error: err => console.error('Error al eliminar usuario:', err)
-            });
+        this.mensajeService.confirmar('¿Estás seguro de que quieres eliminar a este usuario definitivamente?', () => {
+            this.http.delete(this.API + '/' + id, { headers: this.obtenerCabeceras() })
+                .subscribe({
+                    next: () => {
+                        this.mensajeService.mostrarSuccess('Usuario eliminado correctamente');
+                        this.usuarios = this.usuarios.filter(u => u.id !== id);
+                        this.cd.detectChanges();
+                    },
+                    error: err => console.error('Error al eliminar usuario:', err)
+                });
+        });
     }
 }

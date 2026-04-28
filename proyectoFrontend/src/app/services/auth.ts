@@ -53,6 +53,14 @@ export class AuthService {
       })
     );
   }
+  geUserById(id: number) {
+    const url = `https://localhost:8443/usuarios/${id}`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.get<any>(url, { headers });
+  }
 
   saveToken(token: string) {
     localStorage.setItem('token', token);
@@ -91,5 +99,16 @@ export class AuthService {
 
   isAdmin(): boolean {
     return this.getRole() === 'ADMIN';
+  }
+
+  enviarComentario(comentario: string) {
+    const id = this.getId();
+    if (!id) return null;
+    const url = `https://localhost:8443/usuarios/${id}/comentarios`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    return this.http.post<any>(url, { comentario }, { headers });
   }
 }

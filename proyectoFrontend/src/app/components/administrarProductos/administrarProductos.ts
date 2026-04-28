@@ -4,6 +4,8 @@ import { HttpClientModule, HttpClient, HttpHeaders } from '@angular/common/http'
 import { FormsModule } from '@angular/forms';
 import { Producto } from '../../models/producto';
 import { AuthService } from '../../services/auth';
+import { MensajeService } from '../../services/mensaje';
+import { ProductoService } from '../../services/producto';
 
 @Component({
     selector: 'app-administrarProductos',
@@ -16,12 +18,19 @@ export class AdministrarProductosComponent implements OnInit {
     isAdmin = false;    // Dice si ese alguien es administrador
     productos: Producto[] = [];
     API = 'https://localhost:8443/productos';
-    //    @PostMapping("/confirm/{id}")
-    //    @DeleteMapping("/reject/{id}")
+    categoriasGenericas: string[] = [];
+    supermercadosOficiales: string[] = [];
+
+    nuevoPrecio: number = 0;
+    nuevoSupermercado: string = '';
+    nuevaCategoria: string = '';
+
     constructor(
         private http: HttpClient,
         private cd: ChangeDetectorRef,
-        private authService: AuthService
+        private authService: AuthService,
+        private mensajeService: MensajeService,
+        private productoService: ProductoService
     ) {
         console.log('INSTANCIA ADMIN PRODUCTOS');
 
@@ -38,15 +47,28 @@ export class AdministrarProductosComponent implements OnInit {
         });
 
     }
+
+
     // Al entrar mira si eres admin para decidir qué enseñarte.
     ngOnInit(): void {
         this.authService.loginStatus$.subscribe(logged => {
             this.isLoggedIn = logged;
             this.isAdmin = this.authService.isAdmin();
-
             if (logged) {
+                this.cargarListasDinamicas();
                 this.cargarProductos();
             }
+        });
+    }
+
+    cargarListasDinamicas() {
+        this.productoService.listarCategorias().subscribe(cats => {
+            this.categoriasGenericas = cats;
+            this.cd.detectChanges();
+        });
+        this.productoService.listarSupermercados().subscribe(sups => {
+            this.supermercadosOficiales = sups;
+            this.cd.detectChanges();
         });
     }
     // Baja todos los productos, poniendo primero los que aún no se han aprobado.
@@ -73,13 +95,16 @@ export class AdministrarProductosComponent implements OnInit {
     eliminarProducto(id?: number) {
         if (id == null) return;
 
-        this.http.delete(this.API + '/reject/' + id)
-            .subscribe({
-                next: () => {
-                    this.cargarProductos();
-                },
-                error: err => console.error('Error al eliminar producto:', err)
-            });
+        this.mensajeService.confirmar('¿Estás seguro de que quieres eliminar este producto definitivamente?', () => {
+            this.http.delete(this.API + '/reject/' + id)
+                .subscribe({
+                    next: () => {
+                        this.mensajeService.mostrarSuccess('Producto eliminado correctamente');
+                        this.cargarProductos();
+                    },
+                    error: err => console.error('Error al eliminar producto:', err)
+                });
+        });
     }
 
 
@@ -90,9 +115,46 @@ export class AdministrarProductosComponent implements OnInit {
         this.http.post(this.API + '/confirm/' + id, null, { headers: this.obtenerCabeceras() })
             .subscribe({
                 next: () => {
+                    this.mensajeService.mostrarSuccess('Producto confirmado');
                     this.cargarProductos();
                 },
                 error: err => console.error('Error al confirmar producto:', err)
             });
     }
+
+    // Actualiza los datos de un producto (supermercado y categoría).
+    actualizarProducto(p: Producto) {
+        if (!p.id) return;
+
+        const body = {
+            nombre: p.nombre,
+            descripcion: p.descripcion,
+            precio: p.precio,
+            supermercado: p.supermercado,
+            categoria: p.categoria,
+            imagenUrl: p.imagenUrl
+        };
+
+        this.http.put(this.API + '/' + p.id, body, { headers: this.obtenerCabeceras() })
+            .subscribe({
+                next: () => {
+                    this.mensajeService.mostrarSuccess('Producto actualizado con éxito');
+                    this.cargarProductos();
+                },
+                error: err => {
+                    console.error('Error al actualizar producto:', err);
+                    this.mensajeService.mostrarError('Error al actualizar el producto');
+                }
+            });
+    }
+    getSupermercados(): string[] {
+        // Si la lista del servidor ya trae "Mercado Libre", no lo añadimos otra vez
+        const lista = [...this.supermercadosOficiales];
+        if (!lista.includes('Mercado Libre')) {
+            lista.push('Mercado Libre');
+        }
+        return lista;
+    }
+
+
 }

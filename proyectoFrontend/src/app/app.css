@@ -1,67 +1,44 @@
-/* Estilo de la barra de navegación */
+/* --- RESET Y SEGURIDAD --- */
+html,
+body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- BARRA DE NAVEGACIÓN --- */
 .site-header-brand {
     background: linear-gradient(90deg, var(--home-orange), var(--home-orange-dark));
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.text-home-accent {
-    color: var(--home-orange-dark) !important;
+/* FIX CRÍTICO: Rango 940px - 1100px */
+@media (min-width: 992px) and (max-width: 1200px) {
+    .navbar-nav .nav-link {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        font-size: 0.9rem;
+    }
+
+    .rounded-pill {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem !important;
+    }
 }
 
-.navbar {
-    transition: all 0.3s ease;
-}
-
+/* --- ELEMENTOS DEL NAV --- */
 .nav-link {
     font-weight: 500;
-    transition: color 0.2s ease;
-}
-
-.nav-link.active {
-    color: #fff !important;
-    position: relative;
-}
-
-.nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: 5px;
-    left: 1rem;
-    right: 1rem;
-    height: 2px;
-    background-color: #0d6efd;
-}
-
-/* Círculo para el perfil de usuario */
-.avatar-circle {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(45deg, #0d6efd, #0dcaf0);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-}
-
-/* Animación para el menú desplegable */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.3s ease forwards;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    /* Evita que los textos salten de línea y rompan el alto */
 }
 
 .nav-link.active::after {
@@ -75,8 +52,51 @@
     border-radius: 2px;
 }
 
-/* Sombra suave para dropdowns */
-.dropdown-menu {
-    border-radius: 0.75rem;
-    border: none;
+/* Círculo del perfil mejorado */
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+/* Dropdown en móvil */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        border-radius: 1rem;
+        margin-top: 1rem;
+    }
+
+    .dropdown-menu {
+        position: static !important;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+}
+
+/* Animaciones */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

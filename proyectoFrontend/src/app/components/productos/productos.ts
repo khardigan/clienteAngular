@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Producto } from '../../models/producto';
 import { ProductoService } from '../../services/producto';
 import { AuthService } from '../../services/auth';
+import { MensajeService } from '../../services/mensaje';
 
 @Component({
   selector: 'app-productos',
@@ -24,21 +25,49 @@ export class ProductosComponent implements OnInit {
   searchQuery = '';
   minPrice: number | null = null;
   maxPrice: number | null = null;
-
+  selectedSupermarket: string = '';
+  selectedCategory: string = '';
+  // Listas dinámicas desde la BD
+  supermercadosOficiales: string[] = [];
+  categoriasGenericas: string[] = [];
   nuevoNombre = '';
   nuevaDescripcion = '';
   nuevoPrecio: number | null = null;
-  nuevaCantidad: number = 1;
-  nuevoSupermercado = ''; // Nuevo campo
+  nuevoSupermercado = '';
+  nuevaImagenUrl = '';
+  nuevaCategoria = '';
+  @ViewChild('fileInput') fileInput!: ElementRef;
+  imagenSeleccionada: File | null = null;
 
   constructor(
     private productoService: ProductoService,
     private authService: AuthService,
-    private cd: ChangeDetectorRef
+    private mensajeService: MensajeService,
+    private cd: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
+    // Escuchar cambios en los parámetros por URL para preconfigurar el filtro
+    this.route.queryParams.subscribe(params => {
+      const paramSupermercado = params['supermercado'];
+      if (paramSupermercado) {
+        this.selectedSupermarket = paramSupermercado;
+      }
+    });
     this.cargarProductos();
+    this.cargarListasDinamicas();
+  }
+
+  cargarListasDinamicas() {
+    this.productoService.listarCategorias().subscribe(cats => {
+      this.categoriasGenericas = cats;
+      this.cd.detectChanges();
+    });
+    this.productoService.listarSupermercados().subscribe(sups => {
+      this.supermercadosOficiales = sups;
+      this.cd.detectChanges();
+    });
   }
 
   get isLoggedIn(): boolean {
@@ -64,9 +93,110 @@ export class ProductosComponent implements OnInit {
 
       const matchesMinPrice = this.minPrice === null || p.precio >= this.minPrice;
       const matchesMaxPrice = this.maxPrice === null || p.precio <= this.maxPrice;
+      let matchesSupermarket = true;
+      if (this.selectedSupermarket === 'Mercado Libre') {
+        const superNormalize = p.supermercado?.trim().toLowerCase() || '';
+        // Consideramos oficial todo lo que esté en la lista EXCEPTO "Mercado Libre"
+        const oficialesReales = this.supermercadosOficiales
+          .filter(s => s !== 'Mercado Libre')
+          .map(o => o.toLowerCase());
+        const isOficial = oficialesReales.includes(superNormalize);
+        matchesSupermarket = !isOficial && !!p.supermercado;
+      }
+      else if (this.selectedSupermarket !== '') {
+        const superNormalize = p.supermercado?.trim().toLowerCase() || '';
+        matchesSupermarket = superNormalize === this.selectedSupermarket.toLowerCase();
+      }
 
-      return matchesSearch && matchesMinPrice && matchesMaxPrice;
+      const matchesCategory = !this.selectedCategory ||
+        (p.categoria && p.categoria.toLowerCase() === this.selectedCategory.toLowerCase());
+
+      return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesSupermarket && matchesCategory;
     }).sort((a, b) => a.precio - b.precio);
+  }
+  getSupermercados(): string[] {
+    // Si la lista del servidor ya trae "Mercado Libre", no lo añadimos otra vez
+    const lista = [...this.supermercadosOficiales];
+    if (!lista.includes('Mercado Libre')) {
+      lista.push('Mercado Libre');
+    }
+    return lista;
+  }
+  getMediaPuntuacion(): number {
+    const productosConPuntuacion = this.productos.filter(p => p.mediaPuntuacion !== undefined && p.mediaPuntuacion !== null);
+
+    if (productosConPuntuacion.length === 0) {
+      return 0;
+    }
+
+    const totalPuntuaciones = productosConPuntuacion.reduce((acc, p) => acc + p.mediaPuntuacion!, 0);
+    return totalPuntuaciones / productosConPuntuacion.length;
+  }
+  getEstrellas(puntuacion?: number | null): string[] {
+    const estrellas: string[] = [];
+
+    if (puntuacion === undefined || puntuacion === null || puntuacion === 0) {
+      return ['☆', '☆', '☆', '☆', '☆'];
+    }
+
+    const puntuacionNormalizada = Math.max(0, Math.min(5, puntuacion));
+    const estrellasEnteras = Math.floor(puntuacionNormalizada);
+    const tieneMediaEstrella = puntuacionNormalizada - estrellasEnteras >= 0.5;
+
+    for (let i = 0; i < estrellasEnteras; i++) {
+      estrellas.push('★');
+    }
+
+    if (tieneMediaEstrella) {
+      estrellas.push('½');
+    }
+
+    const totalEstrellas = estrellasEnteras + (tieneMediaEstrella ? 1 : 0);
+    for (let i = totalEstrellas; i < 5; i++) {
+      estrellas.push('☆');
+    }
+
+    return estrellas;
+  }
+
+  getMediaEstrellas(): string {
+    const media = this.getMediaPuntuacion();
+    const estrellasEnteras = Math.floor(media);
+    const tieneMediaEstrella = media - estrellasEnteras >= 0.5;
+
+    let resultado = '';
+
+    // Estrellas completas
+    for (let i = 0; i < estrellasEnteras; i++) {
+      resultado += '★';
+    }
+
+    // Media estrella si corresponde
+    if (tieneMediaEstrella) {
+      resultado += '½';
+    }
+
+    // Estrellas vacías restantes
+    const totalEstrellas = estrellasEnteras + (tieneMediaEstrella ? 1 : 0);
+    for (let i = totalEstrellas; i < 5; i++) {
+      resultado += '☆';
+    }
+
+    return resultado;
+  }
+
+  isOficial(nombre: string): boolean {
+    if (!nombre) return false;
+    const superNormalize = nombre.trim().toLowerCase();
+    return this.supermercadosOficiales.map(o => o.toLowerCase()).includes(superNormalize);
+  }
+
+  getLogoSupermercado(nombre: string): string {
+    if (!nombre) return '';
+    const superNormalize = nombre.trim().toLowerCase();
+    if (superNormalize === 'carrefour') return '/images/Carrefour.svg'; // único SVG
+    const oficial = this.supermercadosOficiales.find(o => o.toLowerCase() === superNormalize);
+    return oficial ? `/images/${oficial}.png` : '';
   }
 
   // Genera una URL de imagen dinámica basada en el nombre del producto
@@ -100,29 +230,42 @@ export class ProductosComponent implements OnInit {
       nombre: this.nuevoNombre,
       descripcion: this.nuevaDescripcion,
       precio: this.nuevoPrecio,
-      cantidad: this.nuevaCantidad,
-      supermercado: this.nuevoSupermercado || undefined
+      supermercado: this.nuevoSupermercado || undefined,
+      imagenUrl: this.nuevaImagenUrl || undefined,
+      categoria: this.nuevaCategoria || undefined
+
     }).subscribe({
       next: (producto) => {
         this.productos.push(producto);
         this.nuevoNombre = '';
         this.nuevaDescripcion = '';
         this.nuevoPrecio = null;
-        this.nuevaCantidad = 1;
         this.nuevoSupermercado = '';
+        this.nuevaImagenUrl = '';
+        this.nuevaCategoria = '';
         this.mostrarFormulario = false;
 
-        // Mostrar mensaje de éxito
-        this.mensajeExito = '✓ Producto creado correctamente. Espera a que sea confirmado por un administrador.';
-        setTimeout(() => {
-          this.mensajeExito = '';
-        }, 5000);
-
+        // Mostrar mensaje de éxito global
+        this.mensajeService.mostrarSuccess('¡Producto creado! Pendiente de confirmación por el administrador.');
         this.cd.detectChanges();
       },
-      error: (err) => console.error('Error al crear producto:', err)
+      error: (err) => {
+        console.error('Error al crear producto:', err);
+        this.mensajeService.mostrarError('Error al crear el producto.');
+      }
     });
   }
 
+  // Métodos para el manejo de imágenes
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
 
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.imagenSeleccionada = file;
+      this.mensajeService.mostrarInfo(`Imagen seleccionada: ${file.name}`);
+    }
+  }
 }

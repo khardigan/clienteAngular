@@ -1,60 +1,97 @@
-<div class="container mt-4">
-    <h1>Lista de Productos</h1>
-    <p>Total productos: {{ productos.length }}</p>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripcion</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Estado</th>
-                <th>Opciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let p of productos" [style.background-color]="p.confirmado ? 'transparent' : '#f0fdf4'"
-                [style.border-left]="p.confirmado ? '4px solid #e5e7eb' : '4px solid #22c55e'">
-                <td><strong [style.color]="p.confirmado ? '#374151' : '#16a34a'">{{ p.nombre }}</strong></td>
-                <td>{{ p.descripcion }}</td>
-                <td>{{ p.precio }}</td>
-                <td>{{ p.cantidad }}</td>
-                <td>
-                    <span *ngIf="!p.confirmado"
-                        style="display: inline-block; background: #22c55e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
-                        PENDIENTE
-                    </span>
-                    <span *ngIf="p.confirmado"
-                        style="display: inline-block; background: #9ca3af; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
-                        CONFIRMADO
-                    </span>
-                </td>
+<div class="container-fluid mt-4 px-4 main-content-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-0">Gestión de Catálogo</h1>
+            <p class="text-muted">Administra los productos, valida sugerencias y ajusta precios.</p>
+        </div>
+        <div class="badge bg-dark rounded-pill px-3 py-2">
+            {{ productos.length }} Productos en total
+        </div>
+    </div>
 
-                <td>
-                    <button *ngIf="isLoggedIn"
-                        class="btn btn-outline-danger btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2"
-                        (click)="eliminarProducto(p.id)"
-                        title="Eliminar este producto de la base de datos definitivamente">
-                        <i class="bi bi-trash3"></i>
-                        <span class="small">Eliminar</span>
-                    </button>
-                    <button *ngIf="isAdmin && !p.confirmado"
-                        class="btn btn-success btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 animate-fade-in"
-                        (click)="confirmarProducto(p.id)"
-                        title="Validar este producto para que aparezca en el catálogo público">
-                        <i class="bi bi-check2-all"></i>
-                        <span class="small">Validar</span>
-                    </button>
-                </td>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 15%">Nombre</th>
+                        <th style="width: 25%">Descripción</th>
+                        <th style="width: 12%">Precio</th>
+                        <th style="width: 15%">Supermercado</th>
+                        <th style="width: 15%">Categoría</th>
+                        <th style="width: 8%">Estado</th>
+                        <th style="width: 10%" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let p of productos" [style.background-color]="p.confirmado ? 'transparent' : '#f0fdf4'"
+                        [style.border-left]="p.confirmado ? '4px solid #dee2e6' : '4px solid #22c55e'">
 
+                        <td>
+                            <div class="fw-bold" [style.color]="p.confirmado ? '#374151' : '#16a34a'">{{ p.nombre }}
+                            </div>
+                        </td>
 
+                        <td>
+                            <small class="text-muted d-block text-truncate" style="max-width: 300px;"
+                                [title]="p.descripcion">
+                                {{ p.descripcion }}
+                            </small>
+                        </td>
 
-                <!-- Acción Confirmar para Administradores -->
+                        <td>
+                            <div class="input-group input-group-sm" style="max-width: 100px;">
+                                <input type="number" class="form-control border-0 bg-light" [(ngModel)]="p.precio"
+                                    (change)="actualizarProducto(p)">
+                                <span class="input-group-text border-0 bg-light">€</span>
+                            </div>
+                        </td>
 
+                        <!-- Edición de Supermercado -->
+                        <td>
+                            <input type="text" class="form-control form-control-sm border-0 bg-light"
+                                [(ngModel)]="p.supermercado" list="adminSupermercados" (change)="actualizarProducto(p)"
+                                placeholder="Supermercado...">
+                            <datalist id="adminSupermercados">
+                                <option *ngFor="let s of getSupermercados()" [value]="s"></option>
+                            </datalist>
+                        </td>
 
-                <!-- Botón de Borrado (Solo Usuarios Registrados) -->
+                        <!-- Edición de Categoría -->
+                        <td>
+                            <select class="form-select form-select-sm border-0 bg-light" [(ngModel)]="p.categoria"
+                                (change)="actualizarProducto(p)">
+                                <option value="">Sin categoría</option>
+                                <option *ngFor="let cat of categoriasGenericas" [value]="cat">{{cat}}</option>
+                            </select>
+                        </td>
 
-            </tr>
-        </tbody>
-    </table>
+                        <td>
+                            <span *ngIf="!p.confirmado"
+                                class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">Pendiente</span>
+                            <span *ngIf="p.confirmado" class="badge bg-light text-muted rounded-pill px-2">Activo</span>
+                        </td>
+
+                        <td>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button *ngIf="isLoggedIn"
+                                    class="btn btn-outline-danger btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                    (click)="eliminarProducto(p.id)" title="Eliminar definitivamente"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+
+                                <button *ngIf="isAdmin && !p.confirmado"
+                                    class="btn btn-success btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                    (click)="confirmarProducto(p.id)" title="Validar y publicar"
+                                    style="width: 32px; height: 32px;">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

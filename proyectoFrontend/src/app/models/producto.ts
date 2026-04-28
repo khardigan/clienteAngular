@@ -1,15 +1,21 @@
+import { Comentario } from "./comentario";
+
 export interface Producto {
   id: number;
   nombre: string;
   descripcion: string;
   precio: number;
-  cantidad: number;
   usuarioRegistradorId?: number;
   confirmado?: boolean;
   listas?: number[];
   supermercado?: string;
+  imagenUrl?: string;
+  categoria?: string;
   comprado?: boolean;
-
+  mediaPuntuacion?: number;
+  totalComentarios?: number;
+  comentarios?: Comentario[]
+  puntuaciones?: number[];
 }
 
 export interface ProductoPropio {

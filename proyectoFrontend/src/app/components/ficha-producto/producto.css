@@ -74,3 +74,20 @@ body::after {
     height: 100%;
     background: linear-gradient(180deg, #ff7a00, #ffb347);
 }
+
+.transition-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.transition-hover:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.extra-small {
+    font-size: 0.75rem;
+}

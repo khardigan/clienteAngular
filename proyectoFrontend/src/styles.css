@@ -41,6 +41,10 @@ body {
     margin: 0;
 }
 
+.main-content-wrapper {
+    min-height: 80vh;
+}
+
 /* Estilos globales para las tarjetas de productos */
 .producto-card {
     border: 1px solid rgba(0, 0, 0, 0.12);

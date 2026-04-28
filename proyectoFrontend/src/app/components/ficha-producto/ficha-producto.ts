@@ -6,6 +6,10 @@ import { ProductoService } from '../../services/producto';
 import { Producto } from '../../models/producto';
 import { ListaDetalle } from '../../models/lista';
 import { ListaService } from '../../services/lista';
+import { ComentarioService } from '../../services/comentarioService';
+import { Comentario } from '../../models/comentario';
+import { AuthService } from '../../services/auth';
+import { MensajeService } from '../../services/mensaje';
 
 @Component({
   selector: 'app-ficha-producto',
@@ -21,16 +25,19 @@ export class FichaProductoComponent implements OnInit {
   error = false;
 
 
-  mensaje: string | null = null;
-  tipoMensaje: 'success' | 'error' | null = null;
   listas: ListaDetalle[] = [];
   listaSeleccionada: ListaDetalle | null = null;
-
+  nuevoComentario: string = '';
+  nuevaPuntuacion: number = 0;
+  comentarioEditando: Comentario | null = null;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private productoService: ProductoService,
+    private comentarioService: ComentarioService,
     private listaService: ListaService,
+    public authService: AuthService,
+    public mensajeService: MensajeService,
     private cd: ChangeDetectorRef
   ) { }
 
@@ -47,23 +54,7 @@ export class FichaProductoComponent implements OnInit {
     }
   }
 
-  // ========================
-  // PRODUCTO
-  // ========================
-  // Llama al servidor para traer todos los datos del producto.
-  cargarProducto(id: number): void {
-    this.productoService.obtenerProducto(id).subscribe({
-      next: (prod) => {
-        this.producto = prod;
-        this.cargando = false;
-        this.cd.detectChanges();
-      },
-      error: () => {
-        this.error = true;
-        this.cargando = false;
-      }
-    });
-  }
+
 
   // ========================
   // LISTAS
@@ -79,16 +70,14 @@ export class FichaProductoComponent implements OnInit {
     });
   }
 
-  // Enseña un aviso arriba de si todo ha ido bien o ha habido un error.
   mostrarMensaje(texto: string, tipo: 'success' | 'error'): void {
-    this.mensaje = texto;
-    this.tipoMensaje = tipo;
-
-    setTimeout(() => {
-      this.mensaje = null;
-      this.tipoMensaje = null;
-    }, 2500);
+    if (tipo === 'success') {
+      this.mensajeService.mostrarSuccess(texto);
+    } else {
+      this.mensajeService.mostrarError(texto);
+    }
   }
+
   // Cuando eliges una lista y le das al botón de añadir.
   confirmarAgregarALista(): void {
     if (!this.producto || !this.listaSeleccionada) return;
@@ -144,8 +133,103 @@ export class FichaProductoComponent implements OnInit {
     return `https://picsum.photos/seed/${nombre}/800/600`;
   }
 
+  // Ahora devuelve directamente el valor numérico que procesamos en cargarProducto
+  getMediaPuntuacion(): number {
+    return this.producto?.mediaPuntuacion || 0;
+  }
+
+  cargarProducto(id: number): void {
+    this.productoService.obtenerProducto(id).subscribe({
+      next: (prod) => {
+        this.producto = prod;
+        this.producto.mediaPuntuacion = prod.mediaPuntuacion || 0;
+        this.producto.comentarios = [];
+        this.obtenerComentariosProducto();
+        this.cargando = false;
+        this.cd.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error cargando producto:', err);
+        this.error = true;
+        this.cargando = false;
+      }
+    });
+  }
+
+  getMediaEstrellas(): string {
+    const media = this.getMediaPuntuacion();
+
+    if (media <= 0) return '';
+
+    const estrellasEnteras = Math.floor(media);
+    const tieneMediaEstrella = (media - estrellasEnteras) >= 0.5;
+    let estrellasHTML = '';
+
+    for (let i = 0; i < estrellasEnteras; i++) {
+      estrellasHTML += '<i class="bi bi-star-fill"></i> ';
+    }
+    if (tieneMediaEstrella) {
+      estrellasHTML += '<i class="bi bi-star-half"></i> ';
+    }
+    for (let i = estrellasEnteras + (tieneMediaEstrella ? 1 : 0); i < 5; i++) {
+      estrellasHTML += '<i class="bi bi-star"></i> ';
+    }
+
+    console.log('4. HTML resultante:', estrellasHTML);
+    return estrellasHTML.trim();
+  }
   // Te saca de la ficha y te devuelve a la tienda.
   volver(): void {
     this.router.navigate(['/productos']);
   }
+
+  // Para marcar las estrellas en el formulario
+  setRating(valor: number): void {
+    this.nuevaPuntuacion = valor;
+  }
+
+  // Función que llamarás para enviar los datos
+  enviarComentario(): void {
+    if (!this.producto) return;
+
+    this.comentarioService.crearComentario(this.producto.id, this.nuevoComentario, this.nuevaPuntuacion).subscribe({
+      next: () => {
+        this.mostrarMensaje('¡Gracias por tu opinión!', 'success');
+        this.nuevoComentario = '';
+        this.nuevaPuntuacion = 0;
+        this.cargarProducto(this.producto!.id);
+      },
+      error: () => this.mostrarMensaje('Ya has comentado en este producto o hubo un error', 'error')
+    });
+  }
+  obtenerComentariosProducto(): void {
+    this.comentarioService.obtenerComentariosProducto(this.producto!.id).subscribe({
+      next: (comentarios: any[]) => {
+        comentarios.forEach(c => {
+          // Inicialización síncrona para evitar TypeErrors
+          if (!c.usuario) {
+            c.usuario = { nombre: 'Cargando...' };
+          }
+
+          const userId = c.usuarioId || c.idUsuario;
+          if (userId) {
+            this.authService.geUserById(userId).subscribe({
+              next: (u) => {
+                c.usuario.nombre = u.nombre || u.name || 'Usuario';
+                this.cd.detectChanges();
+              },
+              error: () => {
+                c.usuario.nombre = 'Anónimo';
+                this.cd.detectChanges();
+              }
+            });
+          }
+        });
+        this.producto!.comentarios = comentarios;
+        this.cd.detectChanges();
+      },
+      error: (err) => console.error('Error cargando comentarios:', err)
+    });
+  }
+
 }

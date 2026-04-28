@@ -2,55 +2,113 @@
     <section id="presentacion" class="container-fluid px-0 d-flex align-items-center home-hero text-white">
         <div class="container py-5">
             <div class="row justify-content-center align-items-center g-4">
-                <div class="col-lg-5">
-                    <div class="p-4">
-                        <h2 class="text-white">Crea y personaliza tus propias listas de compra</h2>
-                        <p class="mb-4">Organiza tu compra y tus ganancias con nosotros, aprende a administrar y
-                            sentirte segura con tu compra.</p>
+
+                <div class="col-lg-6 col-md-12">
+                    <swiper-container class="mySwiper" [attr.loop]="true" [attr.pagination]="true"
+                        [attr.navigation]="true" [attr.autoplay-delay]="3000"
+                        [attr.autoplay-disable-on-interaction]="false">
+
+                        <swiper-slide>
+                            <div class="py-4">
+                                <span class="carrusel-title-wrapper">
+                                    <h2 class="carrusel-title carrusel-title-2x">Bienvenido a LinkedList</h2>
+                                    <p class="mt-3 lead text-white opacity-75" style="max-width: 90%;">Tu plataforma
+                                        integral para organizar listas de la compra, comparar precios y ahorrar tiempo
+                                        real.</p>
+                                </span>
+                            </div>
+                        </swiper-slide>
+
+                        <swiper-slide>
+                            <div class="py-4">
+                                <span class="carrusel-title-wrapper">
+                                    <h2 class="carrusel-title carrusel-title-2x">Listas Inteligentes</h2>
+                                    <p class="mt-3 lead text-white opacity-75" style="max-width: 90%;">Crea múltiples
+                                        listas, añade productos y mantén el control de todo lo que necesitas comprar.
+                                    </p>
+                                </span>
+                            </div>
+                        </swiper-slide>
+
+                        <swiper-slide>
+                            <div class="py-4">
+                                <span class="carrusel-title-wrapper">
+                                    <h2 class="carrusel-title carrusel-title-2x">Optimiza tu Dinero</h2>
+                                    <p class="mt-3 lead text-white opacity-75" style="max-width: 90%;">Compara precios
+                                        en diferentes supermercados y encuentra siempre las mejores marcas y ofertas.
+                                    </p>
+                                </span>
+                            </div>
+                        </swiper-slide>
+
+                        <swiper-slide *ngFor="let lista of listas">
+                            <div class="py-4">
+                                <span class="carrusel-title-wrapper">
+                                    <h2 class="carrusel-title carrusel-title-2x fw-bold">Tu Lista: {{lista.nombre}}</h2>
+                                    <p class="mt-2 lead text-white opacity-75">Accede a tus selecciones rápidamente para
+                                        continuar con tus compras.</p>
+                                </span>
+                            </div>
+                        </swiper-slide>
+
+                    </swiper-container>
+
+                    <div class="mt-4">
                         <button type="button" class="btn btn-light me-2" routerLink="/mis-listas">Crear Lista</button>
                         <button type="button" class="btn btn-outline-light" routerLink="/mis-listas">Ver Listas</button>
                     </div>
                 </div>
-                <div class="col-lg-5 text-center">
+
+
+                <div class="col-lg-6 col-md-10 text-center text-lg-end mt-5 mt-lg-0">
                     <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
-                        alt="Compras y listas" class="img-fluid rounded shadow">
+                        alt="Imagen" class="img-fluid rounded shadow hero-img-crop">
                 </div>
             </div>
         </div>
     </section>
 
+
+
+    <!-- Productos mas comprados -->
     <section class="container-fluid py-5 bg-home-sky">
         <div class="container">
             <div class="p-4 p-lg-5 rounded-4 shadow-lg bg-white bg-opacity-75 border border-warning border-opacity-50">
                 <h3 class="mb-4 text-home-accent">Disfruta de nuestros productos y crea tu propio estilo</h3>
-                <p class="mb-4 text-secondary">Estas son algunas de nuestras tiendas disponibles, encuentra lo que
-                    necesitas con una experiencia clara y moderna.</p>
+                <p class="mb-4 text-secondary">
+                    Estas son algunas de nuestras tiendas disponibles, encuentra lo que necesitas con una experiencia
+                    clara y moderna.
+                </p>
+
                 <div class="row g-3 text-center" id="Supermercados" role="list">
                     <div class="col-6 col-md-3">
                         <div class="list-group shadow-sm">
-                            <a href="#"
-                                class="list-group-item list-group-item-action rounded py-3 fw-semibold text-body"
+                            <a [routerLink]="['/productos']" [queryParams]="{ supermercado: 'Mercadona' }"
+                                class="list-group-item list-group-item-action rounded py-3 fw-semibold supermercado-btn btn-mercadona"
                                 role="listitem">Mercadona</a>
                         </div>
                     </div>
+
                     <div class="col-6 col-md-3">
                         <div class="list-group shadow-sm">
-                            <a href="#"
-                                class="list-group-item list-group-item-action rounded py-3 fw-semibold text-body"
+                            <a [routerLink]="['/productos']" [queryParams]="{ supermercado: 'Carrefour' }"
+                                class="list-group-item list-group-item-action rounded py-3 fw-semibold supermercado-btn btn-carrefour"
                                 role="listitem">Carrefour</a>
                         </div>
                     </div>
+
                     <div class="col-6 col-md-3">
                         <div class="list-group shadow-sm">
-                            <a href="#"
-                                class="list-group-item list-group-item-action rounded py-3 fw-semibold text-body"
+                            <a [routerLink]="['/productos']" [queryParams]="{ supermercado: 'Lidl' }"
+                                class="list-group-item list-group-item-action rounded py-3 fw-semibold supermercado-btn btn-lidl"
                                 role="listitem">Lidl</a>
                         </div>
                     </div>
+
                     <div class="col-6 col-md-3">
                         <div class="list-group shadow-sm">
-                            <a href="#"
-                                class="list-group-item list-group-item-action rounded py-3 fw-semibold text-body"
+                            <a [routerLink]="['/productos']" [queryParams]="{ supermercado: 'Dia' }"
+                                class="list-group-item list-group-item-action rounded py-3 fw-semibold supermercado-btn btn-dia"
                                 role="listitem">Dia</a>
                         </div>
                     </div>
@@ -59,6 +117,7 @@
         </div>
     </section>
 
+    <!-- Como funciona parte 2-->
     <section class="container-fluid py-5 bg-home-cream">
         <div class="container">
             <div class="p-4 p-lg-5">
@@ -67,21 +126,24 @@
                     <div class="col-12 col-md-4">
                         <div class="py-3">
                             <h4 class="mb-3">1. Crea tu lista</h4>
-                            <p class="mb-0">Selecciona los productos que deseas comprar y organízalos en tu lista
+                            <p class="mb-0">Selecciona los productos que deseas comprar y organízalos en tu
+                                lista
                                 personalizada.</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="py-3">
                             <h4 class="mb-3">2. Compara precios</h4>
-                            <p class="mb-0">Compara los precios de los productos en diferentes tiendas para encontrar
+                            <p class="mb-0">Compara los precios de los productos en diferentes tiendas para
+                                encontrar
                                 las mejores ofertas.</p>
                         </div>
                     </div>
                     <div class="col-12 col-md-4">
                         <div class="py-3">
                             <h4 class="mb-3">3. Ahorra tiempo y dinero</h4>
-                            <p class="mb-0">Optimiza tu compra y ahorra tiempo y dinero con nuestras herramientas de
+                            <p class="mb-0">Optimiza tu compra y ahorra tiempo y dinero con nuestras
+                                herramientas de
                                 comparación.</p>
                         </div>
                     </div>
@@ -90,18 +152,20 @@
         </div>
     </section>
 
+    <!-- Ventajas que obtienes al usar nuestra web -->
     <section class="container-fluid py-5 bg-home-cream">
         <div class="container">
             <div class="p-4 p-lg-5">
                 <h2 class="mb-4 text-center fw-bold">Ventajas que obtienes al usar nuestra web</h2>
-                <p class="mb-4 text-center">Al utilizar nuestra plataforma, podrás disfrutar de una experiencia de
+                <p class="mb-4 text-center">Al utilizar nuestra plataforma, podrás disfrutar de una experiencia
+                    de
                     compra más eficiente y personalizada. Algunas de las ventajas que ofrecemos incluyen:</p>
                 <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80"
                     alt="Compra en tienda" class="img-fluid rounded mx-auto d-block shadow-sm home-img-wide">
             </div>
         </div>
     </section>
-
+    <!-- Ventajas que obtienes al usar nuestra web parte 2 -->
     <section class="container-fluid py-5 bg-home-cream border-top border-3">
         <div class="container">
             <div class="row align-items-center g-4">
@@ -144,53 +208,94 @@
         </div>
     </section>
 
-    <section class="container-fluid text-body d-flex flex-column"
+    <!-- Seccion de comentarios -->
+    <section class="container-fluid text-body d-flex flex-column py-5"
         style="min-height: 400px; background-color: var(--home-sky);">
-        <div class="container d-flex align-items-center justify-content-center text-center flex-grow-1 py-4">
-            <p class="px-2 mb-0"
-                style="line-height: 1.8; font-family: Georgia, serif; font-size: 1.4rem; font-style: italic;">Desde que
-                utilizo esta web para centralizar mis compras, ahorro muchísimo tiempo y dinero. Antes tenía que
-                comparar en varias páginas, pero aquí encuentro todo en un solo lugar con precios competitivos y
-                opiniones claras. Además, el proceso de compra es muy sencillo y siempre sé que estoy eligiendo bien.
-            </p>
+
+        <div class="container text-center mb-4">
+            <h2 class="fw-bold mb-3">Lo que dicen nuestros usuarios</h2>
         </div>
-        <div
-            class="container d-flex flex-column align-items-center justify-content-center text-center pb-4 flex-shrink-0">
-            <div class="mb-2 text-warning" aria-hidden="true">
-                <svg width="60" height="60" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                </svg>
-            </div>
-            <div>
-                <h3 class="fw-bold h6 mb-1">Carlos Martínez</h3>
-                <p class="small text-secondary mb-0">Encargado de Operaciones, Distribuciones CM</p>
-            </div>
+
+
+        <div class="container" *ngIf="comentarios && comentarios.length > 0">
+
+            <swiper-container class="comment-swiper" [attr.loop]="comentarios.length > 1" slides-per-view="1"
+                [attr.pagination]="true" [attr.navigation]="true" [attr.autoplay-delay]="6000"
+                [attr.autoplay-disable-on-interaction]="false">
+
+                <swiper-slide *ngFor="let comentario of comentarios | slice: 0 : 3">
+                    <div
+                        class="w-100 d-flex flex-column align-items-center justify-content-center text-center px-4 py-5">
+
+                        <!-- Producto (Sutil) -->
+                        <div class="mb-4">
+                            <span class="text-primary fw-bold text-uppercase tracking-wider small"
+                                style="letter-spacing: 2px;">
+                                {{comentario.productoNombre}}
+                            </span>
+                        </div>
+
+                        <!-- Contenido del comentario (Gran tipografía) -->
+                        <div class="mb-4">
+                            <p class="display-6 fw-normal text-dark px-md-5 italic"
+                                style="font-family: 'Outfit', sans-serif; line-height: 1.4;">
+                                "{{ comentario.contenido }}"
+                            </p>
+                        </div>
+
+                        <!-- Estrellas -->
+                        <div class="mb-4 text-warning">
+                            <i *ngFor="let i of [1,2,3,4,5]" class="bi fs-5 mx-1"
+                                [ngClass]="comentario.puntuacion >= i ? 'bi-star-fill' : 'bi-star'">
+                            </i>
+                        </div>
+
+                        <!-- Footer: Usuario y Fecha -->
+                        <div class="pt-3 border-top w-50">
+                            <h5 class="fw-bold h6 mb-1 text-dark">{{ comentario.usuario.nombre }}</h5>
+                            <p class="text-muted extra-small mb-0">{{ comentario.fecha | date:'dd MMMM, yyyy' }}</p>
+                        </div>
+
+                    </div>
+                </swiper-slide>
+
+            </swiper-container>
+        </div>
+
+
+        <div class="container text-center py-5" *ngIf="!comentarios || comentarios.length === 0">
+            <p class="text-muted">Aún no hay comentarios de usuarios.</p>
         </div>
     </section>
 
+    <!-- Seccion de publicidad de la pagina  -->
     <section class="container-fluid py-5 bg-home-cream">
         <div class="container text-center">
             <h2 class="fw-bold mb-4">Ingresa el producto que quieras para ayudar a los demás</h2>
-            <p class="mb-4 lead">Ayuda a nuestra comunidad compartiendo tus experiencias con productos y precios. Tu
-                opinión es valiosa y ayuda a otros usuarios a tomar mejores decisiones de compra. Juntos creamos una
+            <p class="mb-4 lead">Ayuda a nuestra comunidad compartiendo tus experiencias con productos y
+                precios. Tu
+                opinión es valiosa y ayuda a otros usuarios a tomar mejores decisiones de compra. Juntos creamos
+                una
                 plataforma más confiable y beneficiosa para todos.</p>
-            <button type="button" class="btn btn-home btn-lg" routerLink="/login">Get started</button>
+            <button type="button" class="btn btn-home btn-lg" routerLink="/login">Empieza ahora</button>
         </div>
     </section>
-
+    <!-- Seccion de preguntas frecuentes -->
     <section class="container-fluid py-5 bg-home-cream">
         <div class="container">
             <h2 class="fw-bold mb-2 text-center">Preguntas frecuentes</h2>
-            <p class="mb-5 text-center lead">Las dudas más comunes de nuestros usuarios. Si no encuentras tu pregunta
+            <p class="mb-5 text-center lead">Las dudas más comunes de nuestros usuarios. Si no encuentras tu
+                pregunta
                 aquí, no dudes en contactarnos.</p>
 
             <div class="row">
                 <div class="col-lg-6 mb-4">
                     <div class="border-start border-4 border-warning ps-3">
                         <h5 class="fw-bold">¿Cómo puedo crear mi lista de compra?</h5>
-                        <p class="mb-0">Simplemente regístrate en nuestra plataforma, accede a la sección de listas y
-                            comienza a añadir los productos que necesitas. Puedes organizar por categorías, tiendas o
+                        <p class="mb-0">Simplemente regístrate en nuestra plataforma, accede a la sección de
+                            listas y
+                            comienza a añadir los productos que necesitas. Puedes organizar por categorías,
+                            tiendas o
                             fechas para una mejor gestión de tus compras.</p>
                     </div>
                 </div>
@@ -198,39 +303,48 @@
                     <div class="border-start border-4 border-warning ps-3">
                         <h5 class="fw-bold">¿Es gratis usar la plataforma?</h5>
                         <p class="mb-0">Sí, nuestra plataforma es completamente gratuita. Puedes crear listas
-                            ilimitadas, comparar precios entre tiendas y acceder a todas las funciones principales sin
+                            ilimitadas, comparar precios entre tiendas y acceder a todas las funciones
+                            principales sin
                             costo alguno.</p>
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div class="border-start border-4 border-warning ps-3">
                         <h5 class="fw-bold">¿Cómo se comparan los precios?</h5>
-                        <p class="mb-0">Nuestra plataforma recopila datos de precios actualizados de las principales
-                            tiendas. Puedes ver el mismo producto en diferentes establecimientos y elegir dónde comprar
+                        <p class="mb-0">Nuestra plataforma recopila datos de precios actualizados de las
+                            principales
+                            tiendas. Puedes ver el mismo producto en diferentes establecimientos y elegir dónde
+                            comprar
                             al mejor precio.</p>
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div class="border-start border-4 border-warning ps-3">
                         <h5 class="fw-bold">¿Puedo compartir mis listas con amigos?</h5>
-                        <p class="mb-0">Claro que sí. Puedes crear grupos y compartir listas con amigos y familiares.
-                            Esto facilita las compras en grupo y permite que todos vean los mejores precios disponibles.
+                        <p class="mb-0">Claro que sí. Puedes crear grupos y compartir listas con amigos y
+                            familiares.
+                            Esto facilita las compras en grupo y permite que todos vean los mejores precios
+                            disponibles.
                         </p>
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div class="border-start border-4 border-warning ps-3">
                         <h5 class="fw-bold">¿Mis datos están seguros?</h5>
-                        <p class="mb-0">Utilizamos tecnología de encriptación de última generación para proteger tus
-                            datos personales. Tu privacidad es nuestra prioridad y nunca compartimos información con
+                        <p class="mb-0">Utilizamos tecnología de encriptación de última generación para proteger
+                            tus
+                            datos personales. Tu privacidad es nuestra prioridad y nunca compartimos información
+                            con
                             terceros sin tu consentimiento.</p>
                     </div>
                 </div>
                 <div class="col-lg-6 mb-4">
                     <div class="border-start border-4 border-warning ps-3">
                         <h5 class="fw-bold">¿Cómo puedo contactar al soporte?</h5>
-                        <p class="mb-0">Puedes contactarnos a través de nuestro formulario de contacto, email o chat en
-                            vivo. Nuestro equipo de soporte está disponible para ayudarte con cualquier pregunta o
+                        <p class="mb-0">Puedes contactarnos a través de nuestro formulario de contacto, email o
+                            chat en
+                            vivo. Nuestro equipo de soporte está disponible para ayudarte con cualquier pregunta
+                            o
                             problema que tengas.</p>
                     </div>
                 </div>
@@ -238,7 +352,8 @@
 
             <div class="text-center mt-5 p-4 p-lg-5 bg-white bg-opacity-50 rounded-3">
                 <h5 class="fw-bold">¿Aún tienes dudas?</h5>
-                <p class="mb-3">Nuestro equipo de soporte está listo para ayudarte a obtener el máximo valor de nuestra
+                <p class="mb-3">Nuestro equipo de soporte está listo para ayudarte a obtener el máximo valor de
+                    nuestra
                     plataforma.</p>
                 <a routerLink="/contacto" class="btn btn-home">Contactar</a>
             </div>

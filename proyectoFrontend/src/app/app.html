@@ -1,8 +1,5 @@
-<nav class="navbar navbar-expand-lg navbar-dark site-header-brand sticky-top shadow-sm py-3">
-  <div class="container">
-    <a class="navbar-brand fw-bold fs-3" routerLink="/">
-      LinkedList
-    </a>
+<nav class="navbar navbar-expand-lg navbar-dark site-header-brand sticky-top shadow-sm py-2">
+  <div class="container-fluid container-xl"> <a class="navbar-brand fw-bold fs-3" routerLink="/">LinkedList</a>
 
     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal"
       aria-controls="navPrincipal" aria-expanded="false" aria-label="Menu">
@@ -11,72 +8,151 @@
 
     <div class="collapse navbar-collapse" id="navPrincipal">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/" routerLinkActive="active"
-            [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+        <li class="nav-item"><a class="nav-link px-2" routerLink="/" routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}">Inicio</a></li>
+        <li class="nav-item" *ngIf="authService.isAdmin()"><a class="nav-link px-2" routerLink="/usuarios"
+            routerLinkActive="active">Usuarios</a></li>
+        <li class="nav-item" *ngIf="authService.isAdmin()"><a class="nav-link px-2" routerLink="/administrarProductos"
+            routerLinkActive="active">Admin</a></li>
+        <li class="nav-item"><a class="nav-link px-2" routerLink="/productos" routerLinkActive="active">Productos</a>
         </li>
-        <li class="nav-item" *ngIf="authService.isAdmin()">
-          <a class="nav-link px-3" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
-        </li>
-        <li class="nav-item" *ngIf="authService.isAdmin()">
-          <a class="nav-link px-3" routerLink="/administrarProductos" routerLinkActive="active">Administrar
-            Productos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/productos" routerLinkActive="active">Productos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/contacto" routerLinkActive="active">Contacto</a>
-        </li>
-        <li class="nav-item d-flex gap-2" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/mis-listas"
-            routerLinkActive="active">
-            <i class="bi bi-card-checklist me-1"></i>Mis Listas
+        <li class="nav-item"><a class="nav-link px-2" routerLink="/contacto" routerLinkActive="active">Contacto</a></li>
+        <li class="nav-item"><a class="nav-link px-2" routerLink="/comentarios"
+            routerLinkActive="active">Comentarios</a></li>
+
+        <li class="nav-item d-grid d-lg-flex gap-2 mt-2 mt-lg-0 ms-lg-2" *ngIf="authService.isLoggedIn()">
+          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill text-center small"
+            routerLink="/mis-listas" routerLinkActive="active">
+            <i class="bi bi-card-checklist"></i> Listas
           </a>
-          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill" routerLink="/comunidad"
-            routerLinkActive="active">
-            <i class="bi bi-people me-1"></i>Listas Publicas
+          <a class="nav-link px-3 fw-bold text-white bg-white bg-opacity-25 rounded-pill text-center small"
+            routerLink="/comunidad" routerLinkActive="active">
+            <i class="bi bi-people"></i> Públicas
           </a>
         </li>
       </ul>
 
-      <ul class="navbar-nav ms-auto align-items-center">
-        <!-- Login si no hay sesión -->
-        <li class="nav-item d-flex gap-2" *ngIf="!authService.isLoggedIn()">
-          <a class="btn btn-outline-light rounded-pill px-3" routerLink="/login">Iniciar Sesión</a>
-          <a class="btn btn-light rounded-pill px-3 fw-bold text-home-accent" routerLink="/registro">Registrarse</a>
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item d-grid d-lg-flex gap-2" *ngIf="!authService.isLoggedIn()">
+          <a class="btn btn-sm btn-outline-light rounded-pill px-3" routerLink="/login">Login</a>
+          <a class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-home-accent" routerLink="/registro">Registro</a>
         </li>
 
-        <!-- Menú de usuario si está logueado -->
-        <li class="nav-item dropdown" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link dropdown-toggle d-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
-            href="#" role="button" (click)="toggleMenu($event)" [attr.aria-expanded]="menuAbierto">
+        <li class="nav-item dropdown mt-3 mt-lg-0" *ngIf="authService.isLoggedIn()">
+          <a class="nav-link dropdown-toggle d-inline-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
+            href="#" role="button" (click)="toggleMenu($event)">
             <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
               {{ (perfil?.nombrePerfil?.charAt(0) || 'U').toUpperCase() }}
             </div>
-            <span class="text-light small text-uppercase tracking-wider fw-semibold">{{ perfil?.nombrePerfil || 'Mi
-              Perfil' }}</span>
+            <span class="text-light small text-uppercase fw-semibold d-inline-block text-truncate"
+              style="max-width: 80px;">
+              {{ perfil?.nombrePerfil || 'Perfil' }}
+            </span>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 animate-fade-in"
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-lg-3 animate-fade-in"
             [class.show]="menuAbierto">
-            <li class="px-3 py-2 text-muted small border-bottom mb-1">
-              Conectado como <strong>{{ perfil?.nombrePerfil }}</strong>
-            </li>
+            <li class="px-3 py-2 text-muted small border-bottom mb-1">Conectado como <strong>{{ perfil?.nombrePerfil
+                }}</strong></li>
             <li><a class="dropdown-item py-2" routerLink="/perfil" (click)="menuAbierto = false"><i
                   class="bi bi-person-circle me-3 text-primary"></i>Ver Perfil</a></li>
             <li>
               <hr class="dropdown-divider mx-2">
             </li>
-            <li>
-              <button class="dropdown-item py-2 text-danger fw-medium" (click)="onLogout()">
-                <i class="bi bi-door-open-fill me-3"></i>Cerrar Sesión
-              </button>
-            </li>
+            <li><button class="dropdown-item py-2 text-danger fw-medium" (click)="onLogout()"><i
+                  class="bi bi-door-open-fill me-3"></i>Cerrar Sesión</button></li>
           </ul>
         </li>
       </ul>
     </div>
   </div>
 </nav>
-
 <router-outlet></router-outlet>
+
+<!-- footer -->
+<footer class="site-footer bg-dark text-white mt-auto">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-md-6">
+        <h2>LinkedList</h2>
+
+  <!-- ============================================================== -->
+  <!-- MODAL GLOBAL DE CONFIRMACIÓN                                   -->
+  <!-- Se activa cuando MensajeService.confirmar() es llamado         -->
+  <!-- ============================================================== -->
+  <div *ngIf="mensajeService.confirmacion$ | async as c"
+    class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+    style="z-index: 999999; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);">
+    
+    <div class="bg-white rounded-4 shadow-lg p-4 text-center animate-fade-in" style="max-width: 400px; width: 90%;">
+      <div class="mb-3">
+        <i class="bi bi-question-circle text-primary" style="font-size: 3rem;"></i>
+      </div>
+      <h5 class="fw-bold mb-3">¿Estás seguro?</h5>
+      <p class="text-muted mb-4">{{ c.pregunta }}</p>
+      
+      <div class="d-flex gap-2 justify-content-center">
+        <button class="btn btn-light rounded-pill px-4 fw-medium" (click)="mensajeService.cancelarConfirmacion()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary rounded-pill px-4 fw-bold" (click)="mensajeService.aceptarConfirmacion()">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SISTEMA GLOBAL DE NOTIFICACIONES (TOAST)                       -->
+  <!-- Muestra mensajes temporales de éxito, error o aviso           -->
+  <!-- ============================================================== -->
+  <div *ngIf="mensajeService.mensaje$ | async as m"
+    class="position-fixed start-50 translate-middle-x alert shadow-lg px-4 py-3 d-flex align-items-center gap-2"
+    [ngClass]="{
+      'alert-success': m.tipo === 'success',
+      'alert-danger': m.tipo === 'error',
+      'alert-info': m.tipo === 'info'
+    }" style="z-index: 99999; min-width: 320px; top: 100px;">
+    
+    <i class="bi" [ngClass]="{
+      'bi-check-circle-fill text-success': m.tipo === 'success',
+      'bi-x-circle-fill text-danger': m.tipo === 'error',
+      'bi-info-circle-fill text-info': m.tipo === 'info'
+    }"></i>
+
+    <div class="flex-grow-1">
+      <strong class="me-1">
+        {{ m.tipo === 'success' ? '¡Éxito!' : (m.tipo === 'error' ? 'Error' : 'Aviso') }}
+      </strong>
+      {{ m.texto }}
+    </div>
+    
+    <button type="button" class="btn-close btn-sm" (click)="mensajeService.limpiar()"></button>
+  </div>
+
+        <!-- Puedes dejar un comentario si estas logeado, y se habre un toogle para escribir tu comentario -->
+        @if(authService.isLoggedIn()){
+        <button class="btn btn-outline-light mb-3 mt-2" (click)="toggleComentario()">Dejar un comentario</button>
+
+        @if(comentarioAbierto) {
+        <div class="comentario mt-2 p-3 bg-white text-dark rounded shadow-sm">
+          <h6 class="fw-bold">Tu feedback es importante</h6>
+          <textarea class="form-control mb-2" placeholder="Deja tu comentario aquí..." [(ngModel)]="comentario"
+            rows="3"></textarea>
+          <div class="text-end">
+            <button class="btn btn-success btn-sm px-4" (click)="enviarComentario()">Enviar</button>
+          </div>
+        </div>
+        }
+        }
+      </div>
+      <div class="col-md-6">
+        <h5>Enlaces</h5>
+        <ul class="list-unstyled">
+          <li><a href="/" class="text-white">Inicio</a></li>
+          <li><a href="/productos" class="text-white">Productos</a></li>
+          <li><a href="/contacto" class="text-white">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -13,6 +13,7 @@ import { FichaProductoComponent } from './components/ficha-producto/ficha-produc
 import { ListasPublicasComponent } from './components/listas-publicas/listas-publicas';
 import { adminGuard } from './guards/admin.guard';
 import { AdministrarProductosComponent } from './components/administrarProductos/administrarProductos';
+import { ComentarioComponent } from './components/comentarios/comentario';
 
 export const routes: Routes = [
   { path: '', component: InicioComponent },
@@ -25,5 +26,6 @@ export const routes: Routes = [
   { path: 'mis-listas', component: ListaComponent },
   { path: 'comunidad', component: ListasPublicasComponent },
   { path: 'contacto', component: ContactoComponent },
-  { path: 'administrarProductos', component: AdministrarProductosComponent, canActivate: [adminGuard] }
+  { path: 'administrarProductos', component: AdministrarProductosComponent, canActivate: [adminGuard] },
+  { path: 'comentarios', component: ComentarioComponent }
 ];

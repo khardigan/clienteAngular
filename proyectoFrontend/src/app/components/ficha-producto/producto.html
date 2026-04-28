@@ -1,27 +1,5 @@
 <div class="container py-5 mt-5" *ngIf="!cargando && producto">
 
-    <!-- 🔥 TOAST DE MENSAJE (VISIBLE SIEMPRE ARRIBA) -->
-    <div *ngIf="mensaje"
-        class="position-fixed start-50 translate-middle-x alert shadow-lg px-4 py-3 d-flex align-items-center gap-2"
-        [ngClass]="{
-    'alert-success': tipoMensaje === 'success',
-    'alert-danger': tipoMensaje === 'error'
-  }" style="z-index: 99999; min-width: 320px; top: 90px;">
-
-        <i class="bi" [ngClass]="{
-         'bi-check-circle-fill text-success': tipoMensaje === 'success',
-         'bi-x-circle-fill text-danger': tipoMensaje === 'error'
-       }"></i>
-
-        <div class="flex-grow-1">
-            <strong class="me-1">
-                {{ tipoMensaje === 'success' ? '¡Éxito!' : 'Error' }}
-            </strong>
-            {{ mensaje }}
-        </div>
-
-    </div>
-
     <section class="product-card p-4 shadow-lg rounded-4 bg-white">
 
         <!-- HEADER -->
@@ -35,10 +13,12 @@
             </span>
         </div>
 
+
         <div class="row g-4 align-items-center">
 
             <!-- IMAGEN -->
-            <div class="col-lg-6 text-center position-relative p-4 rounded-4" style="background: linear-gradient(135deg, #fff7f0, #fff1e6);">
+            <div class="col-lg-6 text-center position-relative p-4 rounded-4"
+                style="background: linear-gradient(135deg, #fff7f0, #fff1e6);">
 
                 <img [src]="getImagen(producto.nombre)" class="img-fluid rounded-4 shadow-sm main-img"
                     [alt]="producto.nombre" style="min-height: 420px; width: 100%; object-fit: cover;">
@@ -71,19 +51,12 @@
                     <div class="fs-2 fw-bold text-success">
                         {{ producto.precio }} €
                     </div>
-
-                    <small class="text-muted">
-                        <i class="bi bi-box"></i> {{ producto.cantidad }} unidades
-                    </small>
                 </div>
-
-                <hr class="my-4 text-secondary opacity-25">
-
-                <div class="alert alert-light border rounded-3 mb-3">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Producto seleccionado de nuestro catálogo local.
+                <div class="d-flex align-items-center gap-2 mb-4"
+                    *ngIf="producto.mediaPuntuacion !== undefined && producto.mediaPuntuacion > 0">
+                    <div class="text-warning fs-5" [innerHTML]="getMediaEstrellas()"></div>
+                    <span class="fw-bold">{{ producto.mediaPuntuacion | number: '1.1-1' }}</span>
                 </div>
-
                 <!-- SELECT + BOTÓN -->
                 <h6 class="fw-semibold mb-2">
                     <i class="bi bi-list-check"></i> Añadir a lista
@@ -114,6 +87,71 @@
             </div>
 
         </div>
+    </section>
+    <section class="mt-5 p-4 shadow-sm rounded-4 bg-white">
+        <h4 class="fw-bold mb-4">
+            <i class="bi bi-chat-left-text me-2"></i> Opiniones del producto
+        </h4>
+
+        <div class="card border-0 bg-light rounded-4 p-3 mb-4">
+            <h6 class="fw-bold mb-3">Deja tu opinión</h6>
+
+            <div class="mb-3">
+                <label class="form-label d-block small text-muted">Puntuación:</label>
+                <div class="fs-3 text-warning">
+                    <i *ngFor="let estrella of [1,2,3,4,5]" class="bi cursor-pointer"
+                        [ngClass]="nuevaPuntuacion >= estrella ? 'bi-star-fill' : 'bi-star'"
+                        (click)="setRating(estrella)" style="cursor: pointer;">
+                    </i>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <textarea class="form-control rounded-3" [(ngModel)]="nuevoComentario"
+                    placeholder="¿Qué te ha parecido este producto?" rows="3"></textarea>
+            </div>
+
+            <button class="btn btn-primary rounded-pill px-4" [disabled]="nuevaPuntuacion === 0 || !nuevoComentario"
+                (click)="enviarComentario()">
+                Publicar comentario
+            </button>
+        </div>
+
+        <hr class="my-4 text-muted opacity-25">
+
+        <div *ngIf="producto.comentarios && producto.comentarios.length > 0; else noComentarios">
+            <div class="mb-4 p-4 rounded-4 border-start border-4 bg-white shadow-sm transition-hover"
+                *ngFor="let c of producto.comentarios"
+                [ngClass]="c.idUsuario === authService.getId() ? 'border-success' : 'border-primary'">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name={{c.usuario.nombre || 'U'}}&background=random"
+                            class="rounded-circle" width="30" height="30" alt="Avatar">
+                        <strong class="text-dark">{{ c.usuario.nombre || 'Cargando...' }}</strong>
+                        <span class="badge bg-success-subtle text-success small rounded-pill px-2"
+                            *ngIf="c.idUsuario === authService.getId()">Tú</span>
+                    </div>
+                    <small class="text-muted small">{{ c.fecha | date:'dd/MM/yyyy' }}</small>
+                </div>
+
+                <div class="text-warning mb-2 extra-small">
+                    @for(n of [1,2,3,4,5]; track n) {
+                    <i class="bi" [class.bi-star-fill]="c.puntuacion >= n" [class.bi-star]="c.puntuacion < n"></i>
+                    }
+                </div>
+
+                <p class="text-secondary mb-0 italic" style="line-height: 1.5; font-size: 0.95rem;">"{{ c.contenido }}"
+                </p>
+            </div>
+        </div>
+
+        <ng-template #noComentarios>
+            <div class="text-center py-4">
+                <i class="bi bi-chat-dots fs-1 text-muted opacity-50"></i>
+                <p class="mt-2 text-muted">Aún no hay opiniones. <br><strong>¡Sé el primero en comentar!</strong></p>
+            </div>
+        </ng-template>
     </section>
 </div>
 
