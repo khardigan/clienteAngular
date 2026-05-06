@@ -31,6 +31,13 @@ export class App implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Restaurar tema guardado
+    const temaGuardado = localStorage.getItem('tema');
+    if (temaGuardado === 'dark') {
+      this.isDarkMode = true;
+      document.documentElement.setAttribute('data-bs-theme', 'dark');
+    }
+
     // Escuchamos cambios en el estado de login para cargar el perfil al momento
     this.authService.loginStatus$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
@@ -99,6 +106,18 @@ export class App implements OnInit {
     this.menuAbierto = !this.menuAbierto;
   }
 
+  isDarkMode = false;
+
+  cambiarTema() {
+    this.isDarkMode = !this.isDarkMode;
+    if (this.isDarkMode) {
+      document.documentElement.setAttribute('data-bs-theme', 'dark');
+      localStorage.setItem('tema', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-bs-theme', 'light');
+      localStorage.setItem('tema', 'light');
+    }
+  }
   onLogout() {
     this.authService.logout();
     this.perfil = null;

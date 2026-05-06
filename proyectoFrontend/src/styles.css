@@ -1,12 +1,90 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
     color-scheme: light dark;
+    /* Paleta unificada: Naranjas y Neutros */
     --home-orange: #ff8000;
     --home-orange-dark: #e67300;
-    --home-sky: #b9e0ff;
-    --home-cream: #ffefd5;
-    --home-green: #0d3b2c;
-    --home-green-mid: #14523d;
+    --home-orange-light: #fff3e0;
+    --home-orange-muted: #ffe0b2;
+    --home-blue: #004aad;
+    --home-blue-dark: #003680;
+    --home-sky: #f8fbff;
+    --home-cream: #fff9f0;
+    --home-gray-100: #f8f9fa;
+    --home-gray-200: #e9ecef;
+}
+
+/* =====================================================
+   Sobreescritura de colores Globales
+   ===================================================== */
+.text-primary {
+    color: var(--home-blue) !important;
+}
+
+.text-info {
+    color: var(--home-orange) !important;
+}
+
+.bg-primary {
+    background-color: var(--home-blue) !important;
+    background-image: none !important;
+}
+
+.bg-info {
+    background-color: var(--home-orange) !important;
+    background-image: none !important;
+}
+
+.bg-gradient {
+    background-image: none !important;
+}
+
+.btn-primary {
+    background-color: var(--home-blue) !important;
+    border-color: var(--home-blue-dark) !important;
+    color: #fff !important;
+}
+
+.btn-info {
+    background-color: var(--home-orange) !important;
+    border-color: var(--home-orange-dark) !important;
+    color: #fff !important;
+}
+
+.btn-outline-primary {
+    color: var(--home-blue) !important;
+    border-color: var(--home-blue) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--home-blue) !important;
+    color: #fff !important;
+}
+
+.btn-outline-info {
+    color: var(--home-orange) !important;
+    border-color: var(--home-orange) !important;
+}
+
+.btn-outline-info:hover {
+    background-color: var(--home-orange) !important;
+    color: #fff !important;
+}
+
+.border-primary {
+    border-color: var(--home-blue) !important;
+    opacity: 0.2;
+}
+
+.border-info {
+    border-color: var(--home-orange-muted) !important;
+}
+
+/* El fondo "naranja bonito" (Cream to White) */
+.bg-main-gradient {
+    background-color: var(--home-sky) !important;
+    background-image: linear-gradient(135deg, var(--home-cream) 0%, #ffffff 100%) !important;
+    min-height: 100vh;
 }
 
 /* --- ESTILOS DE MARCA (Botones) --- */
@@ -90,4 +168,187 @@ body {
 .row.row-cols-xl-6>.col {
     display: flex;
     justify-content: flex-start;
+}
+
+/* ============================================================== */
+/* TEMA OSCURO — Solo activo con data-bs-theme="dark" en <html>   */
+/* NO afecta al modo claro para nada. Solo añade nuevas reglas.   */
+/* ============================================================== */
+
+/* 1. Redefinir las variables de color de marca para oscuro */
+[data-bs-theme='dark'] {
+    --home-sky: #1c1c21 !important;
+    --home-cream: #252529 !important;
+    --home-orange-light: #3d2b1f !important;
+    --home-orange-muted: #4d3a2b !important;
+}
+
+/* 2. Fondo y texto global (Menos negro, más 'oscur') */
+[data-bs-theme='dark'] body,
+[data-bs-theme='dark'] main,
+[data-bs-theme='dark'] .main-content-wrapper {
+    background-color: #1c1c21 !important;
+    background-image: none !important; /* Quitar gradientes */
+    color: #e4e4e7 !important;
+}
+
+/* 3. Wrappers de página */
+[data-bs-theme='dark'] .contact-page-wrapper,
+[data-bs-theme='dark'] .comentario-page-wrapper,
+[data-bs-theme='dark'] .sesion-page-wrapper,
+[data-bs-theme='dark'] .lista-page-wrapper {
+    background-color: #1c1c21 !important;
+    background-image: none !important;
+    color: #e4e4e7 !important;
+}
+
+/* 4. Secciones de inicio con bg-home-sky / bg-home-cream */
+[data-bs-theme='dark'] .bg-home-sky {
+    background-color: #1a2a3a !important;
+}
+
+[data-bs-theme='dark'] .bg-home-cream {
+    background-color: #1e1e24 !important;
+}
+
+/* 5. bg-white y bg-light de Bootstrap */
+[data-bs-theme='dark'] .bg-white {
+    background-color: #27272a !important;
+}
+
+[data-bs-theme='dark'] .bg-light,
+[data-bs-theme='dark'] .bg-light.bg-opacity-50,
+[data-bs-theme='dark'] .card-body.bg-light {
+    background-color: #3f3f46 !important;
+}
+
+/* 6. Textos */
+[data-bs-theme='dark'] .text-dark {
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme='dark'] .text-muted {
+    color: #9e9e9e !important;
+}
+
+[data-bs-theme='dark'] h1,
+[data-bs-theme='dark'] h2,
+[data-bs-theme='dark'] h3,
+[data-bs-theme='dark'] h4,
+[data-bs-theme='dark'] h5,
+[data-bs-theme='dark'] h6,
+[data-bs-theme='dark'] p,
+[data-bs-theme='dark'] span,
+[data-bs-theme='dark'] label,
+[data-bs-theme='dark'] li {
+    color: inherit;
+}
+
+/* 7. Cards y paneles */
+[data-bs-theme='dark'] .card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme='dark'] .card-header {
+    border-bottom-color: #333 !important;
+}
+
+[data-bs-theme='dark'] .card-footer {
+    background-color: #1e1e1e !important;
+    border-top-color: #333 !important;
+}
+
+[data-bs-theme='dark'] .panel-superior,
+[data-bs-theme='dark'] .panel-oficial,
+[data-bs-theme='dark'] .panel-propio,
+[data-bs-theme='dark'] .lista-card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme='dark'] .list-group-item {
+    background-color: #252525 !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* 8. Producto cards */
+[data-bs-theme='dark'] .producto-card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* 9. Formularios */
+[data-bs-theme='dark'] .form-control,
+[data-bs-theme='dark'] .form-select,
+[data-bs-theme='dark'] input,
+[data-bs-theme='dark'] select,
+[data-bs-theme='dark'] textarea {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #fff !important;
+}
+
+[data-bs-theme='dark'] .input-group-text {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #bbb !important;
+}
+
+/* 10. Navbar */
+[data-bs-theme='dark'] nav.navbar {
+    background-color: #111 !important;
+    border-bottom: 1px solid #2a2a2a !important;
+}
+
+/* 11. Dropdown */
+[data-bs-theme='dark'] .dropdown-menu {
+    background-color: #1e1e1e !important;
+    border-color: #444 !important;
+}
+
+[data-bs-theme='dark'] .dropdown-item {
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme='dark'] .dropdown-item:hover {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+/* 12. Bordes y divisores */
+[data-bs-theme='dark'] .border,
+[data-bs-theme='dark'] .border-bottom,
+[data-bs-theme='dark'] .border-top {
+    border-color: #333 !important;
+}
+
+/* 13. Badges claros */
+[data-bs-theme='dark'] .badge.bg-white,
+[data-bs-theme='dark'] .badge.bg-light {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* 14. Alerts y modal */
+[data-bs-theme='dark'] .modal-content {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* 15. Footer ya oscuro — ajuste menor */
+[data-bs-theme='dark'] footer.site-footer {
+    background-color: #0a0a0a !important;
+}
+
+/* 16. Perfil */
+[data-bs-theme='dark'] .perfil-header,
+[data-bs-theme='dark'] .profile-card {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
 }

@@ -61,6 +61,7 @@ export class ListaService {
         });
     }
 
+
     // Crear una nueva lista de la compra
     crearLista(nombre?: string): Observable<any> {
         // Crea una lista vacía con el nombre indicado o el nombre por defecto del servidor.

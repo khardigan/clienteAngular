@@ -101,13 +101,6 @@
           </datalist>
         </div>
         <div class="col-md-4 col-6 d-flex align-items-end gap-2">
-          <!-- Botón de imagen -->
-          <button class="btn btn-outline-secondary rounded-pill px-3" type="button" (click)="triggerFileInput()"
-            title="Adjuntar imagen del producto">
-            <i class="bi bi-image"></i>
-          </button>
-          <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)">
-
           <button class="btn btn-home rounded-pill flex-grow-1" (click)="crearProducto()">Crear</button>
           <button class="btn btn-light rounded-pill" (click)="toggleFormulario()">Cancelar</button>
         </div>
@@ -177,8 +170,8 @@
               </div>
             </div>
 
-            <div *ngIf="p.categoria" class="mt-1">
-              <span class="badge bg-light text-dark border rounded-pill fw-normal" style="font-size: 0.75rem;">
+            <div *ngIf="p.categoria" class="mt-2">
+              <span class="badge bg-light text-dark border rounded-pill fw-normal" style="font-size: 0.7rem;">
                 {{ p.categoria }}
               </span>
             </div>

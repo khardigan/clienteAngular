@@ -80,34 +80,67 @@
     </div>
   </div>
 
-  <!-- Sección de estadísticas dinámicas (Fuera del *ngIf de perfil) -->
+  <!-- Sección de estadísticas clickables -->
   <div class="container">
     <div class="counter mt-5">
-      <div class="row">
+      <div class="row g-3">
+
+        <!-- Listas Creadas → va a /listas -->
         <div class="col-6 col-lg-3">
-          <div class="count-data text-center">
-            <h6 class="count h2">{{ totalListas() }}</h6>
-            <p class="m-0px font-w-600">Listas Creadas</p>
-          </div>
+          <a routerLink="/listas" class="text-decoration-none">
+            <div class="count-data text-center p-3 rounded-4 shadow-sm bg-white border border-light"
+              style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)'"
+              onmouseout="this.style.transform=''; this.style.boxShadow=''">
+              <i class="bi bi-journal-text fs-3 text-primary mb-2 d-block"></i>
+              <h6 class="count h2 text-dark">{{ totalListas() }}</h6>
+              <p class="m-0px font-w-600 text-muted small">Listas Creadas</p>
+            </div>
+          </a>
         </div>
+
+        <!-- Productos Añadidos → va a /productos -->
         <div class="col-6 col-lg-3">
-          <div class="count-data text-center">
-            <h6 class="count h2">{{ totalProductos() }}</h6>
-            <p class="m-0px font-w-600">Productos Añadidos</p>
-          </div>
+          <a routerLink="/productos" class="text-decoration-none">
+            <div class="count-data text-center p-3 rounded-4 shadow-sm bg-white border border-light"
+              style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)'"
+              onmouseout="this.style.transform=''; this.style.boxShadow=''">
+              <i class="bi bi-box-seam fs-3 text-success mb-2 d-block"></i>
+              <h6 class="count h2 text-dark">{{ totalProductos() }}</h6>
+              <p class="m-0px font-w-600 text-muted small">Productos Añadidos</p>
+            </div>
+          </a>
         </div>
+
+        <!-- Colaboraciones → va a /listas -->
         <div class="col-6 col-lg-3">
-          <div class="count-data text-center">
-            <h6 class="count h2">{{ totalColaboraciones() }}</h6>
-            <p class="m-0px font-w-600">Colaboraciones</p>
-          </div>
+          <a routerLink="/listas" class="text-decoration-none">
+            <div class="count-data text-center p-3 rounded-4 shadow-sm bg-white border border-light"
+              style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)'"
+              onmouseout="this.style.transform=''; this.style.boxShadow=''">
+              <i class="bi bi-people fs-3 text-warning mb-2 d-block"></i>
+              <h6 class="count h2 text-dark">{{ totalColaboraciones() }}</h6>
+              <p class="m-0px font-w-600 text-muted small">Colaboraciones</p>
+            </div>
+          </a>
         </div>
+
+        <!-- Listas Públicas → va a /listas-publicas -->
         <div class="col-6 col-lg-3">
-          <div class="count-data text-center">
-            <h6 class="count h2">{{ totalPublicas() }}</h6>
-            <p class="m-0px font-w-600">Listas publicadas en comunidad</p>
-          </div>
+          <a routerLink="/listas-publicas" class="text-decoration-none">
+            <div class="count-data text-center p-3 rounded-4 shadow-sm bg-white border border-light"
+              style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+              onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.1)'"
+              onmouseout="this.style.transform=''; this.style.boxShadow=''">
+              <i class="bi bi-globe fs-3 text-info mb-2 d-block"></i>
+              <h6 class="count h2 text-dark">{{ totalPublicas() }}</h6>
+              <p class="m-0px font-w-600 text-muted small">Listas en Comunidad</p>
+            </div>
+          </a>
         </div>
+
       </div>
     </div>
   </div>

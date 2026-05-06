@@ -26,11 +26,17 @@ export class ListasPublicasComponent implements OnInit {
     ) { }
     isLoggedIn: boolean = false;
     isAdmin: boolean = false;
+    currentUserId: number | null = null;
 
     // Al entrar mira si estás logueado y carga todas las listas públicas.
     ngOnInit(): void {
         this.isLoggedIn = this.authService.isLoggedIn();
         this.isAdmin = this.authService.isAdmin();
+
+        if (this.isLoggedIn) {
+            this.currentUserId = this.authService.getId();
+        }
+
         this.cargarListasPublicas();
     }
 
@@ -93,5 +99,34 @@ export class ListasPublicasComponent implements OnInit {
     getListaTotal(lista: ListaDetalle): number {
         if (!lista || !lista.productos) return 0;
         return lista.productos.reduce((acc, p) => acc + (p.precio * (p.cantidad || 1)), 0);
+    }
+
+    getSupermarketIcon(item: any): { type: 'img' | 'icon', value: string } {
+        if (!item) return { type: 'icon', value: 'bi-house-door' };
+
+        let s = "";
+        if (typeof item === 'string') {
+            s = item;
+        } else {
+            s = item.supermercado || "";
+            if (!s && item.nombre) {
+                const nombreLower = item.nombre.toLowerCase();
+                if (nombreLower.includes('mercadona')) s = 'Mercadona';
+                else if (nombreLower.includes('carrefour')) s = 'Carrefour';
+                else if (nombreLower.includes('lidl')) s = 'Lidl';
+                else if (nombreLower.includes('dia')) s = 'Dia';
+            }
+        }
+
+        if (!s) return { type: 'icon', value: 'bi-house-door' };
+
+        const superLower = s.trim().toLowerCase();
+
+        if (superLower.includes('mercadona')) return { type: 'img', value: '/images/Mercadona.png' };
+        if (superLower.includes('carrefour')) return { type: 'img', value: '/images/Carrefour.svg' };
+        if (superLower.includes('lidl')) return { type: 'img', value: '/images/Lidl.png' };
+        if (superLower.includes('dia')) return { type: 'img', value: '/images/Dia.png' };
+
+        return { type: 'icon', value: 'bi-house-door' };
     }
 }

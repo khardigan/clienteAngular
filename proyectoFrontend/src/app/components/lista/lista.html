@@ -7,7 +7,10 @@
                         class="fw-bold mb-1 text-primary d-flex align-items-center justify-content-center justify-content-md-start">
                         <i class="bi bi-card-checklist me-3"></i> Mis Listas de Compra
                     </h2>
-                    <p class="text-muted mb-0">Gestiona tus productos y comparte tus listas.</p>
+                    <p class="text-muted mb-0" style="font-size: 1.1rem; opacity: 0.8;">
+                        Organiza tus compras con precisión, comparte listas en tiempo real y gestiona tus productos
+                        favoritos en un solo lugar.
+                    </p>
                 </div>
                 <div class="d-flex gap-2">
                     <!-- Botón de Refrescar (Sincronización Manual) -->
@@ -49,7 +52,7 @@
                         </div>
                     </div>
 
-                    <!-- Panel Añadir Lista (Código) -->
+                    <!-- Panel Añadir Lista por Código -->
                     <div class="position-relative">
                         <button class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm px-3 bg-white"
                             (click)="togglePanelUnirse()">
@@ -145,7 +148,7 @@
             <div class="w-100 d-flex flex-column h-100">
 
                 <!-- Botones de cabecera de lista -->
-                <div class="d-flex justify-content-end gap-2 mb-2">
+                <div class="d-flex justify-content-end align-items-center gap-2 mb-2" style="min-height: 32px;">
                     <button *ngIf="puedePubilcar(lista)" class="btn btn-sm btn-outline-primary"
                         (click)="onPublicar(lista.codLista)">
                         <i class="bi bi-send me-1"></i>Publicar
@@ -155,9 +158,16 @@
                         title="Contiene productos propios: no se puede publicar">
                         <i class="bi bi-lock me-1"></i>No publicable
                     </span>
-                    <span *ngIf="lista.publicada" class="badge bg-success d-flex align-items-center px-2">
-                        <i class="bi bi-check-circle me-1"></i>Publicada
-                    </span>
+                    <div *ngIf="lista.publicada" class="d-flex align-items-center gap-2 animate-fade-in">
+                        <span class="badge bg-success d-flex align-items-center px-2">
+                            <i class="bi bi-check-circle me-1"></i>Publicada
+                        </span>
+                        <button class="btn btn-link text-danger text-decoration-none p-0 ms-1 fw-semibold"
+                            (click)="onDespublicar(lista.codLista)" title="Quitar de la comunidad"
+                            style="font-size: 0.75rem;">
+                            <i class="bi bi-x-circle me-1"></i>Despublicar
+                        </button>
+                    </div>
 
                     <!-- Edición de nombre Inline -->
                     <div *ngIf="confirmandoModificarNombreListaId === lista.codLista; else btnRenombrar"
@@ -182,12 +192,20 @@
                     [ngClass]="{'lista-completada': estaListaCompletada(lista)}">
 
                     <!-- Header -->
-                    <div class="card-header border-0 py-3 d-flex justify-content-between align-items-center"
-                        [ngClass]="estaListaCompletada(lista) ? 'bg-secondary bg-opacity-75 text-white' : (lista.usuariosCompartida.length > 0 ? 'bg-compartida text-white' : 'bg-primary bg-gradient text-white')">
-                        <h5 class="mb-0 fw-bold">
+                    <div class="card-header border-0 py-3 d-flex justify-content-between align-items-center lista-card-header"
+                        [ngClass]="{
+                            'lista-completada-header': estaListaCompletada(lista),
+                            'lista-compartida-header': !estaListaCompletada(lista) && lista.usuariosCompartida.length > 0
+                        }">
+                        <h5 class="mb-0 fw-bold d-flex align-items-center">
                             <i class="bi me-2"
-                                [ngClass]="estaListaCompletada(lista) ? 'bi-check-circle' : 'bi-list-ul'"></i>
-                            {{ lista.nombre || ('Lista #' + lista.codLista) }}
+                                [ngClass]="estaListaCompletada(lista) ? 'bi-check-circle' : (lista.usuariosCompartida.length > 0 ? 'bi-people-fill' : 'bi-list-ul')"></i>
+                            <span class="text-truncate" style="max-width: 180px;">{{ lista.nombre || ('Lista #' +
+                                lista.codLista) }}</span>
+                            <span *ngIf="lista.usuariosCompartida.length > 0"
+                                class="badge bg-white bg-opacity-25 ms-2 fw-normal" style="font-size: 0.65rem;">
+                                Compartida
+                            </span>
                         </h5>
                         <!-- Borrado de lista Inline -->
                         <div *ngIf="confirmandoBorradoListaId === lista.codLista; else btnBorrarLista"
@@ -226,17 +244,27 @@
                         <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs mb-2">
                             <div *ngFor="let p of lista.productos"
                                 class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded bg-white transition-all hover-bg-light">
-                                <div class="d-flex align-items-center text-truncate pe-2">
+                                <div class="d-flex align-items-center text-truncate flex-grow-1"
+                                    style="min-width: 100px;">
                                     <input class="form-check-input me-3 shadow-xs cursor-pointer" type="checkbox"
                                         [checked]="p.comprado" (change)="cambiarEstadoComprado(lista.codLista, p)"
                                         [id]="'check-' + lista.codLista + '-' + p.id">
                                     <label class="mb-0 fw-semibold cursor-pointer text-truncate"
                                         [ngClass]="{'text-decoration-line-through text-muted opacity-50': p.comprado}"
-                                        [for]="'check-' + lista.codLista + '-' + p.id">
+                                        [for]="'check-' + lista.codLista + '-' + p.id" [title]="p.nombre"
+                                        style="max-width: 250px;">
                                         {{ p.nombre }}
                                     </label>
                                 </div>
-                                <div class="d-flex align-items-center">
+
+                                <!-- Columna de Icono (En medio) -->
+                                <div class="d-flex align-items-center justify-content-center px-2"
+                                    style="width: 70px; min-width: 70px;">
+                                    <ng-container *ngTemplateOutlet="iconoSuper; context: { item: p }"></ng-container>
+                                </div>
+
+                                <div class="d-flex align-items-center ms-2"
+                                    style="min-width: 140px; justify-content: flex-end;">
                                     <!-- Controles de Cantidad -->
                                     <div
                                         class="d-flex align-items-center bg-light rounded-pill px-2 me-3 shadow-sm border border-secondary border-opacity-25">
@@ -272,21 +300,59 @@
                             </span>
                             <div class="list-group list-group-flush rounded-3 overflow-hidden shadow-xs">
                                 <div *ngFor="let pp of lista.productoPropios"
-                                    class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded producto-propio-item">
-                                    <div class="d-flex align-items-center text-truncate pe-2">
+                                    class="list-group-item d-flex justify-content-between align-items-center p-3 border-0 mb-1 rounded producto-propio-item transition-all hover-bg-light">
+                                    <div class="d-flex align-items-center text-truncate flex-grow-1"
+                                        style="min-width: 0;">
                                         <input class="form-check-input me-3 shadow-xs cursor-pointer" type="checkbox"
                                             [checked]="pp.comprado"
                                             (change)="cambiarEstadoCompradoPropio(lista.codLista, pp)"
                                             [id]="'check-propio-' + lista.codLista + '-' + pp.id">
-                                        <span class="fw-semibold text-truncate cursor-pointer"
+                                        <label class="mb-0 fw-semibold cursor-pointer text-truncate"
                                             [ngClass]="{'text-decoration-line-through text-muted opacity-50': pp.comprado}"
-                                            (click)="cambiarEstadoCompradoPropio(lista.codLista, pp)">
+                                            [for]="'check-propio-' + lista.codLista + '-' + pp.id">
                                             {{ pp.nombre }}
-                                        </span>
-                                        <small *ngIf="pp.notas" class="text-muted ms-2 d-none d-md-inline"
-                                            [ngClass]="{'opacity-50': pp.comprado}">{{ pp.notas }}</small>
+                                        </label>
                                     </div>
-                                    <div class="d-flex align-items-center">
+
+                                    <!-- Columna de Icono/Selector (En medio) -->
+                                    <div class="d-flex align-items-center justify-content-center px-2"
+                                        style="width: 70px; min-width: 70px;">
+                                        <div class="dropdown" (click)="$event.stopPropagation()">
+                                            <button class="btn btn-link p-0 border-0 shadow-none text-decoration-none"
+                                                type="button" [id]="'dropdownSuper-' + pp.id" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <ng-container
+                                                    *ngTemplateOutlet="iconoSuper; context: { item: pp }"></ng-container>
+                                            </button>
+                                            <ul class="dropdown-menu shadow border-0 p-2"
+                                                [aria-labelledby]="'dropdownSuper-' + pp.id">
+                                                <li>
+                                                    <h6 class="dropdown-header px-2">Supermercado</h6>
+                                                </li>
+                                                <li><a class="dropdown-item rounded py-1 px-3 cursor-pointer"
+                                                        (click)="cambiarSupermercadoPropio(lista.codLista, pp, 'Mercadona')">Mercadona</a>
+                                                </li>
+                                                <li><a class="dropdown-item rounded py-1 px-3 cursor-pointer"
+                                                        (click)="cambiarSupermercadoPropio(lista.codLista, pp, 'Carrefour')">Carrefour</a>
+                                                </li>
+                                                <li><a class="dropdown-item rounded py-1 px-3 cursor-pointer"
+                                                        (click)="cambiarSupermercadoPropio(lista.codLista, pp, 'Lidl')">Lidl</a>
+                                                </li>
+                                                <li><a class="dropdown-item rounded py-1 px-3 cursor-pointer"
+                                                        (click)="cambiarSupermercadoPropio(lista.codLista, pp, 'Dia')">Dia</a>
+                                                </li>
+                                                <li>
+                                                    <hr class="dropdown-divider mx-n2">
+                                                </li>
+                                                <li><a class="dropdown-item rounded py-1 px-3 cursor-pointer"
+                                                        (click)="cambiarSupermercadoPropio(lista.codLista, pp, '')">Ninguno
+                                                        (Casa)</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center ms-2"
+                                        style="min-width: 140px; justify-content: flex-end;">
                                         <!-- Controles de Cantidad Propia -->
                                         <div
                                             class="d-flex align-items-center bg-light rounded-pill px-2 me-3 shadow-sm border border-secondary border-opacity-25">
@@ -367,8 +433,12 @@
                                         <div *ngIf="!buscando && busquedaProducto.length >= 2 && resultadosBusqueda.length === 0"
                                             class="text-muted small text-center py-2">Sin resultados.</div>
                                         <div *ngIf="!buscando && busquedaProducto.length < 2"
-                                            class="text-muted small text-center py-2">
-                                            <i class="bi bi-search me-1"></i>Busca un producto del catálogo
+                                            class="text-muted small text-center py-3 d-flex flex-column align-items-center gap-2">
+                                            <span><i class="bi bi-search me-1"></i>Busca un producto del catálogo</span>
+                                            <button (click)="verCatalogop()"
+                                                class="btn btn-sm btn-outline-info rounded-pill mt-1 fw-bold px-3">
+                                                <i class="bi bi-shop-window me-1"></i> Ver catálogo completo
+                                            </button>
                                         </div>
                                         <div *ngFor="let prod of resultadosBusqueda"
                                             class="list-group-item list-group-item-action p-2 border-0 mb-1 rounded d-flex justify-content-between align-items-center cursor-pointer"
@@ -393,7 +463,7 @@
                             <!-- === Botón Añadir producto PROPIO === -->
                             <div class="position-relative flex-fill">
                                 <button
-                                    class="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                                    class="btn btn-sm btn-propio w-100 d-flex align-items-center justify-content-center gap-2"
                                     [id]="'btn-propio-' + lista.codLista"
                                     (click)="togglePanelProductoPropio(lista.codLista)">
                                     <i class="bi bi-person-plus-fill"></i>
@@ -426,8 +496,10 @@
                                             <div class="d-flex align-items-center gap-2">
                                                 <i class="bi bi-tag text-propio"></i>
                                                 <span class="fw-semibold">{{ pp.nombre }}</span>
-                                                <small *ngIf="pp.supermercado" class="text-muted">· {{ pp.supermercado
-                                                    }}</small>
+                                                <span class="text-muted small">{{ pp.supermercado }}</span>
+
+
+
                                             </div>
                                             <span class="text-propio fw-bold small">{{ (pp.precioObjetivo || 0) |
                                                 number:'1.2-2' }}€</span>
@@ -451,7 +523,8 @@
                                             <div class="d-flex align-items-center mb-3 text-propio">
                                                 <i class="bi"
                                                     [ngClass]="editandoProductoId ? 'bi-pencil-square' : 'bi-plus-circle-fill'"></i>
-                                                <span class="ms-2 fw-bold">{{ editandoProductoId ? 'Editando producto' :
+                                                <span class="ms-2 fw-bold">{{ editandoProductoId ? 'Editando
+                                                    producto' :
                                                     'Nuevo producto propio' }}</span>
                                             </div>
                                             <div class="mb-2">
@@ -467,11 +540,17 @@
                                                         [(ngModel)]="nuevoProducto.precioObjetivo"
                                                         [id]="'precio-nuevo-' + lista.codLista" min="0" step="0.01">
                                                 </div>
+
                                                 <div class="col-6">
-                                                    <input type="text" class="form-control form-control-sm"
-                                                        placeholder="Supermercado"
-                                                        [(ngModel)]="nuevoProducto.supermercado"
+                                                    <select class="form-select form-select-sm"
+                                                        [(ngModel)]="nuevoProducto.supermercado" name="supermercado"
                                                         [id]="'super-nuevo-' + lista.codLista">
+                                                        <option value="">Supermercado...</option>
+                                                        @for (supermercado of supermercadosOficiales; track $index)
+                                                        {
+                                                        <option [value]="supermercado">{{ supermercado }}</option>
+                                                        }
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="mb-2">
@@ -502,22 +581,52 @@
 
                     </div>
 
-                    <!-- Código de invitación con color diferente de fondo -->
 
-                    <div class="invite-code-container text-center color-primary bg-secondary" *ngIf="lista.codigo">
-                        <div class="invite-code-label">Código para compartir:</div>
-                        <div class="invite-code-value">{{ lista.codigo }}</div>
-                    </div>
 
                     <!-- Pie total -->
                     <div
                         class="card-footer bg-white border-0 p-4 pt-2 d-flex justify-content-between align-items-center rounded-bottom">
-                        <span class="text-muted small fw-bold text-uppercase opacity-75">Total estimado</span>
-                        <span class="h4 mb-0 fw-bold text-primary">{{ getListaTotal(lista) | number:'1.2-2' }}€</span>
+                        <div class="d-flex flex-column">
+                            <span class="text-primary small fw-bold text-uppercase">Por comprar</span>
+                            <span class="text-muted small fw-bold text-uppercase opacity-50"
+                                style="font-size: 0.7rem;">Total lista</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-end">
+                            <span class="h4 mb-0 fw-bold text-primary">{{ getListaPendienteTotal(lista) | number:'1.2-2'
+                                }}€</span>
+                            <span class="text-muted small fw-bold opacity-75"
+                                style="text-decoration: line-through; font-size: 0.8rem;">
+                                {{ getListaTotal(lista) | number:'1.2-2' }}€
+                            </span>
+                        </div>
                     </div>
+                    <!-- Código de invitación interactivo al final de la tarjeta -->
+                    <div class="border-top" *ngIf="lista.codigo">
+                        <!-- ponemos que sea con el fondo azulito de nav-bar y el texto blanco-->
+                        <button
+                            class="btn btn-propio w-100 rounded-bottom-4 border-0 py-2 d-flex align-items-center justify-content-center gap-2 text-white fw-bold"
+                            (click)="lista.mostrarCodigo = !lista.mostrarCodigo"
+                            [ngClass]="{'bg-home-accent text-white': lista.mostrarCodigo}">
+                            <i class="bi" [ngClass]="lista.mostrarCodigo ? 'bi-qr-code-scan' : 'bi-share-fill'"></i>
+                            <span *ngIf="!lista.mostrarCodigo">Ver código para compartir</span>
+                            <span *ngIf="lista.mostrarCodigo">CÓDIGO: <span class="fs-5 ms-1"
+                                    style="letter-spacing: 2px;">{{ lista.codigo }}</span></span>
+                        </button>
+                    </div>
+
                 </div>
 
             </div>
+        </ng-template>
+
+        <!-- Template para Icono de Supermercado (Reutilizable) -->
+        <ng-template #iconoSuper let-item="item">
+            <ng-container [ngSwitch]="getSupermarketIcon(item).type">
+                <img *ngSwitchCase="'img'" [src]="getSupermarketIcon(item).value" class="rounded-circle shadow-xs"
+                    style="width: 26px; height: 26px; object-fit: contain;">
+                <i *ngSwitchCase="'icon'" [class]="'bi ' + getSupermarketIcon(item).value + ' text-propio'"
+                    style="font-size: 1.3rem;"></i>
+            </ng-container>
         </ng-template>
 
     </div>

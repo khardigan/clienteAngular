@@ -1,7 +1,29 @@
+/* --- VARIABLES DE TEMA --- */
+:root {
+    --bg-surface: #ffffff;
+    --bg-body: var(--home-sky);
+    --text-main: #1a2b3c;
+    --card-shadow: rgba(0, 0, 0, 0.08);
+}
+
+[data-bs-theme='dark'] {
+    --bg-surface: #1e1e1e;
+    --bg-body: #121212;
+    --text-main: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.5);
+    --bs-body-bg: #121212;
+    --bs-body-color: #ffffff;
+    --bs-tertiary-bg: #2c2c2c;
+}
+
 /* --- RESET Y SEGURIDAD --- */
+
 html,
 body {
+    background-color: var(--bg-body) !important;
+    color: var(--text-main) !important;
     overflow-x: hidden !important;
+
     width: 100% !important;
     margin: 0;
     padding: 0;
@@ -9,10 +31,18 @@ body {
 }
 
 /* --- BARRA DE NAVEGACIÓN --- */
-.site-header-brand {
-    background: linear-gradient(90deg, var(--home-orange), var(--home-orange-dark));
+.admin-nav {
+    background: linear-gradient(90deg, #ff4d4d, #c40000) !important;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
+
+.site-header-brand {
+    background: var(--home-orange) !important;
+    background-image: linear-gradient(135deg, var(--home-orange) 0%, var(--home-orange-dark) 100%) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+
 
 /* FIX CRÍTICO: Rango 940px - 1100px */
 @media (min-width: 992px) and (max-width: 1200px) {
@@ -41,14 +71,14 @@ body {
     /* Evita que los textos salten de línea y rompan el alto */
 }
 
-.nav-link.active::after {
+    .nav-link.active::after {
     content: '';
     position: absolute;
     bottom: -2px;
     left: 1rem;
     right: 1rem;
     height: 3px;
-    background: linear-gradient(90deg, #0d6efd, transparent);
+    background: linear-gradient(90deg, var(--home-orange), transparent);
     border-radius: 2px;
 }
 

@@ -1,4 +1,5 @@
-<div class="container py-5 mt-4">
+<div class="main-content-wrapper bg-main-gradient">
+    <div class="container py-5 mt-4">
     <div class="row mb-4">
         <div class="col-12 text-center text-md-start">
             <h2
@@ -40,7 +41,7 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" *ngIf="!cargando && listas.length > 0">
         <div class="col" *ngFor="let lista of listas">
             <div class="card h-100 border-0 shadow-sm hover-lift bg-white rounded-4 overflow-hidden">
-                <div *ngIf="isLoggedIn && isAdmin">
+                <div *ngIf="isLoggedIn && (isAdmin || currentUserId === lista.usuarioDuenoId)">
                     <button
                         class="btn btn-danger btn-sm flex-fill rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2"
                         (click)="eliminarDeListasPublicas(lista.codLista)"
@@ -74,9 +75,15 @@
                         <span class="text-muted small fw-bold text-uppercase d-block mb-2">Contenido</span>
                         <div class="small text-dark">
                             <div *ngFor="let p of lista.productos.slice(0, 3)"
-                                class="d-flex justify-content-between mb-1">
-                                <span><i class="bi bi-dot"></i> {{ p.nombre }}</span>
-                                <span class="text-muted">{{ p.cantidad }} ud.</span>
+                                class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-dot"></i>
+                                    <span class="text-truncate" style="max-width: 150px;">{{ p.nombre }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <ng-container *ngTemplateOutlet="iconoSuper; context: { item: p }"></ng-container>
+                                    <span class="text-muted">{{ p.cantidad }} ud.</span>
+                                </div>
                             </div>
                             <div *ngIf="lista.productos.length > 3" class="text-primary fw-bold mt-1">
                                 +{{ lista.productos.length - 3 }} productos más...
@@ -99,4 +106,15 @@
             </div>
         </div>
     </div>
+    </div>
 </div>
+
+<!-- Template para Icono de Supermercado -->
+<ng-template #iconoSuper let-item="item">
+    <ng-container [ngSwitch]="getSupermarketIcon(item).type">
+        <img *ngSwitchCase="'img'" [src]="getSupermarketIcon(item).value" class="rounded-circle shadow-xs"
+            style="width: 26px; height: 26px; object-fit: contain;">
+        <i *ngSwitchCase="'icon'" class="bi" [ngClass]="getSupermarketIcon(item).value"
+            style="font-size: 1.2rem; color: var(--home-orange);"></i>
+    </ng-container>
+</ng-template>

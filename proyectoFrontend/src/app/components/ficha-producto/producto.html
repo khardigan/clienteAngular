@@ -8,9 +8,14 @@
                 <i class="bi bi-box-seam"></i> Producto
             </small>
 
-            <span class="badge bg-success rounded-pill px-3 py-2">
-                {{ producto.supermercado || 'Sin supermercado' }}
-            </span>
+            <div class="d-flex gap-2">
+                <span class="badge bg-success rounded-pill px-3 py-2">
+                    {{ producto.supermercado || 'Sin supermercado' }}
+                </span>
+                <span class="badge bg-info text-dark rounded-pill px-3 py-2" *ngIf="producto.categoria">
+                    <i class="bi bi-tag-fill me-1"></i> {{ producto.categoria }}
+                </span>
+            </div>
         </div>
 
 
@@ -20,8 +25,8 @@
             <div class="col-lg-6 text-center position-relative p-4 rounded-4"
                 style="background: linear-gradient(135deg, #fff7f0, #fff1e6);">
 
-                <img [src]="getImagen(producto.nombre)" class="img-fluid rounded-4 shadow-sm main-img"
-                    [alt]="producto.nombre" style="min-height: 420px; width: 100%; object-fit: cover;">
+                <img [src]="getImagen()" class="img-fluid rounded-4 shadow-sm main-img" [alt]="producto.nombre"
+                    style="min-height: 420px; width: 100%; object-fit: contain; background: white;">
 
                 <button (click)="volver()"
                     class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle shadow-sm">
@@ -43,9 +48,23 @@
                     {{ producto.nombre || 'Producto sin nombre' }}
                 </h2>
 
-                <p class="text-muted mb-3">
+                <!-- Categorías -->
+                <div class="mb-3" *ngIf="producto.categoria">
+                    <span class="badge bg-light text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.85rem;">
+                        <i class="bi bi-tag-fill me-1"></i> {{ producto.categoria }}
+                    </span>
+                </div>
+
+                <p class="text-muted mb-3" *ngIf="!isExternalLink(producto.descripcion)">
                     {{ producto.descripcion || 'Sin descripción disponible' }}
                 </p>
+
+                <!-- Botón de enlace externo (si la descripción contiene "Ver en:") -->
+                <div class="mb-4" *ngIf="isExternalLink(producto.descripcion)">
+                    <a [href]="extractUrl(producto.descripcion)" target="_blank" class="btn btn-outline-home rounded-pill w-100 py-2 fw-bold">
+                        <i class="bi bi-box-arrow-up-right me-2"></i> Ver en {{ producto.supermercado || 'Tienda' }}
+                    </a>
+                </div>
 
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="fs-2 fw-bold text-success">
@@ -120,7 +139,7 @@
         <hr class="my-4 text-muted opacity-25">
 
         <div *ngIf="producto.comentarios && producto.comentarios.length > 0; else noComentarios">
-            <div class="mb-4 p-4 rounded-4 border-start border-4 bg-white shadow-sm transition-hover"
+            <div class="mb-4 p-4 rounded-4 border border-2 shadow-sm bg-white"
                 *ngFor="let c of producto.comentarios"
                 [ngClass]="c.idUsuario === authService.getId() ? 'border-success' : 'border-primary'">
 
@@ -129,19 +148,19 @@
                         <img src="https://ui-avatars.com/api/?name={{c.usuario.nombre || 'U'}}&background=random"
                             class="rounded-circle" width="30" height="30" alt="Avatar">
                         <strong class="text-dark">{{ c.usuario.nombre || 'Cargando...' }}</strong>
-                        <span class="badge bg-success-subtle text-success small rounded-pill px-2"
+                        <span class="badge bg-success text-white small rounded-pill px-2"
                             *ngIf="c.idUsuario === authService.getId()">Tú</span>
                     </div>
-                    <small class="text-muted small">{{ c.fecha | date:'dd/MM/yyyy' }}</small>
+                    <small class="text-dark fw-bold small">{{ c.fecha | date:'dd/MM/yyyy' }}</small>
                 </div>
 
-                <div class="text-warning mb-2 extra-small">
+                <div class="text-warning mb-2 fs-5">
                     @for(n of [1,2,3,4,5]; track n) {
                     <i class="bi" [class.bi-star-fill]="c.puntuacion >= n" [class.bi-star]="c.puntuacion < n"></i>
                     }
                 </div>
 
-                <p class="text-secondary mb-0 italic" style="line-height: 1.5; font-size: 0.95rem;">"{{ c.contenido }}"
+                <p class="text-dark mb-0 fw-medium" style="line-height: 1.5; font-size: 0.95rem;">"{{ c.contenido }}"
                 </p>
             </div>
         </div>

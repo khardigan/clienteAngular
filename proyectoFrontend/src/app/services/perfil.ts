@@ -27,7 +27,6 @@ export class PerfilService {
   obtenerPerfilDesdeToken(): Observable<Perfil> {
     const token = localStorage.getItem('token') || '';
 
-    console.log("PerfilService - Token sacado de localStorage:", token);
 
     // ... further down inside obtenerPerfilDesdeToken:
     if (!token || token.split('.').length !== 3) {
@@ -44,12 +43,10 @@ export class PerfilService {
       return throwError(() => new Error('Invalid token format'));
     }
 
-    console.log("PerfilService - ID obtenido del token:", usuarioId);
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
 
-    console.log("PerfilService - Haciendo GET a:", `https://localhost:8443/usuarios/${usuarioId}/perfil`);
 
     // Cambiado: Ahora apuntamos al endpoint de usuario que obtiene su propio perfil
     return this.http.get<Perfil>(`https://localhost:8443/usuarios/${usuarioId}/perfil`, { headers });

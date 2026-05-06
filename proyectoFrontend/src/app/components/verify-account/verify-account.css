@@ -1,0 +1,39 @@
+.sesion-page-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-body);
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%);
+}
+
+.sesion-wrap {
+  max-width: 960px;
+}
+
+.sesion-card {
+  background-color: var(--bg-surface);
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(128, 128, 128, 0.1);
+  color: var(--text-main);
+}
+
+.sesion-card .card-header {
+  background-color: rgba(185, 224, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 128, 0, 0.1);
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.sesion-page-title {
+  color: var(--text-main);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -13,6 +13,7 @@ export interface ProductoEstado {
     precio: number;
     cantidad: number;
     comprado: boolean; // Indica si el producto ya ha sido tachado de la lista
+    supermercado?: string; // <--- Añadido para mostrar el súper en la lista
 }
 
 // Interfaz detallada de una lista de la compra con todos sus datos

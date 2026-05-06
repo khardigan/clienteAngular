@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth';
 import { ListaDetalle, IntegranteLista, ProductoEstado } from '../../models/lista';
 import { ProductoPropio, Producto } from '../../models/producto';
 import { finalize } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
 
 /**
  * Componente principal que gestiona:
@@ -23,42 +24,34 @@ import { finalize } from 'rxjs';
 })
 export class ListaComponent implements OnInit {
 
-    // ===================== ESTADO GENERAL =====================
+    // Variables de estado general y listas
+    listas: ListaDetalle[] = [];
+    cargando = true;
+    errorStr = '';
 
-    listas: ListaDetalle[] = []; // Listas del usuario
-    cargando = true; // Control de spinner
-    errorStr = ''; // Mensaje de error general
-
-    // ===================== PRODUCTOS PROPIOS =====================
-
-    productosPropios: ProductoPropio[] = []; // Productos creados por el usuario
-    panelPropioAbiertoEnLista: number | null = null; // Qué lista tiene abierto el panel
-    mostrarFormNuevo = false; // Mostrar formulario crear producto
-
+    // Variables de productos propios
+    productosPropios: ProductoPropio[] = [];
+    panelPropioAbiertoEnLista: number | null = null;
+    mostrarFormNuevo = false;
     nuevoProducto = {
         nombre: '',
         precioObjetivo: undefined as number | undefined,
         notas: '',
         supermercado: ''
     };
+    guardando = false;
+    editandoProductoId: number | null = null;
 
-    guardando = false; // Estado loading al crear producto
-    editandoProductoId: number | null = null; // ID del producto propio que se está editando
-
-    // ===================== PRODUCTOS OFICIALES =====================
-
+    // Variables de productos oficiales
     panelOficialAbiertoEnLista: number | null = null;
     busquedaProducto = '';
     resultadosBusqueda: Producto[] = [];
     buscando = false;
 
-    // ===================== FEEDBACK =====================
-
+    // Variables de UI y estado
     feedbackMsg = '';
     feedbackTipo: 'success' | 'danger' = 'success';
     private feedbackTimer: any = null;
-
-    // ===================== CABECERA =====================
 
     panelCrearAbierto = false;
     panelUnirseAbierto = false;
@@ -69,44 +62,93 @@ export class ListaComponent implements OnInit {
 
     confirmandoModificarNombreListaId: number | null = null;
     inputNuevoNombre = '';
-
     confirmandoBorradoListaId: number | null = null;
 
-    // ID del usuario actual (para controlar quién puede editar un producto propio)
     currentUserId: number | null = null;
+    supermercadosOficiales: string[] = [];
 
     constructor(
         private listaService: ListaService,
         private productoService: ProductoService,
         private authService: AuthService,
-        private cdr: ChangeDetectorRef // Fuerza actualización manual de la vista
+        private cdr: ChangeDetectorRef,
+        private router: Router
     ) { }
 
-    /**
-     * Hook inicial del componente
-     * - Carga listas
-     * - Carga productos propios
-     */
-    // Carga las listas del usuario y sus productos propios al empezar.
+    verCatalogop() {
+        this.router.navigate(['/productos']);
+    }
+
+    // ==========================================
+    // CICLO DE VIDA E INICIALIZACIÓN
+    // ==========================================
+
     ngOnInit(): void {
         this.currentUserId = this.authService.getId();
         this.cargarListas();
         this.cargarProductosPropios();
+        this.opcionesSuperMercadosOficiales();
     }
 
-    // Devuelve true si el usuario actual es el dueño del producto propio
-    // Necesario porque Angular no puede usar Number() directamente en los templates
-    esDuenioProducto(pp: any): boolean {
-        return this.currentUserId !== null && Number(this.currentUserId) === Number(pp.usuarioId);
+    cargarListas(silencioso = false): void {
+        if (!silencioso) this.cargando = true;
+
+        this.listaService.obtenerMisListas().subscribe({
+            next: (data) => {
+                this.listas = data || [];
+                this.listas.forEach(l => {
+                    if (l.productos) this.ordenarProductos(l.productos, false);
+                    if (l.productoPropios) this.ordenarProductos(l.productoPropios, true);
+                });
+                if (!silencioso) {
+                    setTimeout(() => {
+                        this.cargando = false;
+                        this.cdr.detectChanges();
+                    }, 500);
+                } else {
+                    this.cdr.detectChanges();
+                }
+            },
+            error: () => {
+                this.errorStr = 'No se pudieron cargar tus listas.';
+                this.cargando = false;
+                this.cdr.detectChanges();
+            }
+        });
     }
 
-    // ===================== ORDENACIÓN =====================
+    cargarProductosPropios(): void {
+        const usuarioId = this.authService.getId();
+        if (!usuarioId) return;
 
-    /**
-     * Devuelve las listas ordenadas:
-     * - Primero las NO completadas
-     * - Después las completadas
-     */
+        this.productoService
+            .listarProductosPropiosDeUsuario(usuarioId)
+            .subscribe({
+                next: (data) => {
+                    this.productosPropios = data || [];
+                    this.productosPropios.sort((a, b) => (a.precioObjetivo || 0) - (b.precioObjetivo || 0));
+                    this.cdr.detectChanges();
+                },
+                error: () => {
+                    this.productosPropios = [];
+                }
+            });
+    }
+
+    opcionesSuperMercadosOficiales() {
+        this.productoService.listarSupermercados().subscribe({
+            next: (data) => {
+                this.supermercadosOficiales = data;
+                this.cdr.detectChanges();
+            },
+            error: (err) => console.error('Error al cargar productos', err)
+        });
+    }
+
+    // ==========================================
+    // GETTERS Y MÉTODOS DE UTILIDAD
+    // ==========================================
+
     get listasOrdenadas(): ListaDetalle[] {
         return [...this.listas].sort((a, b) => {
             const aComp = this.estaListaCompletada(a) ? 1 : 0;
@@ -114,11 +156,7 @@ export class ListaComponent implements OnInit {
             return aComp - bComp;
         });
     }
-    /**
-     * Apaño para ordenarlas en dos columnas:
-     *  - Pares
-     *  - Impares
-     */
+
     get listasPares(): ListaDetalle[] {
         return this.listasOrdenadas.filter((_, i) => i % 2 === 0);
     }
@@ -127,26 +165,24 @@ export class ListaComponent implements OnInit {
         return this.listasOrdenadas.filter((_, i) => i % 2 !== 0);
     }
 
-    // Prepara UI para modificar nombre
-    prepararModificarNombre(lista: ListaDetalle): void {
-        this.confirmandoModificarNombreListaId = lista.codLista;
-        this.inputNuevoNombre = lista.nombre || '';
+    getListaTotal(lista: ListaDetalle): number {
+        return this.sumarPrecios(lista, false);
     }
 
-    cancelarModificarNombre(): void {
-        this.confirmandoModificarNombreListaId = null;
-        this.inputNuevoNombre = '';
+    getListaPendienteTotal(lista: ListaDetalle): number {
+        return this.sumarPrecios(lista, true);
     }
 
-    prepararBorradoLista(listaId: number): void {
-        this.confirmandoBorradoListaId = listaId;
+    private sumarPrecios(lista: ListaDetalle, soloPendientes: boolean): number {
+        if (!lista) return 0;
+
+        const suma = (items: any[], isPropio: boolean) => (items || [])
+            .filter(i => !soloPendientes || !i.comprado)
+            .reduce((acc, i) => acc + ((isPropio ? i.precioObjetivo : i.precio) * (i.cantidad || 1)), 0);
+
+        return suma(lista.productos, false) + suma(lista.productoPropios, true);
     }
 
-    cancelarBorradoLista(): void {
-        this.confirmandoBorradoListaId = null;
-    }
-
-    // Dice si ya has comprado todo lo que había en la lista. Se considera completa si tiene items y todos están marcados.
     estaListaCompletada(lista: ListaDetalle): boolean {
         const totalItems = lista.productos.length + (lista.productoPropios ? lista.productoPropios.length : 0);
         if (totalItems === 0) return false;
@@ -157,60 +193,349 @@ export class ListaComponent implements OnInit {
         return todosOficialesComprados && todosPropiosComprados;
     }
 
-    /**
-     * Indica si una lista puede publicarse
-     * - No debe tener productos propios
-     * - No debe estar ya publicada
-     */
     puedePubilcar(lista: ListaDetalle): boolean {
         const tienePropios = lista.productoPropios && lista.productoPropios.length > 0;
         return !tienePropios && !lista.publicada;
     }
 
-    // ===================== CARGA DATOS =====================
+    getSupermarketIcon(item: any): { type: 'img' | 'icon', value: string } {
+        if (!item) return { type: 'icon', value: 'bi-house-door' };
 
-    // Trae todas las listas donde participas desde el servidor.
-    cargarListas(): void {
-        this.cargando = true;
+        let s = "";
+        if (typeof item === 'string') {
+            s = item;
+        } else {
+            s = item.supermercado || "";
+            if (!s && item.nombre) {
+                const nombreLower = item.nombre.toLowerCase();
+                if (nombreLower.includes('mercadona')) s = 'Mercadona';
+                else if (nombreLower.includes('carrefour')) s = 'Carrefour';
+                else if (nombreLower.includes('lidl')) s = 'Lidl';
+                else if (nombreLower.includes('dia')) s = 'Dia';
+            }
+        }
 
-        this.listaService.obtenerMisListas().subscribe({
-            next: (data) => {
+        if (!s) return { type: 'icon', value: 'bi-house-door' };
+
+        const superLower = s.trim().toLowerCase();
+
+        if (superLower.includes('mercadona')) return { type: 'img', value: '/images/Mercadona.png' };
+        if (superLower.includes('carrefour')) return { type: 'img', value: '/images/Carrefour.svg' };
+        if (superLower.includes('lidl')) return { type: 'img', value: '/images/Lidl.png' };
+        if (superLower.includes('dia')) return { type: 'img', value: '/images/Dia.png' };
+
+        return { type: 'icon', value: 'bi-house-door' };
+    }
+
+    esDuenioProducto(pp: any): boolean {
+        return this.currentUserId !== null && Number(this.currentUserId) === Number(pp.usuarioId);
+    }
+
+    ordenarProductos(productos: any[], isPropio: boolean): any[] {
+        if (!productos) return [];
+        return productos.sort((a, b) => {
+            let supA = a.supermercado || '';
+            if (!supA && a.nombre) {
+                const n = a.nombre.toLowerCase();
+                if (n.includes('mercadona')) supA = 'Mercadona';
+                else if (n.includes('carrefour')) supA = 'Carrefour';
+                else if (n.includes('lidl')) supA = 'Lidl';
+                else if (n.includes('dia')) supA = 'Dia';
+            }
+            let supB = b.supermercado || '';
+            if (!supB && b.nombre) {
+                const n = b.nombre.toLowerCase();
+                if (n.includes('mercadona')) supB = 'Mercadona';
+                else if (n.includes('carrefour')) supB = 'Carrefour';
+                else if (n.includes('lidl')) supB = 'Lidl';
+                else if (n.includes('dia')) supB = 'Dia';
+            }
+
+            const cmpSup = supA.localeCompare(supB);
+            if (cmpSup !== 0) return cmpSup;
+
+            const nomA = a.nombre || '';
+            const nomB = b.nombre || '';
+            const cmpNom = nomA.localeCompare(nomB);
+            if (cmpNom !== 0) return cmpNom;
+
+            const precioA = isPropio ? (a.precioObjetivo || 0) : (a.precio || 0);
+            const precioB = isPropio ? (b.precioObjetivo || 0) : (b.precio || 0);
+            return precioA - precioB;
+        });
+    }
+
+    obtenerIntegrantes(lista: ListaDetalle): IntegranteLista[] {
+        const integrantes: IntegranteLista[] = [];
+        integrantes.push({
+            id: lista.usuarioDuenoId,
+            nick: lista.nombreDuenoNick,
+            esDueno: true
+        });
+
+        if (lista.usuariosCompartida) {
+            lista.usuariosCompartida.forEach(u => {
+                integrantes.push({
+                    id: u.id,
+                    nick: u.nick,
+                    esDueno: false
+                });
+            });
+        }
+        return integrantes;
+    }
+
+    mostrarFeedback(msj: string, tipo: 'success' | 'danger' = 'success'): void {
+        this.feedbackMsg = msj;
+        this.feedbackTipo = tipo;
+        this.cdr.detectChanges();
+    }
+
+    // ==========================================
+    // GESTIÓN DE LISTAS
+    // ==========================================
+
+    togglePanelCrear(): void {
+        this.panelCrearAbierto = !this.panelCrearAbierto;
+        if (this.panelCrearAbierto) {
+            this.panelUnirseAbierto = false;
+            this.inputNombreLista = '';
+        }
+    }
+
+    togglePanelUnirse(): void {
+        this.panelUnirseAbierto = !this.panelUnirseAbierto;
+        if (this.panelUnirseAbierto) {
+            this.panelCrearAbierto = false;
+            this.inputCodigoUnirse = '';
+        }
+    }
+
+    onCreateLista(): void {
+        const nombre = this.inputNombreLista.trim() || undefined;
+        this.procesandoAccion = true;
+        this.listaService.crearLista(nombre)
+            .pipe(
+                finalize(() => {
+                    this.procesandoAccion = false;
+                })
+            )
+            .subscribe({
+                next: () => {
+                    this.mostrarFeedback('Lista creada correctamente.', 'success');
+                    this.panelCrearAbierto = false;
+                    this.inputNombreLista = '';
+                    this.cargarListas();
+                },
+                error: (err) => {
+                    console.error('Error al crear lista', err);
+                    this.mostrarFeedback('No se pudo crear la nueva lista.', 'danger');
+                }
+            });
+    }
+
+    onAnadirLista(): void {
+        const codigo = this.inputCodigoUnirse.trim().toUpperCase();
+
+        if (codigo.length !== 6) {
+            this.mostrarFeedback('El código debe tener 6 caracteres.', 'danger');
+            return;
+        }
+
+        this.procesandoAccion = true;
+        this.listaService.unirseALista(codigo).subscribe({
+            next: () => {
+                this.mostrarFeedback('¡Te has unido a la lista con éxito!', 'success');
+                this.panelUnirseAbierto = false;
+                this.inputCodigoUnirse = '';
+                this.cargarListas();
+
                 setTimeout(() => {
-                    this.listas = data || [];
-                    this.cargando = false;
+                    this.procesandoAccion = false;
+                });
+            },
+            error: (err) => {
+                const msg = typeof err.error === 'string' ? err.error : err.error?.message || 'No se pudo unir a la lista.';
+                this.mostrarFeedback(msg, 'danger');
+                this.procesandoAccion = false;
+            }
+        });
+    }
+
+    prepararModificarNombre(lista: ListaDetalle): void {
+        this.confirmandoModificarNombreListaId = lista.codLista;
+        this.inputNuevoNombre = lista.nombre || '';
+    }
+
+    cancelarModificarNombre(): void {
+        this.confirmandoModificarNombreListaId = null;
+        this.inputNuevoNombre = '';
+    }
+
+    onModificarNombre(lista: ListaDetalle): void {
+        const nuevoNombre = this.inputNuevoNombre.trim();
+        if (!nuevoNombre) return;
+
+        this.listaService.cambiarNombreLista(lista.codLista, nuevoNombre).subscribe({
+            next: () => {
+                lista.nombre = nuevoNombre;
+                this.mostrarFeedback('Nombre actualizado.', 'success');
+                this.cdr.detectChanges();
+            },
+            error: () => this.mostrarFeedback('Error al cambiar nombre.', 'danger')
+        });
+    }
+
+    prepararBorradoLista(listaId: number): void {
+        this.confirmandoBorradoListaId = listaId;
+    }
+
+    cancelarBorradoLista(): void {
+        this.confirmandoBorradoListaId = null;
+    }
+
+    eliminarLista(listaId: number): void {
+        this.listaService.eliminarLista(listaId).subscribe({
+            next: () => {
+                this.listas = this.listas.filter(l => l.codLista !== listaId);
+                this.cdr.detectChanges();
+            },
+            error: (err) => console.error('Error al eliminar lista', err)
+        });
+    }
+
+    onPublicar(listaId: number): void {
+        this.listaService.publicarLista(listaId).subscribe({
+            next: () => {
+                const lista = this.listas.find(l => l.codLista === listaId);
+                if (lista) lista.publicada = true;
+                this.cdr.detectChanges();
+            },
+            error: (err) => console.error('Error al publicar lista', err)
+        });
+    }
+
+    onDespublicar(listaId: number): void {
+        this.listaService.eliminarDeListasPublicas(listaId).subscribe({
+            next: () => {
+                const lista = this.listas.find(l => l.codLista === listaId);
+                if (lista) lista.publicada = false;
+                this.cdr.detectChanges();
+            },
+            error: (err) => console.error('Error al despublicar lista', err)
+        });
+    }
+
+    // ==========================================
+    // GESTIÓN DE PRODUCTOS OFICIALES
+    // ==========================================
+
+    togglePanelProducto(codLista: number): void {
+        if (this.panelOficialAbiertoEnLista === codLista) {
+            this.panelOficialAbiertoEnLista = null;
+            this.busquedaProducto = '';
+            this.resultadosBusqueda = [];
+        } else {
+            this.panelOficialAbiertoEnLista = codLista;
+            this.panelPropioAbiertoEnLista = null;
+            this.busquedaProducto = '';
+            this.resultadosBusqueda = [];
+        }
+    }
+
+    onBusquedaProducto(): void {
+        clearTimeout(this.searchTimer);
+        const query = this.busquedaProducto.trim();
+
+        if (query.length < 2) {
+            this.resultadosBusqueda = [];
+            this.buscando = false;
+            return;
+        }
+
+        this.buscando = true;
+        this.cdr.detectChanges();
+
+        this.searchTimer = setTimeout(() => {
+            this.productoService.buscarProductos(query).subscribe({
+                next: (data) => {
+                    this.resultadosBusqueda = data || [];
+                    this.resultadosBusqueda.sort((a, b) => (a.precio || 0) - (b.precio || 0));
+                    this.buscando = false;
                     this.cdr.detectChanges();
-                }, 600);
+                },
+                error: () => {
+                    this.buscando = false;
+                    this.cdr.detectChanges();
+                }
+            });
+        }, 350);
+    }
+
+    agregarProductoOficialALista(lista: ListaDetalle, producto: Producto): void {
+        const currentIds = lista.productos.map(p => p.id);
+        if (currentIds.includes(producto.id)) return;
+
+        const newIds = [...currentIds, producto.id];
+        const usuariosIds = lista.usuariosCompartida ? lista.usuariosCompartida.map(u => u.id) : [];
+
+        this.listaService.actualizarLista(lista.codLista, {
+            productosEnLista: newIds,
+            usuariosCompartida: usuariosIds
+        }).subscribe({
+            next: () => {
+                this.panelOficialAbiertoEnLista = null;
+                this.busquedaProducto = '';
+                this.resultadosBusqueda = [];
+                this.cargarListas();
             },
             error: () => {
-                this.errorStr = 'No se pudieron cargar tus listas.';
-                this.cargando = false;
+                this.errorStr = 'No se pudo añadir el producto a la lista.';
                 this.cdr.detectChanges();
             }
         });
     }
 
-    // Obtiene productos propios del usuario
-    // Servicio devuelve: Observable<ProductoPropio[]>
-    cargarProductosPropios(): void {
-        const usuarioId = this.authService.getId();
-        if (!usuarioId) return;
+    cambiarEstadoComprado(listaId: number, producto: ProductoEstado): void {
+        producto.comprado = !producto.comprado;
+        this.cdr.detectChanges();
 
-        this.productoService
-            .listarProductosPropiosDeUsuario(usuarioId)
-            .subscribe({
-                next: (data) => {
-                    this.productosPropios = data || [];
-                    this.cdr.detectChanges();
-                },
-                error: () => {
-                    this.productosPropios = [];
-                }
-            });
+        this.listaService.cambiarEstadoComprado(listaId, producto.id, producto.comprado)
+            .subscribe({ next: () => this.cargarListas(true) });
     }
 
-    // ===================== PRODUCTOS PROPIOS =====================
+    cambiarCantidad(listaId: number, producto: ProductoEstado, delta: number): void {
+        const nueva = (producto.cantidad || 1) + delta;
+        if (nueva < 1) return;
 
-    // Abre/cierra panel de productos propios
+        producto.cantidad = nueva;
+        this.cdr.detectChanges();
+
+        this.listaService.cambiarCantidadProducto(listaId, producto.id, nueva)
+            .subscribe({ next: () => this.cargarListas(true) });
+    }
+
+    eliminarProducto(lista: ListaDetalle, producto: ProductoEstado, event: MouseEvent): void {
+        event.stopPropagation();
+        const newIds = lista.productos.filter(p => p.id !== producto.id).map(p => p.id);
+        const usuariosIds = lista.usuariosCompartida ? lista.usuariosCompartida.map(u => u.id) : [];
+
+        this.listaService.actualizarLista(lista.codLista, {
+            productosEnLista: newIds,
+            usuariosCompartida: usuariosIds
+        }).subscribe({
+            next: () => this.cargarListas(),
+            error: () => {
+                this.errorStr = 'No se pudo quitar el producto de la lista.';
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    // ==========================================
+    // GESTIÓN DE PRODUCTOS PROPIOS
+    // ==========================================
+
     togglePanelProductoPropio(codLista: number): void {
         if (this.panelPropioAbiertoEnLista === codLista) {
             this.panelPropioAbiertoEnLista = null;
@@ -225,132 +550,6 @@ export class ListaComponent implements OnInit {
         }
     }
 
-    // Elimina producto propio de la BD
-    // Servicio devuelve: Observable<void>
-    eliminarProductoPropio(productoId: number, event: MouseEvent): void {
-        event.stopPropagation();
-
-        this.productoService.eliminarProductoPropio(productoId).subscribe({
-            next: () => {
-                this.cargarProductosPropios();
-                this.cargarListas();
-            },
-            error: () => {
-                this.errorStr = 'No se pudo eliminar el producto propio.';
-                this.cdr.detectChanges();
-            }
-        });
-    }
-
-
-    // Saca un producto inventado de una lista, pero lo deja guardado en tu cuenta.
-    quitarDeListaPropio(producto: ProductoPropio, event: MouseEvent): void {
-        event.stopPropagation();
-
-        this.productoService.actualizarProductoPropio(producto.id, {
-            nombre: producto.nombre,
-            precioObjetivo: producto.precioObjetivo,
-            notas: producto.notas,
-            listaId: null,
-            supermercado: producto.supermercado,
-            cantidad: producto.cantidad
-        }).subscribe({
-            next: () => this.cargarListas(),
-            error: () => {
-                this.errorStr = 'No se pudo quitar el producto de la lista.';
-                this.cdr.detectChanges();
-            }
-        });
-    }
-
-    // Elimina un producto oficial de la lista (NO del catálogo global)
-    // Servicio devuelve: Observable<void>
-    eliminarProducto(lista: ListaDetalle, producto: ProductoEstado, event: MouseEvent): void {
-        event.stopPropagation();
-
-        // Generamos nueva lista de IDs sin el producto eliminado
-        const newIds = lista.productos
-            .filter(p => p.id !== producto.id)
-            .map(p => p.id);
-
-        // IDs de usuarios compartidos
-        const usuariosIds = lista.usuariosCompartida
-            ? lista.usuariosCompartida.map(u => u.id)
-            : [];
-
-        this.listaService.actualizarLista(lista.codLista, {
-            productosEnLista: newIds,
-            usuariosCompartida: usuariosIds
-        }).subscribe({
-            next: () => this.cargarListas(),
-            error: () => {
-                this.errorStr = 'No se pudo quitar el producto de la lista.';
-                this.cdr.detectChanges();
-            }
-        });
-    }
-
-
-    // Mete un producto propio tuyo en una lista concreta.
-    agregarProductoPropioALista(lista: ListaDetalle, producto: ProductoPropio): void {
-        this.productoService.actualizarProductoPropio(producto.id, {
-            nombre: producto.nombre,
-            precioObjetivo: producto.precioObjetivo,
-            notas: producto.notas,
-            listaId: lista.codLista,
-            supermercado: producto.supermercado,
-            cantidad: 1
-        }).subscribe({
-            next: () => {
-                this.panelPropioAbiertoEnLista = null;
-                this.cargarListas();
-            },
-            error: () => {
-                this.errorStr = 'No se pudo añadir el producto a la lista.';
-                this.cdr.detectChanges();
-            }
-        });
-    }
-
-    // Cambia cantidad de producto oficial
-    // Servicio devuelve: Observable<void>
-    cambiarCantidad(listaId: number, producto: ProductoEstado, delta: number): void {
-        const nuevaCantidad = (producto.cantidad || 1) + delta;
-        if (nuevaCantidad < 1) return;
-
-        this.listaService
-            .cambiarCantidadProducto(listaId, producto.id, nuevaCantidad)
-            .subscribe({
-                next: () => this.cargarListas(),
-                error: () => {
-                    this.errorStr = 'No se pudo actualizar la cantidad.';
-                    this.cdr.detectChanges();
-                }
-            });
-    }
-
-    // Cambia cantidad de producto propio
-    cambiarCantidadPropio(producto: ProductoPropio, delta: number): void {
-        const nuevaCantidad = (producto.cantidad || 1) + delta;
-        if (nuevaCantidad < 1) return;
-
-        this.productoService.actualizarProductoPropio(producto.id, {
-            nombre: producto.nombre,
-            precioObjetivo: producto.precioObjetivo,
-            notas: producto.notas,
-            listaId: producto.listaId,
-            supermercado: producto.supermercado,
-            cantidad: nuevaCantidad
-        }).subscribe({
-            next: () => this.cargarListas(),
-            error: () => {
-                this.errorStr = 'No se pudo actualizar la cantidad.';
-                this.cdr.detectChanges();
-            }
-        });
-    }
-
-    // Crea un producto propio y lo añade a la lista o lo actualiza si estamos editando
     crearYAgregarProductoPropio(lista: ListaDetalle): void {
         if (!this.nuevoProducto.nombre.trim()) return;
 
@@ -360,14 +559,13 @@ export class ListaComponent implements OnInit {
         this.guardando = true;
 
         if (this.editandoProductoId) {
-            // Modo EDICIÓN
             this.productoService.actualizarProductoPropio(this.editandoProductoId, {
                 nombre: this.nuevoProducto.nombre.trim(),
                 precioObjetivo: this.nuevoProducto.precioObjetivo,
                 notas: this.nuevoProducto.notas || undefined,
                 listaId: lista.codLista,
                 supermercado: this.nuevoProducto.supermercado || undefined,
-                cantidad: 1 // o mantener la que tenía si fuera necesario
+                cantidad: 1
             }).subscribe({
                 next: () => {
                     this.guardando = false;
@@ -386,7 +584,6 @@ export class ListaComponent implements OnInit {
                 }
             });
         } else {
-            // Modo CREACIÓN
             this.productoService.crearProductoPropio(
                 usuarioId,
                 this.nuevoProducto.nombre.trim(),
@@ -413,7 +610,6 @@ export class ListaComponent implements OnInit {
         }
     }
 
-    // Prepara el formulario para editar un producto propio existente
     editarProductoPropio(codLista: number, producto: ProductoPropio): void {
         this.panelPropioAbiertoEnLista = codLista;
         this.mostrarFormNuevo = true;
@@ -427,30 +623,6 @@ export class ListaComponent implements OnInit {
         this.cdr.detectChanges();
     }
 
-    // Cambia estado comprado de producto propio
-    cambiarEstadoCompradoPropio(listaId: number, producto: ProductoPropio): void {
-        const nuevoEstado = !producto.comprado;
-        producto.comprado = nuevoEstado; // Cambio optimista
-        this.cdr.detectChanges();
-
-        this.productoService.actualizarProductoPropio(producto.id, {
-            nombre: producto.nombre,
-            precioObjetivo: producto.precioObjetivo,
-            notas: producto.notas,
-            listaId: listaId,
-            supermercado: producto.supermercado,
-            cantidad: producto.cantidad,
-            comprado: nuevoEstado
-        }).subscribe({
-            next: () => this.cargarListas(),
-            error: () => {
-                producto.comprado = !nuevoEstado; // revertir
-                this.cdr.detectChanges();
-            }
-        });
-    }
-
-    // Resetea formulario de producto nuevo
     resetFormNuevo(): void {
         this.nuevoProducto = {
             nombre: '',
@@ -460,72 +632,17 @@ export class ListaComponent implements OnInit {
         };
     }
 
-    // ===================== PRODUCTOS OFICIALES =====================
-
-    togglePanelProducto(codLista: number): void {
-        if (this.panelOficialAbiertoEnLista === codLista) {
-            this.panelOficialAbiertoEnLista = null;
-            this.busquedaProducto = '';
-            this.resultadosBusqueda = [];
-        } else {
-            this.panelOficialAbiertoEnLista = codLista;
-            this.panelPropioAbiertoEnLista = null;
-            this.busquedaProducto = '';
-            this.resultadosBusqueda = [];
-        }
-    }
-
-
-    // Busca productos oficiales en el catálogo general mientras escribes.
-    onBusquedaProducto(): void {
-        clearTimeout(this.searchTimer);
-
-        const query = this.busquedaProducto.trim();
-
-        if (query.length < 2) {
-            this.resultadosBusqueda = [];
-            this.buscando = false;
-            return;
-        }
-
-        this.buscando = true;
-        this.cdr.detectChanges();
-
-        this.searchTimer = setTimeout(() => {
-            this.productoService.buscarProductos(query).subscribe({
-                next: (data) => {
-                    this.resultadosBusqueda = data || [];
-                    this.buscando = false;
-                    this.cdr.detectChanges();
-                },
-                error: () => {
-                    this.buscando = false;
-                    this.cdr.detectChanges();
-                }
-            });
-        }, 350);
-    }
-
-    // Añade producto oficial a lista
-    agregarProductoOficialALista(lista: ListaDetalle, producto: Producto): void {
-        const currentIds = lista.productos.map(p => p.id);
-
-        if (currentIds.includes(producto.id)) return;
-
-        const newIds = [...currentIds, producto.id];
-
-        const usuariosIds = lista.usuariosCompartida
-            ? lista.usuariosCompartida.map(u => u.id)
-            : [];
-
-        this.listaService.actualizarLista(lista.codLista, {
-            productosEnLista: newIds,
-            usuariosCompartida: usuariosIds
+    agregarProductoPropioALista(lista: ListaDetalle, producto: ProductoPropio): void {
+        this.productoService.actualizarProductoPropio(producto.id, {
+            nombre: producto.nombre,
+            precioObjetivo: producto.precioObjetivo,
+            notas: producto.notas,
+            listaId: lista.codLista,
+            supermercado: producto.supermercado,
+            cantidad: 1
         }).subscribe({
             next: () => {
-                this.panelOficialAbiertoEnLista = null;
-                this.busquedaProducto = '';
-                this.resultadosBusqueda = [];
+                this.panelPropioAbiertoEnLista = null;
                 this.cargarListas();
             },
             error: () => {
@@ -535,206 +652,84 @@ export class ListaComponent implements OnInit {
         });
     }
 
-    // ===================== ACCIONES LISTA =====================
-
-    // Saca la lista de personas (dueño e invitados) de una lista.
-    obtenerIntegrantes(lista: ListaDetalle): IntegranteLista[] {
-        const integrantes: IntegranteLista[] = [];
-
-        integrantes.push({
-            id: lista.usuarioDuenoId,
-            nick: lista.nombreDuenoNick,
-            esDueno: true
-        });
-
-        if (lista.usuariosCompartida) {
-            lista.usuariosCompartida.forEach(u => {
-                integrantes.push({
-                    id: u.id,
-                    nick: u.nick,
-                    esDueno: false
-                });
-            });
-        }
-
-        return integrantes;
-    }
-
-    // Cambia estado comprado (optimista)
-    cambiarEstadoComprado(listaId: number, producto: ProductoEstado): void {
-        const nuevoEstado = !producto.comprado;
-
-        // UI inmediata
-        producto.comprado = nuevoEstado;
+    cambiarEstadoCompradoPropio(listaId: number, producto: ProductoPropio): void {
+        producto.comprado = !producto.comprado;
         this.cdr.detectChanges();
 
-        this.listaService
-            .cambiarEstadoComprado(listaId, producto.id, nuevoEstado)
-            .subscribe({
-                next: () => { },
-                error: () => {
-                    // revertir
-                    producto.comprado = !nuevoEstado;
-                    this.cdr.detectChanges();
-                }
-            });
+        this.productoService.actualizarProductoPropio(producto.id, { ...producto, listaId, comprado: producto.comprado })
+            .subscribe({ next: () => this.cargarListas(true) });
     }
 
-    // Elimina lista
-    eliminarLista(listaId: number): void {
-        this.listaService.eliminarLista(listaId).subscribe({
+    cambiarCantidadPropio(producto: ProductoPropio, delta: number): void {
+        const nueva = (producto.cantidad || 1) + delta;
+        if (nueva < 1) return;
+
+        producto.cantidad = nueva;
+        this.cdr.detectChanges();
+
+        this.productoService.actualizarProductoPropio(producto.id, { ...producto, cantidad: nueva })
+            .subscribe({ next: () => this.cargarListas(true) });
+    }
+
+    onCambiarSupermercadoPropio(listaId: number, pp: ProductoPropio, event: Event): void {
+        const select = event.target as HTMLSelectElement;
+        this.cambiarSupermercadoPropio(listaId, pp, select.value);
+    }
+
+    cambiarSupermercadoPropio(listaId: number, pp: ProductoPropio, nuevoSup: string): void {
+        if (nuevoSup === pp.supermercado) return;
+
+        this.productoService.actualizarProductoPropio(pp.id, {
+            ...pp,
+            supermercado: nuevoSup || undefined,
+            listaId: listaId
+        }).subscribe({
             next: () => {
-                this.listas = this.listas.filter(l => l.codLista !== listaId);
-                this.cdr.detectChanges();
-            },
-            error: (err) => console.error('Error al eliminar lista', err)
-        });
-    }
-
-    // Modifica nombre lista
-    onModificarNombre(lista: ListaDetalle): void {
-        const nuevoNombre = this.inputNuevoNombre.trim();
-        if (!nuevoNombre) return;
-
-        this.listaService
-            .cambiarNombreLista(lista.codLista, nuevoNombre)
-            .subscribe({
-                next: () => {
-                    lista.nombre = nuevoNombre;
-                    this.mostrarFeedback('Nombre actualizado.', 'success');
-                    this.cdr.detectChanges();
-                },
-                error: () => this.mostrarFeedback('Error al cambiar nombre.', 'danger')
-            });
-    }
-
-    // Publica lista
-    onPublicar(listaId: number): void {
-        this.listaService.publicarLista(listaId).subscribe({
-            next: () => {
+                pp.supermercado = nuevoSup;
+                this.mostrarFeedback('Supermercado actualizado.', 'success');
                 const lista = this.listas.find(l => l.codLista === listaId);
-                if (lista) lista.publicada = true;
+                if (lista && lista.productoPropios) {
+                    this.ordenarProductos(lista.productoPropios, true);
+                }
                 this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error al publicar lista', err)
-        });
-    }
-
-    // ===================== UI version 2 =====================
-
-    mostrarFeedback(msj: string, tipo: 'success' | 'danger' = 'success'): void {
-        this.feedbackMsg = msj;
-        this.feedbackTipo = tipo;
-        this.cdr.detectChanges();
-    }
-
-    // ===================== TOGGLES (INTERRUPTORES UI) =====================
-    
-    // EXPLICACIÓN: "Toggle" significa alternar entre dos estados (como un interruptor de luz encendido/apagado).
-    // Usamos esto para abrir/cerrar los paneles superiores de crear o unirse a una lista sin tener que recargar la web.
-
-    togglePanelCrear(): void {
-        // Invierte el estado: Si estaba false pasa a true (se abre), si estaba true pasa a false (se cierra)
-        this.panelCrearAbierto = !this.panelCrearAbierto;
-
-        // Si lo abrimos, por seguridad nos aseguramos de que el panel de "Unirse" se cierre automáticamente
-        // y le limpiamos el campo de texto para que esté como nuevo.
-        if (this.panelCrearAbierto) {
-            this.panelUnirseAbierto = false;
-            this.inputNombreLista = '';
-        }
-    }
-
-    togglePanelUnirse(): void {
-        // Invierte el estado
-        this.panelUnirseAbierto = !this.panelUnirseAbierto;
-
-        // Si lo abrimos, cerramos el panel de "Crear"
-        if (this.panelUnirseAbierto) {
-            this.panelCrearAbierto = false;
-            this.inputCodigoUnirse = '';
-        }
-    }
-
-    // ===================== CREAR / UNIRSE =====================
-
-    // Unirse a lista por código
-    onAnadirLista(): void {
-        const codigo = this.inputCodigoUnirse.trim().toUpperCase();
-
-        if (codigo.length !== 6) {
-            this.mostrarFeedback('El código debe tener 6 caracteres.', 'danger');
-            return;
-        }
-
-        this.procesandoAccion = true;
-
-        this.listaService.unirseALista(codigo).subscribe({
-            next: () => {
-                this.mostrarFeedback('¡Te has unido a la lista con éxito!', 'success');
-                this.panelUnirseAbierto = false;
-                this.inputCodigoUnirse = '';
-                this.cargarListas();
-
-                setTimeout(() => {
-                    this.procesandoAccion = false;
-                });
-            },
-            error: (err) => {
-                const msg =
-                    typeof err.error === 'string'
-                        ? err.error
-                        : err.error?.message || 'No se pudo unir a la lista.';
-
-                this.mostrarFeedback(msg, 'danger');
-                this.procesandoAccion = false;
+            error: () => {
+                this.mostrarFeedback('No se pudo actualizar el supermercado.', 'danger');
             }
         });
     }
 
-    // Crear nueva lista
-    onCreateLista(): void {
-        // Limpiamos input y evitamos espacios
-        const nombre = this.inputNombreLista.trim() || undefined;
-        // Activamos loading del botón
-        this.procesandoAccion = true;
-        this.listaService.crearLista(nombre)
-            .pipe(
-                // Se ejecuta SIEMPRE (éxito o error)
-                // Aquí apagamos el loading
-                finalize(() => {
-                    this.procesandoAccion = false;
-                })
-            )
-            .subscribe({
-                next: () => {
-                    this.mostrarFeedback('Lista creada correctamente.', 'success');
-                    // Cerramos panel y limpiamos input
-                    this.panelCrearAbierto = false;
-                    this.inputNombreLista = '';
-                    // Recargamos datos del servidor
-                    this.cargarListas();
-                },
-                error: (err) => {
-                    console.error('Error al crear lista', err);
-                    this.mostrarFeedback(
-                        'No se pudo crear la nueva lista.',
-                        'danger'
-                    );
-                }
-            });
+    quitarDeListaPropio(producto: ProductoPropio, event: MouseEvent): void {
+        event.stopPropagation();
+
+        this.productoService.actualizarProductoPropio(producto.id, {
+            nombre: producto.nombre,
+            precioObjetivo: producto.precioObjetivo,
+            notas: producto.notas,
+            listaId: null,
+            supermercado: producto.supermercado,
+            cantidad: producto.cantidad
+        }).subscribe({
+            next: () => this.cargarListas(),
+            error: () => {
+                this.errorStr = 'No se pudo quitar el producto de la lista.';
+                this.cdr.detectChanges();
+            }
+        });
     }
 
-    // Calcula el total de la lista
-    getListaTotal(lista: ListaDetalle): number {
-        if (!lista) return 0;
+    eliminarProductoPropio(productoId: number, event: MouseEvent): void {
+        event.stopPropagation();
 
-        const totalOficiales = (lista.productos || [])
-            .reduce((acc, p) => acc + (p.precio * (p.cantidad || 1)), 0);
-
-        const totalPropios = (lista.productoPropios || [])
-            .reduce((acc, p) => acc + ((p.precioObjetivo || 0) * (p.cantidad || 1)), 0);
-
-        return totalOficiales + totalPropios;
+        this.productoService.eliminarProductoPropio(productoId).subscribe({
+            next: () => {
+                this.cargarProductosPropios();
+                this.cargarListas();
+            },
+            error: () => {
+                this.errorStr = 'No se pudo eliminar el producto propio.';
+                this.cdr.detectChanges();
+            }
+        });
     }
 }

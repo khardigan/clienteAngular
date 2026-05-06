@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 
@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -25,10 +25,10 @@ export class LoginComponent {
 
   // Manda el usuario y la contraseña al servidor para entrar en la cuenta.
   onLogin() {
-    console.log('Enviando esto al server:', this.credentials);
+    //console.log('Enviando esto al server:', this.credentials);
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        console.log('¡Login ok!', response);
+        //console.log('¡Login ok!', response);
         this.router.navigate(['/perfil']);
       },
       error: (err) => {
@@ -37,11 +37,5 @@ export class LoginComponent {
       }
     });
   }
-
-  // Muestra un aviso para funciones no implementadas aún
-  // Aviso de que todavía no hemos hecho la parte de recuperar contraseña.
-  forgotPasswordAlert(event: Event) {
-    event.preventDefault();
-    alert('Aun no implementado');
-  }
 }
+

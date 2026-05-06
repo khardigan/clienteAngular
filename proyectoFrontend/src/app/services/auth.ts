@@ -25,6 +25,12 @@ export class AuthService {
           if (res.id) {
             localStorage.setItem('id', String(res.id));
           }
+          if (res.nombre) {
+            localStorage.setItem('nombre', res.nombre);
+          }
+          if (res.email) {
+            localStorage.setItem('email', res.email);
+          }
           this.loginStatus$.next(true); // Avisamos del cambio
         }
       })
@@ -43,13 +49,8 @@ export class AuthService {
 
     return this.http.post<any>(this.registerUrl, payload).pipe(
       tap(res => {
-        if (res && res.token) {
-          this.saveToken(res.token);
-          if (res.id) {
-            localStorage.setItem('id', String(res.id));
-          }
-          this.loginStatus$.next(true);
-        }
+        // Ya no hacemos login automático aquí.
+        // El usuario deberá confirmar su email e ir a login manualmente.
       })
     );
   }
@@ -78,8 +79,18 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('id');
+    localStorage.removeItem('nombre');
+    localStorage.removeItem('email');
     this.loginStatus$.next(false);
     this.router.navigate(['/login']);
+  }
+
+  getNombre(): string | null {
+    return localStorage.getItem('nombre');
+  }
+
+  getEmail(): string | null {
+    return localStorage.getItem('email');
   }
 
   isLoggedIn(): boolean {
@@ -111,4 +122,22 @@ export class AuthService {
     });
     return this.http.post<any>(url, { comentario }, { headers });
   }
+
+  solicitarRecuperacion(nombre: string, email: string) {
+    const url = `https://localhost:8443/usuarios/recuperar`;
+    return this.http.post<any>(url, { nombre, email });
+  }
+
+  resetearPassword(token: string, password: string, nombre: string, email: string) {
+    const url = `https://localhost:8443/usuarios/reset-password`;
+    return this.http.post<any>(url, { token, password, nombre, email });
+  }
+
+  verificarEmail(token: string) {
+    const url = `https://localhost:8443/usuarios/verificar?token=${token}`;
+    return this.http.get<any>(url);
+  }
+
+
 }
+

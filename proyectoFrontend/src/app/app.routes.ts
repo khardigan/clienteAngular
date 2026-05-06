@@ -14,6 +14,9 @@ import { ListasPublicasComponent } from './components/listas-publicas/listas-pub
 import { adminGuard } from './guards/admin.guard';
 import { AdministrarProductosComponent } from './components/administrarProductos/administrarProductos';
 import { ComentarioComponent } from './components/comentarios/comentario';
+import { RecuperarPasswordComponent } from './components/recuperar-password/recuperar-password';
+import { ResetPasswordComponent } from './components/reset-password/reset-password';
+import { VerifyAccountComponent } from './components/verify-account/verify-account';
 
 export const routes: Routes = [
   { path: '', component: InicioComponent },
@@ -22,10 +25,15 @@ export const routes: Routes = [
   { path: 'productos/:id', component: FichaProductoComponent },
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
+  { path: 'recuperar', component: RecuperarPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'verificar-cuenta', component: VerifyAccountComponent },
   { path: 'perfil', component: PerfilComponent },
+
   { path: 'mis-listas', component: ListaComponent },
   { path: 'comunidad', component: ListasPublicasComponent },
   { path: 'contacto', component: ContactoComponent },
   { path: 'administrarProductos', component: AdministrarProductosComponent, canActivate: [adminGuard] },
   { path: 'comentarios', component: ComentarioComponent }
 ];
+

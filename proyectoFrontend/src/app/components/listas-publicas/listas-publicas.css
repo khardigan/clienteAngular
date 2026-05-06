@@ -8,7 +8,21 @@
 }
 
 .bg-gradient {
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    background: linear-gradient(135deg, var(--home-blue) 0%, var(--home-blue-dark) 100%) !important;
+}
+
+.text-primary {
+    color: var(--home-blue) !important;
+}
+
+.btn-primary {
+    background-color: var(--home-blue) !important;
+    border-color: var(--home-blue-dark) !important;
+}
+
+.btn-outline-primary {
+    color: var(--home-blue) !important;
+    border-color: var(--home-blue) !important;
 }
 
 .animate-fade-in {

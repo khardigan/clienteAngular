@@ -80,6 +80,7 @@ export class ProductoService {
     });
   }
 
+
   // Solo para administradores: elimina un producto del catálogo global
   eliminarProducto(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`, {

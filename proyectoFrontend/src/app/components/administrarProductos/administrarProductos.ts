@@ -24,6 +24,18 @@ export class AdministrarProductosComponent implements OnInit {
     nuevoPrecio: number = 0;
     nuevoSupermercado: string = '';
     nuevaCategoria: string = '';
+    filtroNombre: string = '';
+    filtroSupermercado: string = '';
+
+    get productosFiltrados() {
+        return this.productos.filter(p => {
+            const coincideNombre = !this.filtroNombre.trim() ||
+                p.nombre?.toLowerCase().includes(this.filtroNombre.toLowerCase());
+            const coincideSuper = !this.filtroSupermercado ||
+                p.supermercado === this.filtroSupermercado;
+            return coincideNombre && coincideSuper;
+        });
+    }
 
     constructor(
         private http: HttpClient,

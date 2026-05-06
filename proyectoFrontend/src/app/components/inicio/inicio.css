@@ -7,13 +7,24 @@ swiper-container {
   width: 100%;
   height: 100%;
   display: block;
-  /* A veces los web components vienen como inline */
+  overflow: visible !important;
+  /* Permitir que las flechas se vean si salen un poco */
 
   /* Variables de Swiper para colores de flechas/puntos */
-  --swiper-navigation-color: var(--home-orange-dark);
-  --swiper-pagination-color: var(--home-orange-dark);
-  --swiper-navigation-size: 30px;
-  --swiper-navigation-sides-offset: 10px;
+  --swiper-navigation-color: #fff;
+  --swiper-pagination-color: #fff;
+  --swiper-navigation-size: 25px;
+  --swiper-navigation-sides-offset: -15px;
+  /* Las sacamos un poco hacia afuera */
+}
+
+swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 60px;
+  /* Añadimos padding lateral para que el texto nunca toque las flechas */
+  min-height: 300px;
 }
 
 /* Minimalist Comment Styles */
@@ -109,8 +120,9 @@ swiper-slide {
 }
 
 .home-hero {
-  min-height: 80vh;
-  background-color: var(--home-orange);
+  min-height: 80vh !important;
+  background-color: var(--home-orange) !important;
+  color: white !important;
 }
 
 .home-img-wide {

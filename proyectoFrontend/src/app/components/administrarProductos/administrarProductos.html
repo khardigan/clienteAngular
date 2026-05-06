@@ -4,8 +4,21 @@
             <h1 class="fw-bold mb-0">Gestión de Catálogo</h1>
             <p class="text-muted">Administra los productos, valida sugerencias y ajusta precios.</p>
         </div>
-        <div class="badge bg-dark rounded-pill px-3 py-2">
-            {{ productos.length }} Productos en total
+        <div class="d-flex gap-3 align-items-center">
+            <div class="input-group" style="width: 300px;">
+                <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0 rounded-end-pill py-2"
+                    placeholder="Buscar producto..." [(ngModel)]="filtroNombre">
+            </div>
+            <select class="form-select rounded-pill py-2" style="width: 180px;" [(ngModel)]="filtroSupermercado">
+                <option value="">Todos los súpers</option>
+                <option *ngFor="let s of getSupermercados()" [value]="s">{{ s }}</option>
+            </select>
+            <div class="badge bg-dark rounded-pill px-3 py-2">
+                {{ productosFiltrados.length }} Resultados
+            </div>
         </div>
     </div>
 
@@ -24,7 +37,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let p of productos" [style.background-color]="p.confirmado ? 'transparent' : '#f0fdf4'"
+                    <tr *ngFor="let p of productosFiltrados"
+                        [style.background-color]="p.confirmado ? 'transparent' : '#f0fdf4'"
                         [style.border-left]="p.confirmado ? '4px solid #dee2e6' : '4px solid #22c55e'">
 
                         <td>

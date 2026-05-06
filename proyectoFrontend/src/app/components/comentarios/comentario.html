@@ -17,46 +17,50 @@
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" *ngIf="TusComentarios.length > 0">
         @for(comentario of TusComentarios; track comentario.id){
         <div class="col">
-          <div class="card shadow-sm border-0 border-top border-primary border-4 h-100 animate-fade-in">
-            <div class="card-body p-4">
+          <div class="card shadow border border-primary border-2 h-100 bg-white"
+            style="opacity: 1 !important; visibility: visible !important;">
+            <div class="card-body p-4" style="opacity: 1 !important;">
               <div class="d-flex justify-content-between align-items-start mb-3">
-                <div class="badge bg-primary-subtle text-primary rounded-pill small">
+                <div
+                  class="badge bg-home-accent text-dark rounded-pill px-3 py-2 pointer shadow-sm text-truncate d-inline-block"
+                  [routerLink]="['/productos', comentario.productoId]" [title]="comentario.productoNombre"
+                  style="cursor: pointer; opacity: 1 !important; max-width: 150px; vertical-align: middle;">
                   <i class="bi bi-tag-fill me-1"></i>{{comentario.productoNombre}}
                 </div>
-                <small class="text-muted">{{ comentario.fecha | date:'dd/MM/yyyy' }}</small>
+                <small class="text-dark fw-bold">{{ comentario.fecha | date:'dd/MM/yyyy' }}</small>
               </div>
 
               @if(!comentario.editando) {
-                <div class="mb-2 text-warning small">
-                  @for(n of [1,2,3,4,5]; track n) {
-                    <i class="bi" [class.bi-star-fill]="n <= (comentario.puntuacion || 0)"
-                       [class.bi-star]="n > (comentario.puntuacion || 0)"></i>
-                  }
-                </div>
-                <p class="card-text text-secondary mb-4 italic" style="min-height: 4.5rem;">"{{comentario.contenido}}"</p>
-                <div class="d-flex gap-2 mt-auto pt-3 border-top">
-                  <button class="btn btn-outline-primary btn-sm flex-grow-1" (click)="habilitarEdicion(comentario)">
-                    <i class="bi bi-pencil me-1"></i> Editar
-                  </button>
-                  <button class="btn btn-outline-danger btn-sm" (click)="eliminarComentario(comentario)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
+              <div class="mb-2 text-warning fs-5">
+                @for(n of [1,2,3,4,5]; track n) {
+                <i class="bi" [class.bi-star-fill]="n <= (comentario.puntuacion || 0)"
+                  [class.bi-star]="n > (comentario.puntuacion || 0)"></i>
+                }
+              </div>
+              <p class="card-text text-dark mb-4 fw-medium" style="min-height: 4.5rem;">"{{comentario.contenido}}"</p>
+              <div class="d-flex gap-2 mt-auto pt-3 border-top">
+                <button class="btn btn-outline-primary btn-sm flex-grow-1" (click)="habilitarEdicion(comentario)">
+                  <i class="bi bi-pencil me-1"></i> Editar
+                </button>
+                <button class="btn btn-outline-danger btn-sm" (click)="eliminarComentario(comentario)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
               } @else {
-                <div class="mb-2 fs-5">
-                  @for(n of [1,2,3,4,5]; track n) {
-                    <i class="bi pointer" [class.bi-star-fill]="n <= (comentario.puntuacion || 0)"
-                       [class.bi-star]="n > (comentario.puntuacion || 0)"
-                       [style.color]="n <= (comentario.puntuacion || 0) ? '#ffc107' : '#ccc'"
-                       (click)="comentario.puntuacion = n" style="cursor: pointer;"></i>
-                  }
-                </div>
-                <textarea class="form-control mb-2" [(ngModel)]="comentario.contenido" rows="3"></textarea>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-success btn-sm flex-grow-1" (click)="guardarCambios(comentario)"
-                          [disabled]="!comentario.contenido || comentario.contenido.trim() === ''">Guardar</button>
-                  <button class="btn btn-light btn-sm" (click)="cancelarEdicion(comentario)">Cancelar</button>
-                </div>
+              <div class="mb-2 fs-5">
+                @for(n of [1,2,3,4,5]; track n) {
+                <i class="bi pointer" [class.bi-star-fill]="n <= (comentario.puntuacion || 0)"
+                  [class.bi-star]="n > (comentario.puntuacion || 0)"
+                  [style.color]="n <= (comentario.puntuacion || 0) ? '#ffc107' : '#ccc'"
+                  (click)="comentario.puntuacion = n" style="cursor: pointer;"></i>
+                }
+              </div>
+              <textarea class="form-control mb-2" [(ngModel)]="comentario.contenido" rows="3"></textarea>
+              <div class="d-flex gap-2">
+                <button class="btn btn-success btn-sm flex-grow-1" (click)="guardarCambios(comentario)"
+                  [disabled]="!comentario.contenido || comentario.contenido.trim() === ''">Guardar</button>
+                <button class="btn btn-light btn-sm" (click)="cancelarEdicion(comentario)">Cancelar</button>
+              </div>
               }
             </div>
           </div>
@@ -82,19 +86,18 @@
           </h2>
           <div class="flex-grow-1 border-top border-secondary border-opacity-25"></div>
         </div>
-        
+
         <!-- barra de busqueda -->
         <div class="input-group shadow-sm" style="max-width: 400px;">
           <span class="input-group-text bg-white border-end-0">
             <i class="bi bi-search text-primary"></i>
           </span>
-          <input type="text" class="form-control border-start-0" 
-            placeholder="Filtrar por producto..." 
+          <input type="text" class="form-control border-start-0" placeholder="Filtrar por producto..."
             [(ngModel)]="filtroProducto">
           @if(filtroProducto){
-            <button class="btn btn-outline-secondary border-start-0 bg-white" (click)="filtroProducto = ''">
-              <i class="bi bi-x-lg"></i>
-            </button>
+          <button class="btn btn-outline-secondary border-start-0 bg-white" (click)="filtroProducto = ''">
+            <i class="bi bi-x-lg"></i>
+          </button>
           }
         </div>
       </div>
@@ -102,38 +105,42 @@
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
         @for(comentario of comentariosFiltrados; track comentario.id){
         <div class="col">
-          <div class="card shadow-sm border-0 border-start border-secondary border-4 h-100 bg-light">
-            <div class="card-body p-4 d-flex flex-column">
+          <div class="card shadow border border-home-accent border-2 h-100 bg-white"
+            style="opacity: 1 !important; visibility: visible !important;">
+            <div class="card-body p-4 d-flex flex-column" style="opacity: 1 !important;">
               <div class="d-flex align-items-center mb-3">
                 <img src="https://ui-avatars.com/api/?name={{comentario.usuario}}&background=random"
-                     class="rounded-circle shadow-sm me-3" width="40" height="40" alt="Avatar">
+                  class="rounded-circle shadow-sm me-3" width="40" height="40" alt="Avatar">
                 <div class="flex-grow-1 overflow-hidden">
                   <h6 class="mb-0 fw-bold text-truncate">{{ comentario.usuario }}</h6>
                   <small class="text-muted d-block extra-small">{{ comentario.fecha | date:'dd/MM/yyyy' }}</small>
                 </div>
               </div>
-              
+
               <div class="mb-2">
-                <span class="badge bg-secondary-subtle text-secondary rounded-pill extra-small">
+                <span
+                  class="badge bg-home-accent text-dark rounded-pill px-3 py-2 pointer shadow-sm text-truncate d-inline-block"
+                  [routerLink]="['/productos', comentario.productoId]" [title]="comentario.productoNombre"
+                  style="cursor: pointer; opacity: 1 !important; max-width: 180px; vertical-align: middle;">
                   {{comentario.productoNombre}}
                 </span>
               </div>
 
-              <div class="mb-2 text-warning extra-small">
+              <div class="mb-2 text-warning fs-5">
                 @for(n of [1,2,3,4,5]; track n) {
-                  <i class="bi" [class.bi-star-fill]="n <= (comentario.puntuacion || 0)"
-                     [class.bi-star]="n > (comentario.puntuacion || 0)"></i>
+                <i class="bi" [class.bi-star-fill]="n <= (comentario.puntuacion || 0)"
+                  [class.bi-star]="n > (comentario.puntuacion || 0)"></i>
                 }
               </div>
 
-              <p class="card-text text-secondary small mb-4 flex-grow-1">"{{comentario.contenido}}"</p>
+              <p class="card-text text-dark mb-4 flex-grow-1 fw-medium">"{{comentario.contenido}}"</p>
 
               @if(authService.isAdmin()){
-                <div class="pt-3 border-top mt-auto text-end">
-                  <button class="btn btn-danger btn-sm w-100" (click)="eliminarCualquierComentario(comentario)">
-                    <i class="bi bi-shield-lock me-1"></i> Eliminar (Admin)
-                  </button>
-                </div>
+              <div class="pt-3 border-top mt-auto text-end">
+                <button class="btn btn-danger btn-sm w-100" (click)="eliminarCualquierComentario(comentario)">
+                  <i class="bi bi-shield-lock me-1"></i> Eliminar (Admin)
+                </button>
+              </div>
               }
             </div>
           </div>
@@ -141,12 +148,12 @@
         }
 
         @if(comentariosFiltrados.length === 0){
-          <div class="col-12 text-center py-5">
-            <div class="bg-light rounded-4 p-5 border border-dashed">
-              <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
-              <p class="text-muted mb-0">No hay resultados para "{{filtroProducto}}"</p>
-            </div>
+        <div class="col-12 text-center py-5">
+          <div class="bg-light rounded-4 p-5 border border-dashed">
+            <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+            <p class="text-muted mb-0">No hay resultados para "{{filtroProducto}}"</p>
           </div>
+        </div>
         }
       </div>
     </section>

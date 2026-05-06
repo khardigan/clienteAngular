@@ -1,15 +1,62 @@
-/*Estilo de fondo a conservar porque me gusta mucho*/
+/* Estilo de fondo a conservar porque me gusta mucho */
+.form-select-xs {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    padding-left: 0.25rem;
+    font-size: 0.75rem;
+    border-radius: 0.2rem;
+}
+
+/* Supermarket backgrounds - Unified to Orange tones */
+.bg-mercadona {
+    background-color: rgba(255, 128, 0, 0.04) !important;
+    border-left: 4px solid #ff9900 !important;
+}
+
+.btn-xs {
+    padding: 0.1rem 0.3rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    border-radius: 0.2rem;
+}
+
+.bg-carrefour {
+    background-color: rgba(255, 128, 0, 0.04) !important;
+    border-left: 4px solid #e67300 !important;
+}
+
+.bg-lidl {
+    background-color: rgba(255, 128, 0, 0.04) !important;
+    border-left: 4px solid #cc6600 !important;
+}
+
+.bg-dia {
+    background-color: rgba(255, 128, 0, 0.04) !important;
+    border-left: 4px solid #b35900 !important;
+}
+
+.bg-aldi {
+    background-color: rgba(255, 128, 0, 0.04) !important;
+    border-left: 4px solid #994d00 !important;
+}
+
+.bg-mercadolibre {
+    background-color: rgba(255, 128, 0, 0.08) !important;
+    border-left: 4px solid #ffcc00 !important;
+}
+
+.bg-default-super {
+    background-color: rgba(108, 117, 125, 0.05) !important;
+    border-left: 4px solid #6c757d !important;
+}
+
 .lista-page-wrapper {
     min-height: 100vh;
     min-height: 100dvh;
     overflow-x: hidden;
     background-color: var(--home-sky);
-    background-image:
-        radial-gradient(72% 52% at 0% 0%, rgba(255, 128, 0, 0.14) 0%, transparent 58%),
-        radial-gradient(68% 48% at 100% 8%, rgba(185, 224, 255, 0.65) 0%, transparent 55%),
-        linear-gradient(180deg, var(--home-cream) 0%, #fff9f0 38%, #e8f3fc 72%, var(--home-sky) 100%);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+    /* Simplificado: menos gradientes locos */
+    background-image: linear-gradient(135deg, var(--home-cream) 0%, #ffffff 100%);
     display: flex;
     flex-direction: column;
 }
@@ -20,6 +67,10 @@
    ===================================================== */
 .cursor-pointer {
     cursor: pointer;
+}
+
+.transition-all {
+    transition: all 0.2s ease-in-out;
 }
 
 /* =====================================================
@@ -79,23 +130,33 @@
    Botón productos oficiales
    ===================================================== */
 .btn-oficial {
-    background-color: #06b6d4;
+    background-color: var(--home-orange);
     color: #fff;
     border: none;
     transition: all 0.2s;
 }
 
+.producto-oficial-item:hover {
+    background-color: #d5e9f8 !important;
+}
 
 /* =====================================================
    Panel Productos OFICIALES
    ===================================================== */
 .panel-oficial {
     position: absolute;
-    bottom: calc(100% + 8px);
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
     z-index: 300;
     min-width: 260px;
+    background-color: white;
+}
+
+.panel-oficial-lista {
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 6px 10px;
 }
 
 .panel-oficial-lista::-webkit-scrollbar {
@@ -116,15 +177,16 @@
    ===================================================== */
 .panel-propio {
     position: absolute;
-    bottom: calc(100% + 8px);
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
     z-index: 300;
     min-width: 260px;
+    background-color: white;
 }
 
 .panel-propio-lista {
-    max-height: 170px;
+    max-height: 600px;
     overflow-y: auto;
     padding: 6px 10px;
 
@@ -145,10 +207,17 @@
    Botones y textos color naranja suave (reemplaza btn-warning en productos propios)
    ===================================================== */
 .btn-propio {
-    background-color: #e8630a;
+    background-color: var(--home-blue);
     color: #fff;
     border: none;
     transition: all 0.2s;
+}
+
+.btn-propio:hover {
+    background-color: var(--home-blue-dark);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 74, 173, 0.3);
 }
 
 
@@ -174,13 +243,23 @@
     transition: all 0.2s ease-in-out;
 }
 
-/* =====================================================
-   Listas compartidas
-   ===================================================== */
+/* Listas compartidas - Tono azul marino profesional */
 .bg-compartida {
-    background-color: #059669 !important;
+    background-color: #1e293b !important;
     color: #fff !important;
+}
 
+.lista-card-header {
+    background: linear-gradient(135deg, #ffd1a9 0%, var(--home-orange) 100%) !important;
+    color: #4a2c10 !important;
+    border-bottom: 1px solid rgba(255, 128, 0, 0.2) !important;
+    transition: all 0.3s ease;
+}
+
+[data-bs-theme='dark'] .lista-card-header {
+    background: linear-gradient(135deg, #2d1b0d 0%, #4d2b12 100%) !important;
+    color: #ffb380 !important;
+    border-bottom: 1px solid rgba(255, 128, 0, 0.3) !important;
 }
 
 /* ====================================
@@ -204,4 +283,90 @@
         width: 90vw;
         max-width: 320px;
     }
+}
+
+/* =====================================================
+   Sobreescritura de colores para unificar al naranja
+   ===================================================== */
+.text-primary {
+    color: var(--home-blue) !important;
+}
+
+.text-info {
+    color: var(--home-orange) !important;
+}
+
+.bg-primary {
+    background-color: var(--home-blue) !important;
+    background-image: none !important;
+}
+
+.bg-info {
+    background-color: var(--home-orange) !important;
+    background-image: none !important;
+}
+
+.bg-gradient {
+    background-image: none !important;
+}
+
+.btn-primary {
+    background-color: var(--home-blue) !important;
+    border-color: var(--home-blue-dark) !important;
+    color: #fff !important;
+}
+
+.btn-info {
+    background-color: var(--home-orange) !important;
+    border-color: var(--home-orange-dark) !important;
+    color: #fff !important;
+}
+
+.btn-outline-primary {
+    color: var(--home-blue) !important;
+    border-color: var(--home-blue) !important;
+}
+
+.btn-outline-info {
+    color: var(--home-orange) !important;
+    border-color: var(--home-orange) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--home-blue) !important;
+    color: #fff !important;
+}
+
+.btn-outline-info:hover {
+    background-color: var(--home-orange) !important;
+    color: #fff !important;
+}
+
+.border-primary {
+    border-color: var(--home-blue) !important;
+    opacity: 0.2;
+}
+
+.border-info {
+    border-color: var(--home-orange-muted) !important;
+}
+
+/* Contenedor código invitación */
+.invite-code-container {
+    background-color: var(--home-orange-light) !important;
+    color: var(--home-orange-dark) !important;
+    padding: 12px;
+    border-top: 1px dashed var(--home-orange-muted);
+}
+
+.invite-code-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.invite-code-value {
+    font-size: 1.4rem;
+    font-weight: 800;
 }

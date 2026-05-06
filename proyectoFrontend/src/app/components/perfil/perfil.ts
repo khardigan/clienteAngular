@@ -7,21 +7,32 @@ import { ListaService } from '../../services/lista';
 import { ProductoService } from '../../services/producto';
 import { AuthService } from '../../services/auth';
 import { MensajeService } from '../../services/mensaje';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
   templateUrl: './perfil.html',
   styleUrls: ['./perfil.css']
 })
 export class PerfilComponent implements OnInit {
-  perfil: Perfil | null = null;
+
+  // ==========================================
+  // ESTADO DEL PERFIL Y MENSAJERÍA
+  // ==========================================
+  perfilSignal = signal<Perfil | null>(null);
+
+  // Getter para compatibilidad con el template si fuera necesario, pero usaremos el signal directamente.
+  get perfil() { return this.perfilSignal(); }
+  set perfil(value: Perfil | null) { this.perfilSignal.set(value); }
+
   mensajeSuccess: string = '';
   mensajeError: string = '';
 
-  // Usamos Signals para los contadores. Estos notifican automáticamente a la plantilla 
-  // cuando cambian, permitiendo una actualización reactiva y fluida.
+  // ==========================================
+  // CONTADORES REACTIVOS (Signals)
+  // ==========================================
   totalListas = signal(0);
   totalProductos = signal(0);
   totalColaboraciones = signal(0);
@@ -32,32 +43,31 @@ export class PerfilComponent implements OnInit {
     private listaService: ListaService,
     private productoService: ProductoService,
     private authService: AuthService,
-    private mensajeService: MensajeService, // Inyectamos el servicio global
+    private mensajeService: MensajeService,
     private cd: ChangeDetectorRef,
     private zone: NgZone,
     private appRef: ApplicationRef
   ) { }
 
+  // ==========================================
+  // INICIALIZACIÓN Y CARGA DE DATOS
+  // ==========================================
+
   ngOnInit(): void {
-    // Obtenemos el ID de sesión del localStorage nada más entrar para no mostrar 0s mientras carga el perfil
     const sessionUserId = this.authService.getId();
-    // 1. Cargamos los datos personales del perfil desde el token
+
     this.perfilService.obtenerPerfilDesdeToken().subscribe({
       next: (perfil) => {
-        // Envolvemos en zone.run para asegurar que Angular detecte el cambio tras la navegación
-        this.zone.run(() => {
-          this.perfil = {
-            ...perfil,
-            subtitulo: perfil.subtitulo || '',
-            residencia: perfil.residencia || '',
-            email: perfil.email || '',
-            telefono: perfil.telefono || '',
-            fechaNacimiento: perfil.fechaNacimiento || '',
-            edad: perfil.edad || ''
-          };
+        this.perfilSignal.set({
+          ...perfil,
+          subtitulo: perfil.subtitulo || '',
+          residencia: perfil.residencia || '',
+          email: perfil.email || '',
+          telefono: perfil.telefono || '',
+          fechaNacimiento: perfil.fechaNacimiento || '',
+          edad: perfil.edad || ''
         });
 
-        // Si el perfil tiene un ID propio, lo usamos para asegurar que las estadísticas son las correctas
         if (perfil.usuarioId) {
           this.cargarContadores(perfil.usuarioId);
         }
@@ -65,70 +75,106 @@ export class PerfilComponent implements OnInit {
       error: (err) => console.error("Perfil - Error cargando perfil:", err)
     });
 
-    // 2. Disparo inmediato con el ID de sesión para ganar tiempo y evitar el "efecto 0"
+    // Si ya tenemos el ID de la sesión, podemos ir cargando contadores
     if (sessionUserId) {
       this.cargarContadores(sessionUserId);
     }
   }
 
-
-  //Carga y calcula las estadísticas del usuario (listas, productos, colaboraciones).
-  //@param id ID del usuario para el cual cargar los datos.
   cargarContadores(id: number): void {
     if (!id) return;
-    // Petición de listas (propias y compartidas)
+
     this.listaService.obtenerMisListas().subscribe({
       next: (listas) => {
-        // Pequeño retardo para dar tiempo a que el DOM se renderice si se acaba de activar el *ngIf
-        setTimeout(() => {
-          this.zone.run(() => {
-            const idNumber = Number(id);
-            // Actualizamos los Signals con los resultados filtrados
-            this.totalListas.set(listas.filter(l => Number(l.usuarioDuenoId) === idNumber).length);
-            this.totalColaboraciones.set(listas.filter(l => l.usuariosCompartida && l.usuariosCompartida.length > 0).length);
-            this.totalPublicas.set(listas.filter(l => Number(l.usuarioDuenoId) === idNumber && l.publicada).length);
-
-            // Forzamos un ciclo de detección de cambios en toda la app para evitar que se queden en 0 tras navegar
-            this.appRef.tick();
-          });
-        }, 50);
+        const idNumber = Number(id);
+        this.totalListas.set(listas.filter(l => Number(l.usuarioDuenoId) === idNumber).length);
+        this.totalColaboraciones.set(listas.filter(l => l.usuariosCompartida && l.usuariosCompartida.length > 0).length);
+        this.totalPublicas.set(listas.filter(l => Number(l.usuarioDuenoId) === idNumber && l.publicada).length);
       }
     });
 
-    // Petición de productos subidos al catálogo global por el usuario (excluyendo privados)
     this.productoService.listarProductosCatalogSubidosPorUsuario(id).subscribe({
       next: (catalogo) => {
-        setTimeout(() => {
-          this.zone.run(() => {
-            this.totalProductos.set(catalogo.length);
-            this.appRef.tick(); // Refresco forzado de la interfaz
-          });
-        }, 50);
+        this.totalProductos.set(catalogo.length);
       }
     });
   }
 
-  // Manda los datos del perfil al servidor para guardarlos.
+  // ==========================================
+  // VALIDACIONES
+  // ==========================================
+
+  validarNombre(nombre: string): boolean {
+    const nombreRegex = /^.{3,}$/;
+    return nombreRegex.test(nombre);
+  }
+
+  validarCorreo(correo: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(correo);
+  }
+
+  validarTelefono(telefono: string): boolean {
+    const telefonoRegex = /^\d{9}$/;
+    return telefonoRegex.test(telefono);
+  }
+
+  validarCumpleaniosYAniosEdad(fechaNacimiento: string | undefined, edad: string | undefined): boolean {
+    if (!fechaNacimiento || !edad) return false;
+    const fechaRegex = /^(\d{4}-\d{2}-\d{2})|(\d{2}\/\d{2}\/\d{4})$/;
+    const edadRegex = /^\d{1,3}$/;
+
+    if (!fechaRegex.test(fechaNacimiento) || !edadRegex.test(edad)) return false;
+
+    const nacimiento = new Date(fechaNacimiento);
+    const hoy = new Date();
+
+    let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edadCalculada--;
+    }
+    return edadCalculada === Number(edad);
+  }
+
+  // ==========================================
+  // GESTIÓN DEL PERFIL
+  // ==========================================
+
   guardarCambios(): void {
     if (!this.perfil || !this.perfil.idPerfil) return;
 
-    // Validación básica antes de enviar
-    if (this.perfil.nombrePerfil && this.perfil.nombrePerfil.length < 3) {
+    if (!this.validarNombre(this.perfil.nombrePerfil)) {
       this.mensajeService.mostrarError('El nombre público debe tener al menos 3 caracteres.');
       return;
     }
+    if (!this.validarCorreo(this.perfil.email || '')) {
+      this.mensajeService.mostrarError('El correo electrónico no es válido.');
+      return;
+    }
+    if (!this.validarTelefono(this.perfil.telefono || '')) {
+      this.mensajeService.mostrarError('El número de teléfono no es válido.');
+      return;
+    }
+    if (!this.validarCumpleaniosYAniosEdad(this.perfil.fechaNacimiento || '', this.perfil.edad || '')) {
+      this.mensajeService.mostrarError('La fecha de nacimiento o la edad no son válidas.');
+      return;
+    }
 
-    this.perfilService.actualizarPerfil(this.perfil.idPerfil, this.perfil).subscribe({
-      next: (actualizado) => {
-        this.perfil = actualizado;
-        this.mensajeService.mostrarSuccess('¡Perfil actualizado con éxito!');
-        this.cd.detectChanges();
-      },
-      error: (err) => {
-        console.error("Error al actualizar perfil:", err);
-        this.mensajeService.mostrarError('No se pudieron guardar los cambios en el servidor.');
-        this.cd.detectChanges();
-      }
+    this.mensajeService.confirmar('¿Estás seguro de que quieres actualizar tu perfil?', () => {
+      this.perfilService.actualizarPerfil(this.perfil!.idPerfil!, this.perfil!).subscribe({
+        next: (actualizado) => {
+          this.perfil = actualizado;
+          this.mensajeService.mostrarSuccess('¡Perfil actualizado con éxito!');
+          this.cd.detectChanges();
+        },
+        error: (err) => {
+          console.error("Error al actualizar perfil:", err);
+          this.mensajeService.mostrarError('No se pudieron guardar los cambios en el servidor.');
+          this.cd.detectChanges();
+        }
+      });
     });
   }
 }

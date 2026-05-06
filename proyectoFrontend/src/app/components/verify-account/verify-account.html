@@ -1,0 +1,50 @@
+<div class="sesion-page-wrapper">
+    <main class="flex-grow-1 py-4 py-md-5">
+        <div class="container sesion-wrap">
+            <h1 class="h3 fw-bold text-center mb-4 sesion-page-title">Verificación de Cuenta</h1>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8">
+                    <div class="card border-0 h-100 rounded-4 shadow-sm sesion-card">
+                        <div class="card-header py-3 fw-semibold border-0 rounded-top-4">
+                            Estado de la activación
+                        </div>
+                        <div class="card-body p-5 text-center">
+                            
+                            <!-- Cargando -->
+                            <div *ngIf="verificando" class="animate-fade-in">
+                                <div class="spinner-border text-home-accent mb-3" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p>Verificando tu cuenta, por favor espera...</p>
+                            </div>
+
+                            <!-- Éxito -->
+                            <div *ngIf="exito" class="animate-fade-in">
+                                <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-3"></i>
+                                <h2 class="h4 fw-bold mb-3">¡Cuenta Activada!</h2>
+                                <p class="text-muted">Tu correo ha sido verificado correctamente. Ya puedes acceder a todas las funciones de LinkedList.</p>
+                                <div class="alert alert-info mt-4 small">
+                                    Redirigiendo al inicio de sesión en unos segundos...
+                                </div>
+                                <button routerLink="/login" class="btn btn-home w-100 mt-3">Ir al Login ahora</button>
+                            </div>
+
+                            <!-- Error -->
+                            <div *ngIf="error && !verificando" class="animate-fade-in">
+                                <i class="bi bi-x-circle-fill text-danger fs-1 d-block mb-3"></i>
+                                <h2 class="h4 fw-bold mb-3">Error de Verificación</h2>
+                                <p class="text-muted">{{ error }}</p>
+                                <button (click)="verificar()" class="btn btn-outline-home w-100 mt-3 mb-2">Reintentar</button>
+                                <a routerLink="/login" class="text-home-accent text-decoration-none small fw-bold d-block mt-3">
+                                    Volver al inicio
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
