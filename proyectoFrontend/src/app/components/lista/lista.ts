@@ -28,6 +28,7 @@ export class ListaComponent implements OnInit {
     listas: ListaDetalle[] = [];
     cargando = true;
     errorStr = '';
+    filtroListas: 'todas' | 'mias' | 'compartidas' = 'todas';
 
     // Variables de productos propios
     productosPropios: ProductoPropio[] = [];
@@ -149,12 +150,24 @@ export class ListaComponent implements OnInit {
     // GETTERS Y MÉTODOS DE UTILIDAD
     // ==========================================
 
-    get listasOrdenadas(): ListaDetalle[] {
-        return [...this.listas].sort((a, b) => {
+    get listasFiltradas(): ListaDetalle[] {
+        let filtradas = [...this.listas];
+ 
+        if (this.filtroListas === 'mias') {
+            filtradas = filtradas.filter(l => l.usuarioDuenoId === this.currentUserId);
+        } else if (this.filtroListas === 'compartidas') {
+            filtradas = filtradas.filter(l => l.usuarioDuenoId !== this.currentUserId);
+        }
+ 
+        return filtradas.sort((a, b) => {
             const aComp = this.estaListaCompletada(a) ? 1 : 0;
             const bComp = this.estaListaCompletada(b) ? 1 : 0;
             return aComp - bComp;
         });
+    }
+ 
+    get listasOrdenadas(): ListaDetalle[] {
+        return this.listasFiltradas;
     }
 
     get listasPares(): ListaDetalle[] {

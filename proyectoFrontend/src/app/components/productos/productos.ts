@@ -31,6 +31,7 @@ export class ProductosComponent implements OnInit {
   maxPrice: number | null = null;
   selectedSupermarket: string = '';
   selectedCategory: string = '';
+  showOnlyMine: boolean = false;
 
   // ==========================================
   // VARIABLES DEL FORMULARIO DE CREACIÓN
@@ -49,7 +50,7 @@ export class ProductosComponent implements OnInit {
 
   constructor(
     private productoService: ProductoService,
-    private authService: AuthService,
+    public authService: AuthService,
     private mensajeService: MensajeService,
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute
@@ -133,7 +134,9 @@ export class ProductosComponent implements OnInit {
       const matchesCategory = !this.selectedCategory ||
         (p.categoria && p.categoria.toLowerCase() === this.selectedCategory.toLowerCase());
 
-      return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesSupermarket && matchesCategory;
+      const matchesMine = !this.showOnlyMine || p.usuarioRegistradorId === this.authService.getId();
+
+      return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesSupermarket && matchesCategory && matchesMine;
     }).sort((a, b) => a.precio - b.precio);
   }
 
@@ -194,6 +197,8 @@ export class ProductosComponent implements OnInit {
   isOficial(nombre: string): boolean {
     if (!nombre) return false;
     const superNormalize = nombre.trim().toLowerCase();
+    // Mercado Libre no tiene logo oficial PNG, así que lo tratamos como no oficial para que use el icono bi-house
+    if (superNormalize === 'mercado libre') return false;
     return this.supermercadosOficiales.map(o => o.toLowerCase()).includes(superNormalize);
   }
 

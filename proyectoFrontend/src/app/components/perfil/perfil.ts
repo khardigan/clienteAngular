@@ -149,10 +149,7 @@ export class PerfilComponent implements OnInit {
       this.mensajeService.mostrarError('El nombre público debe tener al menos 3 caracteres.');
       return;
     }
-    if (!this.validarCorreo(this.perfil.email || '')) {
-      this.mensajeService.mostrarError('El correo electrónico no es válido.');
-      return;
-    }
+    // El email se sincroniza automáticamente desde el usuario — no se valida aquí en el frontend ya que es readonly
     if (!this.validarTelefono(this.perfil.telefono || '')) {
       this.mensajeService.mostrarError('El número de teléfono no es válido.');
       return;

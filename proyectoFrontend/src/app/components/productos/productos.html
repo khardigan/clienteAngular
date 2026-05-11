@@ -47,11 +47,20 @@
           </select>
         </div>
 
+        <!-- Filtro Mis Aportaciones -->
+        <div class="col-lg-2 col-md-4 col-6" *ngIf="isLoggedIn">
+          <button class="btn w-100 rounded-pill shadow-sm py-2 d-flex align-items-center justify-content-center gap-2"
+            [ngClass]="showOnlyMine ? 'btn-home' : 'btn-outline-secondary'" (click)="showOnlyMine = !showOnlyMine">
+            <i class="bi" [ngClass]="showOnlyMine ? 'bi-person-check-fill' : 'bi-person'"></i>
+            <span class="small fw-bold">{{ showOnlyMine ? 'Mis Productos' : 'Ver los míos' }}</span>
+          </button>
+        </div>
+
         <!-- Botón de añadir (Solo si está logueado) -->
         <div class="col-lg-3 col-md-12 text-lg-end">
           <button *ngIf="isLoggedIn" class="btn btn-home rounded-pill px-4 py-2 w-100 w-lg-auto shadow-sm"
             (click)="toggleFormulario()">
-            <i class="bi bi-plus-circle me-1"></i> Publicar Producto
+            <i class="bi bi-plus-circle me-1"></i> Añadir Producto
           </button>
         </div>
       </div>
@@ -66,7 +75,7 @@
   <!-- Formulario de creación rápida -->
   <div *ngIf="mostrarFormulario" class="card border-0 shadow-lg mb-5 rounded-4">
     <div class="card-body p-4">
-      <h5 class="fw-bold mb-4 text-success">Nuevo Producto Sugerido</h5>
+      <h5 class="fw-bold mb-4 text-success">Nuevo Producto para el Catálogo</h5>
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label small fw-bold">Nombre</label>
@@ -94,11 +103,10 @@
         </div>
         <div class="col-md-4 col-6">
           <label class="form-label small fw-bold">Supermercado (Opcional)</label>
-          <input type="text" class="form-control bg-light border-0" [(ngModel)]="nuevoSupermercado"
-            placeholder="Escribe o busca..." list="supermercadosList">
-          <datalist id="supermercadosList">
-            <option *ngFor="let s of supermercadosOficiales" [value]="s"></option>
-          </datalist>
+          <select class="form-select bg-light border-0" [(ngModel)]="nuevoSupermercado">
+            <option value="">Selecciona supermercado...</option>
+            <option *ngFor="let s of getSupermercados()" [value]="s">{{ s }}</option>
+          </select>
         </div>
         <div class="col-md-4 col-6 d-flex align-items-end gap-2">
           <button class="btn btn-home rounded-pill flex-grow-1" (click)="crearProducto()">Crear</button>
@@ -175,9 +183,17 @@
                 {{ p.categoria }}
               </span>
             </div>
-            <span class="text-home-orange small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">
-              Sugerencia de Usuario
-            </span>
+            <div class="mt-1">
+              <span *ngIf="p.usuarioRegistradorId === authService.getId()"
+                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill fw-bold"
+                style="font-size: 0.65rem;">
+                <i class="bi bi-person-heart me-1"></i>Tu Producto
+              </span>
+              <span *ngIf="p.usuarioRegistradorId !== authService.getId() && p.usuarioRegistradorId"
+                class="text-home-orange small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.65rem;">
+                Producto Añadido
+              </span>
+            </div>
           </div>
 
           <p class="text-muted small mb-4 line-clamp-3" style="min-height: 3em;">

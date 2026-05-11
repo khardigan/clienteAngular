@@ -21,6 +21,7 @@ export class RegistroComponent {
   };
   errorRegistro: string = '';
   registroExitoso: boolean = false;
+  registrando: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -31,16 +32,21 @@ export class RegistroComponent {
       return;
     }
 
+    this.registrando = true;
+    this.errorRegistro = '';
+
     console.log('Iniciando registro para:', this.user.nombre);
 
     this.authService.register(this.user).subscribe({
       next: (res) => {
         console.log('¡Registro exitoso!', res);
         this.registroExitoso = true;
+        this.registrando = false;
         this.errorRegistro = '';
       },
       error: (err) => {
         console.error('Error en el registro:', err);
+        this.registrando = false;
         this.errorRegistro = 'Hubo un error al crear la cuenta. Es posible que el nombre de usuario ya esté en uso o haya un problema con los datos.';
       }
     });

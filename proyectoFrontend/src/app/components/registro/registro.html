@@ -54,7 +54,13 @@
                                 </div>
                                 
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-home btn-lg">Registrar mi cuenta</button>
+                                    <button type="submit" class="btn btn-home btn-lg" [disabled]="registrando">
+                                        <span *ngIf="!registrando">Registrar mi cuenta</span>
+                                        <span *ngIf="registrando">
+                                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Enviando solicitud...
+                                        </span>
+                                    </button>
                                     <div class="text-center mt-3">
                                         <span class="text-muted small">¿Ya tienes cuenta? <a routerLink="/login" class="text-home-accent text-decoration-none fw-bold">Inicia sesión</a></span>
                                     </div>

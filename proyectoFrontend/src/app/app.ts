@@ -48,42 +48,7 @@ export class App implements OnInit {
     });
   }
 
-  comentarioAbierto: boolean = false;
-  comentario: string = '';
 
-  feedbackMsg = '';
-  feedbackTipo: 'success' | 'danger' = 'success';
-
-  mostrarFeedback(msj: string, tipo: 'success' | 'danger' = 'success'): void {
-    if (tipo === 'success') {
-      this.mensajeService.mostrarSuccess(msj);
-    } else {
-      this.mensajeService.mostrarError(msj);
-    }
-  }
-
-  toggleComentario() {
-    this.comentarioAbierto = !this.comentarioAbierto;
-  }
-
-  enviarComentario() {
-    if (!this.comentario || this.comentario.trim().length === 0) return;
-
-    const peticion = this.authService.enviarComentario(this.comentario);
-    if (peticion) {
-      peticion.subscribe({
-        next: () => {
-          this.comentario = '';
-          this.comentarioAbierto = false;
-          this.mostrarFeedback('Comentario enviado con éxito. ¡Gracias!', 'success');
-        },
-        error: (err: any) => {
-          console.error('Error enviando comentario: ', err);
-          this.mostrarFeedback('Ocurrió un error al enviar.', 'danger');
-        }
-      });
-    }
-  }
 
   cargarPerfil() {
     this.perfilService.obtenerPerfilDesdeToken().subscribe({

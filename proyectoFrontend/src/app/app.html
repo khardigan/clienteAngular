@@ -64,7 +64,8 @@
                   class="bi bi-person-circle me-3 text-primary"></i>Ver Perfil</a></li>
             <li>
               <button class="dropdown-item py-2" (click)="cambiarTema()">
-                <i class="bi me-3" [ngClass]="isDarkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary'"></i>
+                <i class="bi me-3"
+                  [ngClass]="isDarkMode ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary'"></i>
                 {{ isDarkMode ? 'Modo Claro' : 'Modo Oscuro' }}
               </button>
             </li>
@@ -143,21 +144,6 @@
           <button type="button" class="btn-close btn-sm" (click)="mensajeService.limpiar()"></button>
         </div>
 
-        <!-- Puedes dejar un comentario si estas logeado, y se habre un toogle para escribir tu comentario -->
-        @if(authService.isLoggedIn()){
-        <button class="btn btn-outline-light mb-3 mt-2" (click)="toggleComentario()">Dejar un comentario</button>
-
-        @if(comentarioAbierto) {
-        <div class="comentario mt-2 p-3 bg-white text-dark rounded shadow-sm">
-          <h6 class="fw-bold">Tu feedback es importante</h6>
-          <textarea class="form-control mb-2" placeholder="Deja tu comentario aquí..." [(ngModel)]="comentario"
-            rows="3"></textarea>
-          <div class="text-end">
-            <button class="btn btn-success btn-sm px-4" (click)="enviarComentario()">Enviar</button>
-          </div>
-        </div>
-        }
-        }
       </div>
       <div class="col-md-6">
         <h5>Enlaces</h5>

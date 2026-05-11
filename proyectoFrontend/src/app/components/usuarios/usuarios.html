@@ -17,10 +17,28 @@
                 <td>{{ u.id }}</td>
                 <td>{{ u.nombre }}</td>
                 <td>{{ u.email }}</td>
-                <td>{{ u.rol }}</td>
+                <td>
+                    <span class="badge" [ngClass]="u.rol === 'ADMIN' ? 'bg-danger' : 'bg-primary'">
+                        {{ u.rol }}
+                    </span>
+                </td>
                 <td>{{ u.listaProductosSubidos.length || 0 }}</td>
                 <td>{{ u.listasCreadas.length || 0 }}</td>
-                <td><button (click)="eliminarUsuario(u.id)">Eliminar</button></td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-danger" (click)="eliminarUsuario(u.id)" title="Eliminar usuario">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <button *ngIf="u.rol !== 'ADMIN'" class="btn btn-outline-success"
+                            (click)="cambiarRol(u, 'ADMIN')" title="Hacer Admin">
+                            <i class="bi bi-shield-lock"></i>
+                        </button>
+                        <button *ngIf="u.rol === 'ADMIN'" class="btn btn-outline-warning"
+                            (click)="cambiarRol(u, 'USER')" title="Quitar Admin">
+                            <i class="bi bi-person-dash"></i>
+                        </button>
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>

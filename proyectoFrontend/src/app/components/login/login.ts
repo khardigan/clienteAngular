@@ -28,7 +28,8 @@ export class LoginComponent {
     //console.log('Enviando esto al server:', this.credentials);
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        //console.log('¡Login ok!', response);
+        //creamos
+
         this.router.navigate(['/perfil']);
       },
       error: (err) => {

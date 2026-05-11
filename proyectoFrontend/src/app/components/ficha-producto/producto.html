@@ -107,12 +107,12 @@
 
         </div>
     </section>
-    <section class="mt-5 p-4 shadow-sm rounded-4 bg-white">
+    <section class="mt-5 p-4 shadow-sm rounded-4 bg-white" style="background-color: #ffffff !important; opacity: 1 !important;">
         <h4 class="fw-bold mb-4">
             <i class="bi bi-chat-left-text me-2"></i> Opiniones del producto
         </h4>
 
-        <div class="card border-0 bg-light rounded-4 p-3 mb-4">
+        <div class="card border-0 bg-light rounded-4 p-3 mb-4" style="background-color: #f8f9fa !important; opacity: 1 !important;">
             <h6 class="fw-bold mb-3">Deja tu opinión</h6>
 
             <div class="mb-3">
@@ -139,7 +139,7 @@
         <hr class="my-4 text-muted opacity-25">
 
         <div *ngIf="producto.comentarios && producto.comentarios.length > 0; else noComentarios">
-            <div class="mb-4 p-4 rounded-4 border border-2 shadow-sm bg-white"
+            <div class="mb-4 p-4 rounded-4 border border-2 shadow-sm bg-white" style="background-color: #ffffff !important; opacity: 1 !important;"
                 *ngFor="let c of producto.comentarios"
                 [ngClass]="c.idUsuario === authService.getId() ? 'border-success' : 'border-primary'">
 
