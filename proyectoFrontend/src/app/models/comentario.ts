@@ -11,4 +11,7 @@ export interface Comentario {
     productoId?: number;
     productoNombre?: string;
     idUsuario?: number;
+    nombreUsuario?: string;
+    nickAutor?: string;
+    imagenAutorUrl?: string;
 }

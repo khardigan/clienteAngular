@@ -30,7 +30,6 @@ export class ProductoService {
       headers: this.obtenerCabeceras()
     });
   }
-
   // Productos que el usuario ha subido al catálogo global (pendientes o confirmados)
   listarProductosCatalogSubidosPorUsuario(usuarioId: number): Observable<Producto[]> {
     const t = new Date().getTime();

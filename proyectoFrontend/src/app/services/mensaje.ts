@@ -24,30 +24,21 @@ export class MensajeService {
 
   constructor() { }
 
-  /**
-   * Muestra un mensaje de éxito que desaparece solo
-   */
+  /* Muestra un mensaje de éxito que desaparece solo */
   mostrarSuccess(texto: string) {
     this.mostrar({ texto, tipo: 'success' });
   }
-
   mostrarInfo(texto: string) {
     this.mostrar({ texto, tipo: 'info' });
   }
-  /**
-   * Muestra un mensaje de error
-   */
+  /* Muestra un mensaje de error */
   mostrarError(texto: string) {
     this.mostrar({ texto, tipo: 'error' });
   }
-
-  /**
-   * Abre un cuadro de diálogo para confirmar una acción
-   */
+  /* Abre un cuadro de diálogo para confirmar una acción */
   confirmar(pregunta: string, alConfirmar: () => void) {
     this.confirmacionSubject.next({ pregunta, callback: alConfirmar });
   }
-
   aceptarConfirmacion() {
     const actual = this.confirmacionSubject.value;
     if (actual) {

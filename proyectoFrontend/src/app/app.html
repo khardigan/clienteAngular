@@ -48,8 +48,9 @@
         <li class="nav-item dropdown mt-3 mt-lg-0" *ngIf="authService.isLoggedIn()">
           <a class="nav-link dropdown-toggle d-inline-flex align-items-center bg-white bg-opacity-10 rounded-pill px-3 py-1 border border-light border-opacity-25"
             href="#" role="button" (click)="toggleMenu($event)">
-            <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold">
-              {{ (perfil?.nombrePerfil?.charAt(0) || 'U').toUpperCase() }}
+            <div class="avatar-circle me-2 shadow-sm border border-light border-opacity-50 text-white fw-bold overflow-hidden">
+              <img *ngIf="perfil?.imagenUrl" [src]="perfil.imagenUrl" class="w-100 h-100" style="object-fit: cover;">
+              <span *ngIf="!perfil?.imagenUrl">{{ (perfil?.nombrePerfil?.charAt(0) || 'U').toUpperCase() }}</span>
             </div>
             <span class="text-light small text-uppercase fw-semibold d-inline-block text-truncate"
               style="max-width: 80px;">

@@ -15,13 +15,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const token = localStorage.getItem('token');
     const isLoginOrRegister = req.url.includes('/login') || req.url.includes('/registrar');
-
     if (token && !isLoginOrRegister) {
       cloned = req.clone({
         setHeaders: { Authorization: `Bearer ${token}` }
       });
     }
-
     // --- Envía la petición al backend y captura errores ---
     return next.handle(cloned).pipe(
       catchError((error: HttpErrorResponse) => {

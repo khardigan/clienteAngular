@@ -76,7 +76,17 @@
       </div>
       <div class="col-lg-6">
         <div class="about-avatar text-center">
-          <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="rounded-circle shadow-lg" alt="Avatar">
+          <div class="position-relative d-inline-block">
+            <img [src]="perfil.imagenUrl || 'https://bootdey.com/img/Content/avatar/avatar7.png'" 
+                 class="rounded-circle shadow-lg mb-3" alt="Avatar"
+                 style="width: 250px; height: 250px; object-fit: cover; border: 5px solid white;">
+            
+            <div class="mt-2">
+              <label class="small text-muted mb-1 d-block">URL de tu foto de perfil</label>
+              <input type="text" class="form-control form-control-sm rounded-pill shadow-sm" 
+                     [(ngModel)]="perfil.imagenUrl" placeholder="Pega aquí el enlace a tu imagen...">
+            </div>
+          </div>
         </div>
       </div>
     </div>

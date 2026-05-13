@@ -8,6 +8,7 @@ import { ListaDetalle, IntegranteLista, ProductoEstado } from '../../models/list
 import { ProductoPropio, Producto } from '../../models/producto';
 import { finalize } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
+import { MensajeService } from '../../services/mensaje';
 
 /**
  * Componente principal que gestiona:
@@ -72,6 +73,7 @@ export class ListaComponent implements OnInit {
         private listaService: ListaService,
         private productoService: ProductoService,
         private authService: AuthService,
+        private mensajeService: MensajeService,
         private cdr: ChangeDetectorRef,
         private router: Router
     ) { }
@@ -96,11 +98,15 @@ export class ListaComponent implements OnInit {
 
         this.listaService.obtenerMisListas().subscribe({
             next: (data) => {
-                this.listas = data || [];
-                this.listas.forEach(l => {
-                    if (l.productos) this.ordenarProductos(l.productos, false);
-                    if (l.productoPropios) this.ordenarProductos(l.productoPropios, true);
+                let listasSucias = data || [];
+
+                // Ordenamos aquí una sola vez al cargar: completadas al fondo
+                this.listas = listasSucias.sort((a, b) => {
+                    const aComp = this.estaListaCompletada(a) ? 1 : 0;
+                    const bComp = this.estaListaCompletada(b) ? 1 : 0;
+                    return aComp - bComp;
                 });
+
                 if (!silencioso) {
                     setTimeout(() => {
                         this.cargando = false;
@@ -152,20 +158,16 @@ export class ListaComponent implements OnInit {
 
     get listasFiltradas(): ListaDetalle[] {
         let filtradas = [...this.listas];
- 
+
         if (this.filtroListas === 'mias') {
             filtradas = filtradas.filter(l => l.usuarioDuenoId === this.currentUserId);
         } else if (this.filtroListas === 'compartidas') {
             filtradas = filtradas.filter(l => l.usuarioDuenoId !== this.currentUserId);
         }
- 
-        return filtradas.sort((a, b) => {
-            const aComp = this.estaListaCompletada(a) ? 1 : 0;
-            const bComp = this.estaListaCompletada(b) ? 1 : 0;
-            return aComp - bComp;
-        });
+
+        return filtradas;
     }
- 
+
     get listasOrdenadas(): ListaDetalle[] {
         return this.listasFiltradas;
     }
@@ -244,46 +246,15 @@ export class ListaComponent implements OnInit {
         return this.currentUserId !== null && Number(this.currentUserId) === Number(pp.usuarioId);
     }
 
-    ordenarProductos(productos: any[], isPropio: boolean): any[] {
-        if (!productos) return [];
-        return productos.sort((a, b) => {
-            let supA = a.supermercado || '';
-            if (!supA && a.nombre) {
-                const n = a.nombre.toLowerCase();
-                if (n.includes('mercadona')) supA = 'Mercadona';
-                else if (n.includes('carrefour')) supA = 'Carrefour';
-                else if (n.includes('lidl')) supA = 'Lidl';
-                else if (n.includes('dia')) supA = 'Dia';
-            }
-            let supB = b.supermercado || '';
-            if (!supB && b.nombre) {
-                const n = b.nombre.toLowerCase();
-                if (n.includes('mercadona')) supB = 'Mercadona';
-                else if (n.includes('carrefour')) supB = 'Carrefour';
-                else if (n.includes('lidl')) supB = 'Lidl';
-                else if (n.includes('dia')) supB = 'Dia';
-            }
 
-            const cmpSup = supA.localeCompare(supB);
-            if (cmpSup !== 0) return cmpSup;
-
-            const nomA = a.nombre || '';
-            const nomB = b.nombre || '';
-            const cmpNom = nomA.localeCompare(nomB);
-            if (cmpNom !== 0) return cmpNom;
-
-            const precioA = isPropio ? (a.precioObjetivo || 0) : (a.precio || 0);
-            const precioB = isPropio ? (b.precioObjetivo || 0) : (b.precio || 0);
-            return precioA - precioB;
-        });
-    }
 
     obtenerIntegrantes(lista: ListaDetalle): IntegranteLista[] {
         const integrantes: IntegranteLista[] = [];
         integrantes.push({
             id: lista.usuarioDuenoId,
             nick: lista.nombreDuenoNick,
-            esDueno: true
+            esDueno: true,
+            imagenUrl: lista.imagenDuenoUrl
         });
 
         if (lista.usuariosCompartida) {
@@ -291,7 +262,8 @@ export class ListaComponent implements OnInit {
                 integrantes.push({
                     id: u.id,
                     nick: u.nick,
-                    esDueno: false
+                    esDueno: false,
+                    imagenUrl: u.imagenUrl
                 });
             });
         }
@@ -408,13 +380,23 @@ export class ListaComponent implements OnInit {
     }
 
     eliminarLista(listaId: number): void {
-        this.listaService.eliminarLista(listaId).subscribe({
-            next: () => {
-                this.listas = this.listas.filter(l => l.codLista !== listaId);
-                this.cdr.detectChanges();
-            },
-            error: (err) => console.error('Error al eliminar lista', err)
-        });
+        this.mensajeService.confirmar(
+            '¿Estás seguro de que quieres eliminar esta lista por completo? Esta acción no se puede deshacer.',
+            () => {
+                this.listaService.eliminarLista(listaId).subscribe({
+                    next: () => {
+                        this.listas = this.listas.filter(l => l.codLista !== listaId);
+                        this.confirmandoBorradoListaId = null;
+                        this.mensajeService.mostrarSuccess('Lista eliminada correctamente.');
+                        this.cdr.detectChanges();
+                    },
+                    error: (err) => {
+                        console.error('Error al eliminar lista', err);
+                        this.mensajeService.mostrarError('No se pudo eliminar la lista.');
+                    }
+                });
+            }
+        );
     }
 
     onPublicar(listaId: number): void {
@@ -530,18 +512,24 @@ export class ListaComponent implements OnInit {
 
     eliminarProducto(lista: ListaDetalle, producto: ProductoEstado, event: MouseEvent): void {
         event.stopPropagation();
-        const newIds = lista.productos.filter(p => p.id !== producto.id).map(p => p.id);
-        const usuariosIds = lista.usuariosCompartida ? lista.usuariosCompartida.map(u => u.id) : [];
 
-        this.listaService.actualizarLista(lista.codLista, {
-            productosEnLista: newIds,
-            usuariosCompartida: usuariosIds
-        }).subscribe({
-            next: () => this.cargarListas(),
-            error: () => {
-                this.errorStr = 'No se pudo quitar el producto de la lista.';
-                this.cdr.detectChanges();
-            }
+        this.mensajeService.confirmar(`¿Quitar "${producto.nombre}" de la lista?`, () => {
+            const newIds = lista.productos.filter(p => p.id !== producto.id).map(p => p.id);
+            const usuariosIds = lista.usuariosCompartida ? lista.usuariosCompartida.map(u => u.id) : [];
+
+            this.listaService.actualizarLista(lista.codLista, {
+                productosEnLista: newIds,
+                usuariosCompartida: usuariosIds
+            }).subscribe({
+                next: () => {
+                    this.mensajeService.mostrarSuccess('Producto quitado de la lista.');
+                    this.cargarListas(true);
+                },
+                error: () => {
+                    this.mensajeService.mostrarError('Error al quitar el producto.');
+                    this.cdr.detectChanges();
+                }
+            });
         });
     }
 
@@ -700,10 +688,6 @@ export class ListaComponent implements OnInit {
             next: () => {
                 pp.supermercado = nuevoSup;
                 this.mostrarFeedback('Supermercado actualizado.', 'success');
-                const lista = this.listas.find(l => l.codLista === listaId);
-                if (lista && lista.productoPropios) {
-                    this.ordenarProductos(lista.productoPropios, true);
-                }
                 this.cdr.detectChanges();
             },
             error: () => {
@@ -715,34 +699,42 @@ export class ListaComponent implements OnInit {
     quitarDeListaPropio(producto: ProductoPropio, event: MouseEvent): void {
         event.stopPropagation();
 
-        this.productoService.actualizarProductoPropio(producto.id, {
-            nombre: producto.nombre,
-            precioObjetivo: producto.precioObjetivo,
-            notas: producto.notas,
-            listaId: null,
-            supermercado: producto.supermercado,
-            cantidad: producto.cantidad
-        }).subscribe({
-            next: () => this.cargarListas(),
-            error: () => {
-                this.errorStr = 'No se pudo quitar el producto de la lista.';
-                this.cdr.detectChanges();
-            }
+        this.mensajeService.confirmar(`¿Quitar "${producto.nombre}" de la lista?`, () => {
+            this.productoService.actualizarProductoPropio(producto.id, {
+                nombre: producto.nombre,
+                precioObjetivo: producto.precioObjetivo,
+                notas: producto.notas,
+                listaId: null,
+                supermercado: producto.supermercado,
+                cantidad: producto.cantidad
+            }).subscribe({
+                next: () => {
+                    this.mensajeService.mostrarSuccess('Producto quitado de la lista.');
+                    this.cargarListas(true);
+                },
+                error: () => {
+                    this.mensajeService.mostrarError('No se pudo quitar el producto.');
+                    this.cdr.detectChanges();
+                }
+            });
         });
     }
 
     eliminarProductoPropio(productoId: number, event: MouseEvent): void {
         event.stopPropagation();
 
-        this.productoService.eliminarProductoPropio(productoId).subscribe({
-            next: () => {
-                this.cargarProductosPropios();
-                this.cargarListas();
-            },
-            error: () => {
-                this.errorStr = 'No se pudo eliminar el producto propio.';
-                this.cdr.detectChanges();
-            }
+        this.mensajeService.confirmar('¿Borrar este producto de tu inventario para siempre?', () => {
+            this.productoService.eliminarProductoPropio(productoId).subscribe({
+                next: () => {
+                    this.mensajeService.mostrarSuccess('Producto eliminado permanentemente.');
+                    this.cargarProductosPropios();
+                    this.cargarListas(true);
+                },
+                error: () => {
+                    this.mensajeService.mostrarError('Error al eliminar el producto.');
+                    this.cdr.detectChanges();
+                }
+            });
         });
     }
 }

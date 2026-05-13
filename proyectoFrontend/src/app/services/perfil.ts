@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, Subject } from 'rxjs';
 
 export interface Perfil {
   idPerfil: number;
@@ -13,6 +13,7 @@ export interface Perfil {
   residencia?: string;
   email?: string;
   telefono?: string;
+  imagenUrl?: string;
 }
 
 @Injectable({
@@ -21,6 +22,13 @@ export interface Perfil {
 export class PerfilService {
 
   private API = 'https://localhost:8443/perfiles';
+  //esto es un emisor de eventos para que el nav se actualice con el cambio de foto del perfil y el subtitulo
+  private perfilActualizadoSource = new Subject<void>();
+  perfilActualizado$ = this.perfilActualizadoSource.asObservable();
+
+  notificarCambioPerfil() {
+    this.perfilActualizadoSource.next();
+  }
 
   constructor(private http: HttpClient) { }
 

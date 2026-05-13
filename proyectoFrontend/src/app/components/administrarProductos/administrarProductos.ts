@@ -44,12 +44,9 @@ export class AdministrarProductosComponent implements OnInit {
         private mensajeService: MensajeService,
         private productoService: ProductoService
     ) {
-        console.log('INSTANCIA ADMIN PRODUCTOS');
-
     }
 
-    // Genera las cabeceras con el token JWT del usuario logueado
-    // Prepara el token para que el servidor nos deje hacer cosas protegidas.
+    // Genera las cabeceras con el token JWT del usuario logueado para que el servidor nos deje hacer cosas protegidas.
     private obtenerCabeceras(): HttpHeaders {
         const token = this.authService.getToken();
 
@@ -85,7 +82,6 @@ export class AdministrarProductosComponent implements OnInit {
     }
     // Baja todos los productos, poniendo primero los que aún no se han aprobado.
     cargarProductos() {
-        console.log('TOKEN:', this.authService.getToken());
 
         this.http.get<Producto[]>(this.API, { headers: this.obtenerCabeceras() })
             .subscribe({

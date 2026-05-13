@@ -20,6 +20,7 @@ export class ContactoComponent implements OnInit {
   tema: string = '';
   mensaje: string = '';
   aceptaTerminos: boolean = false;
+  emailOficial: string = 'linkedlistoficial@gmail.com';
 
   constructor(
     private mensajeService: MensajeService,
@@ -28,6 +29,12 @@ export class ContactoComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    // Recuperar el correo oficial del backend
+    this.http.get<{ email: string }>('https://localhost:8443/contacto/email').subscribe({
+      next: (res) => this.emailOficial = res.email,
+      error: (err) => console.error('Error recuperando correo oficial:', err)
+    });
+
     if (this.authService.isLoggedIn()) {
       this.nombre = this.authService.getNombre() || '';
       this.correo = this.authService.getEmail() || '';

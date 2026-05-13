@@ -72,9 +72,9 @@
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center mb-4">
                             <div class="flex-shrink-0">
-                                <div class="rounded-circle bg-light p-2 border">
-                                    <i class="bi bi-person-circle fs-3 text-primary"></i>
-                                </div>
+                                <img [src]="lista.imagenDuenoUrl || 'https://ui-avatars.com/api/?name=' + lista.nombreDuenoNick + '&background=random'"
+                                    class="rounded-circle shadow-sm border" width="45" height="45" alt="Avatar"
+                                    style="object-fit: cover;">
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <small class="text-muted d-block text-uppercase fw-bold"

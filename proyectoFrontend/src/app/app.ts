@@ -46,6 +46,11 @@ export class App implements OnInit {
         this.perfil = null;
       }
     });
+
+    // Suscribirse a actualizaciones del perfil
+    this.perfilService.perfilActualizado$.subscribe(() => {
+      this.cargarPerfil();
+    });
   }
 
 

@@ -7,13 +7,10 @@ import { BehaviorSubject, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  // En desarrollo usamos HTTP para evitar problemas de certificación. En producción: usar HTTPS.
   private apiUrl = 'https://localhost:8443/usuarios/login';
   private registerUrl = 'https://localhost:8443/usuarios/registrar';
-
   // Observable para que otros componentes sepan cuando cambia el estado de la sesión
   public loginStatus$ = new BehaviorSubject<boolean>(this.isLoggedIn());
-
   constructor(private http: HttpClient, private router: Router) { }
 
   login(credentials: any) {
@@ -31,11 +28,26 @@ export class AuthService {
           if (res.email) {
             localStorage.setItem('email', res.email);
           }
-          this.loginStatus$.next(true); // Avisamos del cambio
+          this.loginStatus$.next(true); // Actualizamos el estado de la sesión
+          this.router.navigate(['/perfil']); // Redirigimos al perfil después de login exitoso
         }
       })
     );
   }
+  
+  saveToken(token: string) {
+    localStorage.setItem('token', token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  getId(): number | null {
+    const id = localStorage.getItem('id');
+    return id ? parseInt(id, 10) : null;
+  }
+
 
   register(userData: any) {
     // El backend espera el campo 'contraseña' con ñ según el DTO
@@ -61,19 +73,6 @@ export class AuthService {
       'Authorization': `Bearer ${this.getToken()}`
     });
     return this.http.get<any>(url, { headers });
-  }
-
-  saveToken(token: string) {
-    localStorage.setItem('token', token);
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  getId(): number | null {
-    const id = localStorage.getItem('id');
-    return id ? parseInt(id, 10) : null;
   }
 
   logout() {

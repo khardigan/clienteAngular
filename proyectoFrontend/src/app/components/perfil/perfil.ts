@@ -65,7 +65,8 @@ export class PerfilComponent implements OnInit {
           email: perfil.email || '',
           telefono: perfil.telefono || '',
           fechaNacimiento: perfil.fechaNacimiento || '',
-          edad: perfil.edad || ''
+          edad: perfil.edad || '',
+          imagenUrl: perfil.imagenUrl || 'https://bootdey.com/img/Content/avatar/avatar7.png'
         });
 
         if (perfil.usuarioId) {
@@ -164,6 +165,7 @@ export class PerfilComponent implements OnInit {
         next: (actualizado) => {
           this.perfil = actualizado;
           this.mensajeService.mostrarSuccess('¡Perfil actualizado con éxito!');
+          this.perfilService.notificarCambioPerfil(); // Notificamos al Nav, es necesario para que se actualice el navbar
           this.cd.detectChanges();
         },
         error: (err) => {

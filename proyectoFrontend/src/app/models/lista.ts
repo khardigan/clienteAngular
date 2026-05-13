@@ -4,6 +4,7 @@ import { ProductoPropio } from "./producto";
 export interface UsuarioMinimo {
     id: number;
     nick: string;
+    imagenUrl?: string;
 }
 
 // Representa el estado de un producto dentro de una lista específica
@@ -21,6 +22,7 @@ export interface ListaDetalle {
     codLista: number;
     usuarioDuenoId: number;
     nombreDuenoNick: string;
+    imagenDuenoUrl?: string;
     usuariosCompartida: UsuarioMinimo[]; // Usuarios con los que se ha compartido la lista
     productos: ProductoEstado[]; // Listado de productos incluidos
     productoPropios: ProductoPropio[];
@@ -35,4 +37,5 @@ export interface IntegranteLista {
     id: number;
     nick: string;
     esDueno: boolean;
+    imagenUrl?: string;
 }

@@ -252,15 +252,19 @@
 
                     <div class="card-body p-4 bg-light bg-opacity-50">
 
-                        <!-- Integrantes -->
+                        <!-- Integrantes con Avatar -->
                         <div class="mb-3">
-                            <span class="text-muted small fw-bold text-uppercase d-block mb-2">Integrantes</span>
-                            <div class="d-flex flex-wrap gap-1">
-                                <span *ngFor="let i of obtenerIntegrantes(lista)"
-                                    class="badge bg-white text-dark border px-2 py-1 shadow-xs fw-normal">
-
-                                    {{ i.nick }} <small *ngIf="i.esDueno" class="text-primary">(Dueño)</small>
-                                </span>
+                            <span class="text-muted small fw-bold text-uppercase d-block mb-2">Colaboradores</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div *ngFor="let i of obtenerIntegrantes(lista)" 
+                                     class="d-flex align-items-center bg-white border rounded-pill px-2 py-1 shadow-xs transition-all hover-scale"
+                                     [title]="i.nick + (i.esDueno ? ' (Dueño)' : '')">
+                                    <img [src]="i.imagenUrl || 'https://ui-avatars.com/api/?name=' + i.nick + '&background=random'" 
+                                         class="rounded-circle me-2" 
+                                         style="width: 24px; height: 24px; object-fit: cover; border: 1px solid #eee;">
+                                    <span class="small fw-semibold text-dark text-truncate" style="max-width: 90px;">{{ i.nick }}</span>
+                                    <i *ngIf="i.esDueno" class="bi bi-crown-fill text-warning ms-1" style="font-size: 0.7rem;"></i>
+                                </div>
                             </div>
                         </div>
 

@@ -50,7 +50,9 @@
 
                 <!-- Categorías -->
                 <div class="mb-3" *ngIf="producto.categoria">
-                    <span class="badge bg-light text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.85rem;">
+                    <span
+                        class="badge bg-light text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold"
+                        style="font-size: 0.85rem;">
                         <i class="bi bi-tag-fill me-1"></i> {{ producto.categoria }}
                     </span>
                 </div>
@@ -61,7 +63,8 @@
 
                 <!-- Botón de enlace externo (si la descripción contiene "Ver en:") -->
                 <div class="mb-4" *ngIf="isExternalLink(producto.descripcion)">
-                    <a [href]="extractUrl(producto.descripcion)" target="_blank" class="btn btn-outline-home rounded-pill w-100 py-2 fw-bold">
+                    <a [href]="extractUrl(producto.descripcion)" target="_blank"
+                        class="btn btn-outline-home rounded-pill w-100 py-2 fw-bold">
                         <i class="bi bi-box-arrow-up-right me-2"></i> Ver en {{ producto.supermercado || 'Tienda' }}
                     </a>
                 </div>
@@ -107,12 +110,14 @@
 
         </div>
     </section>
-    <section class="mt-5 p-4 shadow-sm rounded-4 bg-white" style="background-color: #ffffff !important; opacity: 1 !important;">
+    <section class="mt-5 p-4 shadow-sm rounded-4 bg-white"
+        style="background-color: #ffffff !important; opacity: 1 !important;">
         <h4 class="fw-bold mb-4">
             <i class="bi bi-chat-left-text me-2"></i> Opiniones del producto
         </h4>
 
-        <div class="card border-0 bg-light rounded-4 p-3 mb-4" style="background-color: #f8f9fa !important; opacity: 1 !important;">
+        <div class="card border-0 bg-light rounded-4 p-3 mb-4"
+            style="background-color: #f8f9fa !important; opacity: 1 !important;">
             <h6 class="fw-bold mb-3">Deja tu opinión</h6>
 
             <div class="mb-3">
@@ -139,15 +144,17 @@
         <hr class="my-4 text-muted opacity-25">
 
         <div *ngIf="producto.comentarios && producto.comentarios.length > 0; else noComentarios">
-            <div class="mb-4 p-4 rounded-4 border border-2 shadow-sm bg-white" style="background-color: #ffffff !important; opacity: 1 !important;"
+            <div class="mb-4 p-4 rounded-4 border border-2 shadow-sm bg-white"
+                style="background-color: #ffffff !important; opacity: 1 !important;"
                 *ngFor="let c of producto.comentarios"
                 [ngClass]="c.idUsuario === authService.getId() ? 'border-success' : 'border-primary'">
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="d-flex align-items-center gap-2">
-                        <img src="https://ui-avatars.com/api/?name={{c.usuario.nombre || 'U'}}&background=random"
-                            class="rounded-circle" width="30" height="30" alt="Avatar">
-                        <strong class="text-dark">{{ c.usuario.nombre || 'Cargando...' }}</strong>
+                        <img [src]="c.imagenAutorUrl || 'https://ui-avatars.com/api/?name=' + (c.nickAutor || c.nombreUsuario || 'U') + '&background=random'"
+                            class="rounded-circle shadow-sm" width="35" height="35" alt="Avatar"
+                            style="object-fit: cover;">
+                        <strong class="text-dark">{{ c.nickAutor || c.nombreUsuario || 'Cargando...' }}</strong>
                         <span class="badge bg-success text-white small rounded-pill px-2"
                             *ngIf="c.idUsuario === authService.getId()">Tú</span>
                     </div>

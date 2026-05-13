@@ -6,6 +6,7 @@ import { ComentarioService } from '../../services/comentarioService';
 import { AuthService } from '../../services/auth';
 import { Comentario } from '../../models/comentario';
 import { ProductoService } from '../../services/producto';
+import { MensajeService } from '../../services/mensaje';
 
 @Component({
   selector: 'app-comentario',
@@ -23,6 +24,7 @@ export class ComentarioComponent implements OnInit {
     private comentarioService: ComentarioService,
     public authService: AuthService,
     private productoService: ProductoService,
+    private mensajeService: MensajeService,
     private cd: ChangeDetectorRef // Fuerza el repintado cuando llegan datos
   ) { }
 
@@ -47,16 +49,38 @@ export class ComentarioComponent implements OnInit {
 
   // Función genérica para eliminar cualquier comentario (usada por el admin)
   eliminarCualquierComentario(comentario: Comentario) {
-    if (confirm('¿Estás seguro de que quieres eliminar este comentario como administrador?')) {
+    this.mensajeService.confirmar('¿Estás seguro de que quieres eliminar este comentario como administrador?', () => {
       this.comentarioService.eliminarComentario(comentario.id).subscribe({
         next: () => {
-          this.cargarTodosComentarios(); // Refrescamos la lista global
-          this.cargarComentariosUsuario(); // Y la del usuario por si era suyo
+          this.mensajeService.mostrarSuccess('Comentario eliminado por el administrador.');
+          this.cargarTodosComentarios();
+          this.cargarComentariosUsuario();
         },
-        error: (err) => console.error('Error al eliminar', err)
+        error: (err) => {
+          console.error('Error al eliminar', err);
+          this.mensajeService.mostrarError('No se pudo eliminar el comentario.');
+        }
       });
-    }
+    });
   }
+
+  eliminarComentario(comentario: Comentario) {
+    this.mensajeService.confirmar('¿Estás seguro de que quieres eliminar tu comentario? Esta acción no se puede deshacer.', () => {
+      this.comentarioService.eliminarComentario(comentario.id).subscribe({
+        next: () => {
+          this.mensajeService.mostrarSuccess('Tu comentario ha sido eliminado.');
+          this.cargarComentariosUsuario();
+          this.cargarTodosComentarios();
+          this.cd.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error al eliminar comentario', err);
+          this.mensajeService.mostrarError('No se pudo eliminar tu comentario.');
+        }
+      });
+    });
+  }
+
   // Carga todos los comentarios y resuelve el nombre de cada producto
   cargarTodosComentarios() {
     this.comentarioService.getTodosLosComentarios().subscribe((res: Comentario[]) => {
@@ -135,14 +159,7 @@ export class ComentarioComponent implements OnInit {
         }
       });
   }
-  eliminarComentario(comentario: Comentario) {
-    if (confirm('¿Estás seguro?')) {
-      this.comentarioService.eliminarComentario(comentario.id).subscribe(() => {
-        this.cargarComentariosUsuario();
-        this.cargarTodosComentarios();
-      });
-    }
-  }
+
 
   // Getter para filtrar los comentarios de la comunidad
   get comentariosFiltrados(): Comentario[] {
@@ -150,7 +167,7 @@ export class ComentarioComponent implements OnInit {
       return this.Comentarios;
     }
     const busqueda = this.filtroProducto.toLowerCase();
-    return this.Comentarios.filter(c => 
+    return this.Comentarios.filter(c =>
       c.productoNombre?.toLowerCase().includes(busqueda)
     );
   }
