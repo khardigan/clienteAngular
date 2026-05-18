@@ -113,7 +113,7 @@ export class ProductosComponent implements OnInit {
     const query = this.searchQuery ? this.searchQuery.trim().toLowerCase() : '';
 
     return this.productos.filter(p => {
-      if (!this.isAdmin && !p.confirmado) return false;
+      if (!p.confirmado) return false;
 
       const matchesSearch = !query || p.nombre.toLowerCase().includes(query);
       const matchesMinPrice = this.minPrice === null || p.precio >= this.minPrice;
@@ -264,5 +264,9 @@ export class ProductosComponent implements OnInit {
       this.imagenSeleccionada = file;
       this.mensajeService.mostrarInfo(`Imagen seleccionada: ${file.name}`);
     }
+  }
+
+  onImageError(event: any): void {
+    event.target.src = 'https://static.vecteezy.com/system/resources/previews/024/392/058/non_2x/alert-mark-failed-to-load-something-went-wrong-tap-to-retry-concept-illustration-flat-design-eps10-simple-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg';
   }
 }

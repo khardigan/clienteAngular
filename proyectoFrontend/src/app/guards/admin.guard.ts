@@ -3,8 +3,18 @@ import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth';
 
 /**
- * Guard para proteger rutas administrativas.
- * Solo permite el acceso si el usuario tiene el rol de ADMIN.
+ * Guard de Administración (admin.guard)
+ * -------------------------------------
+ * Un Guard en Angular actúa como un "portero de seguridad" para nuestras rutas (URLs).
+ * 
+ * PROPÓSITO:
+ * Se asigna a rutas sensibles en app.routes.ts (ej. '/usuarios' o '/administrarProductos').
+ * Antes de permitir que el navegador cargue ese componente, Angular ejecuta esta función.
+ * 
+ * FUNCIONAMIENTO:
+ * Llama al AuthService para comprobar si el rol guardado en el token del usuario es 'ADMIN'.
+ * - Si devuelve `true`: Se le permite el paso y carga el componente.
+ * - Si devuelve `false`: Se bloquea la navegación y se le redirige a la página principal ('/').
  */
 export const adminGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -14,7 +24,6 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Si no es admin, redirigir a la página de inicio
   console.warn('Acceso denegado: Se requiere rol de administrador.');
   router.navigate(['/']);
   return false;

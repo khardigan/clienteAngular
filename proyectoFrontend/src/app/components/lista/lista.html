@@ -634,7 +634,6 @@
                     </div>
                     <!-- Código de invitación interactivo al final de la tarjeta -->
                     <div class="border-top" *ngIf="lista.codigo">
-                        <!-- ponemos que sea con el fondo azulito de nav-bar y el texto blanco-->
                         <button
                             class="btn btn-propio w-100 rounded-bottom-4 border-0 py-2 d-flex align-items-center justify-content-center gap-2 text-white fw-bold"
                             (click)="lista.mostrarCodigo = !lista.mostrarCodigo"
@@ -643,6 +642,10 @@
                             <span *ngIf="!lista.mostrarCodigo">Ver código para compartir</span>
                             <span *ngIf="lista.mostrarCodigo">CÓDIGO: <span class="fs-5 ms-1"
                                     style="letter-spacing: 2px;">{{ lista.codigo }}</span></span>
+                            <i *ngIf="lista.mostrarCodigo" class="bi ms-2"
+                                [ngClass]="lista._copiado ? 'bi-check-lg' : 'bi-clipboard'"
+                                (click)="copiarCodigo(lista.codigo, $event)"
+                                style="cursor: pointer;" title="Copiar código"></i>
                         </button>
                     </div>
 

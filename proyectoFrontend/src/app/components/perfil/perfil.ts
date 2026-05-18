@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef, signal, NgZone, ApplicationRef } 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { Perfil, PerfilService } from '../../services/perfil';
+import { PerfilService } from '../../services/perfil';
+import { Perfil } from '../../models/perfil';
 import { ListaService } from '../../services/lista';
 import { ProductoService } from '../../services/producto';
 import { AuthService } from '../../services/auth';
@@ -37,6 +38,7 @@ export class PerfilComponent implements OnInit {
   totalProductos = signal(0);
   totalColaboraciones = signal(0);
   totalPublicas = signal(0);
+  nombreCuenta: string = '';
 
   constructor(
     private perfilService: PerfilService,
@@ -55,6 +57,7 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit(): void {
     const sessionUserId = this.authService.getId();
+    this.nombreCuenta = this.authService.getNombre() || '';
 
     this.perfilService.obtenerPerfilDesdeToken().subscribe({
       next: (perfil) => {
@@ -106,16 +109,13 @@ export class PerfilComponent implements OnInit {
   // ==========================================
 
   validarNombre(nombre: string): boolean {
+    if (!nombre) return true;
     const nombreRegex = /^.{3,}$/;
     return nombreRegex.test(nombre);
   }
 
-  validarCorreo(correo: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(correo);
-  }
-
   validarTelefono(telefono: string): boolean {
+    if (!telefono) return true;
     const telefonoRegex = /^\d{9}$/;
     return telefonoRegex.test(telefono);
   }
@@ -146,17 +146,13 @@ export class PerfilComponent implements OnInit {
   guardarCambios(): void {
     if (!this.perfil || !this.perfil.idPerfil) return;
 
-    if (!this.validarNombre(this.perfil.nombrePerfil)) {
+    if (this.perfil.nombrePerfil && !this.validarNombre(this.perfil.nombrePerfil)) {
       this.mensajeService.mostrarError('El nombre público debe tener al menos 3 caracteres.');
       return;
     }
-    // El email se sincroniza automáticamente desde el usuario — no se valida aquí en el frontend ya que es readonly
-    if (!this.validarTelefono(this.perfil.telefono || '')) {
-      this.mensajeService.mostrarError('El número de teléfono no es válido.');
-      return;
-    }
-    if (!this.validarCumpleaniosYAniosEdad(this.perfil.fechaNacimiento || '', this.perfil.edad || '')) {
-      this.mensajeService.mostrarError('La fecha de nacimiento o la edad no son válidas.');
+
+    if (this.perfil.telefono && !this.validarTelefono(this.perfil.telefono)) {
+      this.mensajeService.mostrarError('El número de teléfono debe tener 9 dígitos.');
       return;
     }
 

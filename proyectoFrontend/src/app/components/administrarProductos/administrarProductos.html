@@ -27,11 +27,12 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th style="width: 15%">Nombre</th>
-                        <th style="width: 25%">Descripción</th>
-                        <th style="width: 12%">Precio</th>
-                        <th style="width: 15%">Supermercado</th>
-                        <th style="width: 15%">Categoría</th>
+                        <th style="width: 12%">Nombre</th>
+                        <th style="width: 20%">Descripción</th>
+                        <th style="width: 10%">Precio</th>
+                        <th style="width: 12%">Supermercado</th>
+                        <th style="width: 12%">Categoría</th>
+                        <th style="width: 16%">Subido por</th>
                         <th style="width: 8%">Estado</th>
                         <th style="width: 10%" class="text-center">Acciones</th>
                     </tr>
@@ -47,14 +48,14 @@
                         </td>
 
                         <td>
-                            <small class="text-muted d-block text-truncate" style="max-width: 300px;"
+                            <small class="text-muted d-block text-truncate" style="max-width: 200px;"
                                 [title]="p.descripcion">
                                 {{ p.descripcion }}
                             </small>
                         </td>
 
                         <td>
-                            <div class="input-group input-group-sm" style="max-width: 100px;">
+                            <div class="input-group input-group-sm" style="max-width: 90px;">
                                 <input type="number" class="form-control border-0 bg-light" [(ngModel)]="p.precio"
                                     (change)="actualizarProducto(p)">
                                 <span class="input-group-text border-0 bg-light">€</span>
@@ -78,6 +79,14 @@
                                 <option value="">Sin categoría</option>
                                 <option *ngFor="let cat of categoriasGenericas" [value]="cat">{{cat}}</option>
                             </select>
+                        </td>
+
+                        <!-- Usuario que subió el producto -->
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-person-circle text-muted"></i>
+                                <span class="small fw-medium text-dark">{{ p.nombreRegistrador || 'Sistema' }}</span>
+                            </div>
                         </td>
 
                         <td>

@@ -12,9 +12,9 @@ import { MensajeService } from '../../services/mensaje';
 
 /**
  * Componente principal que gestiona:
- * - Listas del usuario
- * - Productos oficiales y propios
- * - Acciones como crear, borrar, compartir, etc.
+  - Listas del usuario
+  - Productos oficiales y propios
+  - Acciones como crear, borrar, compartir, etc.
  */
 @Component({
     selector: 'app-lista',
@@ -53,7 +53,6 @@ export class ListaComponent implements OnInit {
     // Variables de UI y estado
     feedbackMsg = '';
     feedbackTipo: 'success' | 'danger' = 'success';
-    private feedbackTimer: any = null;
 
     panelCrearAbierto = false;
     panelUnirseAbierto = false;
@@ -400,25 +399,35 @@ export class ListaComponent implements OnInit {
     }
 
     onPublicar(listaId: number): void {
-        this.listaService.publicarLista(listaId).subscribe({
-            next: () => {
-                const lista = this.listas.find(l => l.codLista === listaId);
-                if (lista) lista.publicada = true;
-                this.cdr.detectChanges();
-            },
-            error: (err) => console.error('Error al publicar lista', err)
-        });
+        this.mensajeService.confirmar(
+            '¿Estás seguro de que quieres publicar esta lista?',
+            () => {
+                this.listaService.publicarLista(listaId).subscribe({
+                    next: () => {
+                        const lista = this.listas.find(l => l.codLista === listaId);
+                        if (lista) lista.publicada = true;
+                        this.cdr.detectChanges();
+                    },
+                    error: (err) => console.error('Error al publicar lista', err)
+                });
+            }
+        );
     }
 
     onDespublicar(listaId: number): void {
-        this.listaService.eliminarDeListasPublicas(listaId).subscribe({
-            next: () => {
-                const lista = this.listas.find(l => l.codLista === listaId);
-                if (lista) lista.publicada = false;
-                this.cdr.detectChanges();
-            },
-            error: (err) => console.error('Error al despublicar lista', err)
-        });
+        this.mensajeService.confirmar(
+            '¿Estás seguro de que quieres despublicar esta lista?',
+            () => {
+                this.listaService.eliminarDeListasPublicas(listaId).subscribe({
+                    next: () => {
+                        const lista = this.listas.find(l => l.codLista === listaId);
+                        if (lista) lista.publicada = false;
+                        this.cdr.detectChanges();
+                    },
+                    error: (err) => console.error('Error al despublicar lista', err)
+                });
+            }
+        );
     }
 
     // ==========================================
@@ -720,6 +729,8 @@ export class ListaComponent implements OnInit {
         });
     }
 
+
+
     eliminarProductoPropio(productoId: number, event: MouseEvent): void {
         event.stopPropagation();
 
@@ -735,6 +746,23 @@ export class ListaComponent implements OnInit {
                     this.cdr.detectChanges();
                 }
             });
+        });
+    }
+    copiarCodigo(codigo: string, event: MouseEvent): void {
+        event.stopPropagation();
+        navigator.clipboard.writeText(codigo).then(() => {
+            const lista = this.listas.find(l => l.codigo === codigo);
+            if (lista) {
+                (lista as any)._copiado = true;
+                this.cdr.detectChanges();
+                setTimeout(() => {
+                    (lista as any)._copiado = false;
+                    this.cdr.detectChanges();
+                }, 2000);
+            }
+            this.mostrarFeedback('¡Código copiado al portapapeles!', 'success');
+        }).catch(() => {
+            this.mostrarFeedback('No se pudo copiar el código.', 'danger');
         });
     }
 }

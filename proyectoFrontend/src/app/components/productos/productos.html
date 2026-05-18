@@ -143,7 +143,7 @@
           </div>
 
           <img [src]="p.imagenUrl || getImagenProducto(p.nombre)" class="card-img-top object-fit-cover" [alt]="p.nombre"
-            style="height: 180px;">
+            style="height: 180px;" (error)="onImageError($event)">
 
           <!-- Badge de Precio flotante -->
           <div class="position-absolute top-0 end-0 m-3">

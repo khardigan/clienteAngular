@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // IMPORTANTE: Añade HttpHeaders aquí
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, tap } from 'rxjs';
@@ -9,7 +9,13 @@ import { BehaviorSubject, tap } from 'rxjs';
 export class AuthService {
   private apiUrl = 'https://localhost:8443/usuarios/login';
   private registerUrl = 'https://localhost:8443/usuarios/registrar';
-  // Observable para que otros componentes sepan cuando cambia el estado de la sesión
+  /**
+   * REACTIVIDAD GLOBAL:
+   * BehaviorSubject es un tipo especial de Observable que siempre guarda su último estado.
+   * Lo usamos como un "interruptor global". Cuando el usuario hace login o logout,
+   * cambiamos este valor (true/false). Todos los componentes (como el navbar) que estén
+   * "escuchando" (suscritos) se actualizarán en tiempo real sin recargar la página.
+   */
   public loginStatus$ = new BehaviorSubject<boolean>(this.isLoggedIn());
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -34,7 +40,7 @@ export class AuthService {
       })
     );
   }
-  
+
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
@@ -68,11 +74,7 @@ export class AuthService {
   }
   geUserById(id: number) {
     const url = `https://localhost:8443/usuarios/${id}`;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.getToken()}`
-    });
-    return this.http.get<any>(url, { headers });
+    return this.http.get<any>(url);
   }
 
   logout() {
@@ -111,16 +113,7 @@ export class AuthService {
     return this.getRole() === 'ADMIN';
   }
 
-  enviarComentario(comentario: string) {
-    const id = this.getId();
-    if (!id) return null;
-    const url = `https://localhost:8443/usuarios/${id}/comentarios`;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.getToken()}`
-    });
-    return this.http.post<any>(url, { comentario }, { headers });
-  }
+
 
   solicitarRecuperacion(nombre: string, email: string) {
     const url = `https://localhost:8443/usuarios/recuperar`;

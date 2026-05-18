@@ -11,7 +11,7 @@
 
 <!-- Titulo y icono de perfil de boostrap-->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<h1 class="text-center size-2 my-4">Perfil <i class="bi bi-person-circle"></i></h1>
+<h1 class="text-center size-2 my-4" *ngIf="perfil">Perfil de {{ nombreCuenta }} <i class="bi bi-person-circle"></i></h1>
 
 <section class="section about-section gray-bg main-content-wrapper" id="about">
   <div class="container" *ngIf="perfil">
@@ -36,14 +36,6 @@
                 <label>Cumpleaños</label>
                 <input type="date" class="form-control form-control-sm border-0 bg-transparent"
                   [(ngModel)]="perfil.fechaNacimiento">
-              </div>
-              <div class="media">
-                <label>Edad</label>
-                <div class="d-flex align-items-center">
-                  <input type="number" class="form-control form-control-sm border-0 bg-transparent w-25"
-                    [(ngModel)]="perfil.edad" placeholder="0">
-                  <span class="small text-muted ms-1">Años</span>
-                </div>
               </div>
               <div class="media">
                 <label>Residencia</label>
@@ -77,14 +69,14 @@
       <div class="col-lg-6">
         <div class="about-avatar text-center">
           <div class="position-relative d-inline-block">
-            <img [src]="perfil.imagenUrl || 'https://bootdey.com/img/Content/avatar/avatar7.png'" 
-                 class="rounded-circle shadow-lg mb-3" alt="Avatar"
-                 style="width: 250px; height: 250px; object-fit: cover; border: 5px solid white;">
-            
+            <img [src]="perfil.imagenUrl || 'https://bootdey.com/img/Content/avatar/avatar7.png'"
+              class="rounded-circle shadow-lg mb-3" alt="Avatar"
+              style="width: 250px; height: 250px; object-fit: cover; border: 5px solid white;">
+
             <div class="mt-2">
               <label class="small text-muted mb-1 d-block">URL de tu foto de perfil</label>
-              <input type="text" class="form-control form-control-sm rounded-pill shadow-sm" 
-                     [(ngModel)]="perfil.imagenUrl" placeholder="Pega aquí el enlace a tu imagen...">
+              <input type="text" class="form-control form-control-sm rounded-pill shadow-sm"
+                [(ngModel)]="perfil.imagenUrl" placeholder="Pega aquí el enlace a tu imagen...">
             </div>
           </div>
         </div>

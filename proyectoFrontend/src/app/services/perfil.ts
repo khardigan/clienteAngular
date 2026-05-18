@@ -1,20 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, throwError, Subject } from 'rxjs';
 
-export interface Perfil {
-  idPerfil: number;
-  usuarioId: number;
-  nombrePerfil: string;
-  descripcion: string;
-  subtitulo?: string;
-  fechaNacimiento?: string;
-  edad?: string;
-  residencia?: string;
-  email?: string;
-  telefono?: string;
-  imagenUrl?: string;
-}
+import { Perfil } from '../models/perfil';
 
 @Injectable({
   providedIn: 'root'
@@ -35,8 +23,6 @@ export class PerfilService {
   obtenerPerfilDesdeToken(): Observable<Perfil> {
     const token = localStorage.getItem('token') || '';
 
-
-    // ... further down inside obtenerPerfilDesdeToken:
     if (!token || token.split('.').length !== 3) {
       console.warn("PerfilService - No hay token válido en localStorage");
       return throwError(() => new Error('No valid token found'));
@@ -51,22 +37,12 @@ export class PerfilService {
       return throwError(() => new Error('Invalid token format'));
     }
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-
     // Cambiado: Ahora apuntamos al endpoint de usuario que obtiene su propio perfil
-    return this.http.get<Perfil>(`https://localhost:8443/usuarios/${usuarioId}/perfil`, { headers });
+    return this.http.get<Perfil>(`https://localhost:8443/usuarios/${usuarioId}/perfil`);
   }
 
   // Manda los datos del perfil actualizados al servidor.
   actualizarPerfil(id: number, datos: Partial<Perfil>): Observable<Perfil> {
-    const token = localStorage.getItem('token') || '';
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-    return this.http.put<Perfil>(`${this.API}/${id}`, datos, { headers });
+    return this.http.put<Perfil>(`${this.API}/${id}`, datos);
   }
 }

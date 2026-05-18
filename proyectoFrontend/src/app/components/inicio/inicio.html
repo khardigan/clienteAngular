@@ -41,15 +41,7 @@
                             </div>
                         </swiper-slide>
 
-                        <swiper-slide *ngFor="let lista of listas">
-                            <div class="py-4">
-                                <span class="carrusel-title-wrapper">
-                                    <h2 class="carrusel-title carrusel-title-2x fw-bold">Tu Lista: {{lista.nombre}}</h2>
-                                    <p class="mt-2 lead text-white opacity-75">Accede a tus selecciones rápidamente para
-                                        continuar con tus compras.</p>
-                                </span>
-                            </div>
-                        </swiper-slide>
+
 
                     </swiper-container>
 
@@ -252,8 +244,10 @@
                         <!-- Footer: Usuario y Fecha -->
                         <div class="pt-3 border-top w-50 d-flex flex-column align-items-center">
                             <img [src]="comentario.imagenAutorUrl || 'https://ui-avatars.com/api/?name=' + (comentario.nickAutor || comentario.nombreUsuario || 'U') + '&background=random'"
-                                class="rounded-circle shadow-sm mb-2" width="50" height="50" alt="Avatar" style="object-fit: cover; border: 2px solid white;">
-                            <h5 class="fw-bold h6 mb-1 text-dark">{{ comentario.nickAutor || comentario.nombreUsuario || 'Usuario' }}</h5>
+                                class="rounded-circle shadow-sm mb-2" width="50" height="50" alt="Avatar"
+                                style="object-fit: cover; border: 2px solid white;">
+                            <h5 class="fw-bold h6 mb-1 text-dark">{{ comentario.nickAutor || comentario.nombreUsuario ||
+                                'Usuario' }}</h5>
                             <p class="text-muted extra-small mb-0">{{ comentario.fecha | date:'dd MMMM, yyyy' }}</p>
                         </div>
 

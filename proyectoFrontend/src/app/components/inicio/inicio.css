@@ -7,15 +7,14 @@ swiper-container {
   width: 100%;
   height: 100%;
   display: block;
-  overflow: visible !important;
-  /* Permitir que las flechas se vean si salen un poco */
+  position: relative;
 
   /* Variables de Swiper para colores de flechas/puntos */
   --swiper-navigation-color: #fff;
   --swiper-pagination-color: #fff;
   --swiper-navigation-size: 25px;
-  --swiper-navigation-sides-offset: -15px;
-  /* Las sacamos un poco hacia afuera */
+  --swiper-navigation-sides-offset: 10px;
+  /* Flechas dentro del contenedor para que no se corten */
 }
 
 swiper-slide {

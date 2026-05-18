@@ -14,6 +14,7 @@ export interface Producto {
   comprado?: boolean;
   mediaPuntuacion?: number;
   totalComentarios?: number;
+  nombreRegistrador?: string;
   comentarios?: Comentario[]
   puntuaciones?: number[];
 }
@@ -27,5 +28,5 @@ export interface ProductoPropio {
   supermercado?: string;
   cantidad?: number;
   comprado?: boolean;
-  usuarioId?: number; // ID del dueño del producto
+  usuarioId?: number;
 }
